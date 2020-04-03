@@ -3,16 +3,22 @@ package dev.maxc.models;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.transform.Rotate;
 
 /**
  * @author Max Carter
  * @since 01/04/2020
  */
-public class SemiRing extends Path {
-    public SemiRing(double centerX, double centerY, double radius, double innerRadius, Color bgColor, Color strkColor) {
+public class SemiRing extends Path implements Rotatable {
+    private Rotate rotation;
+
+    /**
+     * Creates a semi ring object
+     */
+    public SemiRing(double centerX, double centerY, double radius, double innerRadius, Color fill, Color strokeColor) {
         super();
-        setFill(bgColor);
-        setStroke(strkColor);
+        setFill(fill);
+        setStroke(strokeColor);
         setFillRule(FillRule.EVEN_ODD);
 
         MoveTo moveTo = new MoveTo();
@@ -52,4 +58,13 @@ public class SemiRing extends Path {
         getElements().add(hLineToLeftLeg);
     }
 
+    @Override
+    public Rotate getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public void setRotation(Rotate rotation) {
+        this.rotation = rotation;
+    }
 }

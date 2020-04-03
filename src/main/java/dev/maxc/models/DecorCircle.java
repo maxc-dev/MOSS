@@ -21,52 +21,34 @@ public class DecorCircle extends Circle {
     public static final int RADIUS_MAX = 2;
 
     private double counter, xOffset, yOffset;
-    private DecorCircle before, after;
 
-    public DecorCircle(double counter, DecorCircle before, DecorCircle after) {
+    /**
+     * Creates a glowing dot on the background
+     */
+    public DecorCircle(double counter) {
         super(Utils.randomInt(RADIUS_MIN, RADIUS_MAX));
+        this.counter = counter;
 
         xOffset = OFFSET_X_BASE + (double) Utils.randomInt(0, OFFSET_X)/10;
         yOffset = OFFSET_Y_BASE + (double) Utils.randomInt(0, OFFSET_Y)/10;
 
-        this.counter = counter;
-        this.before = before;
-        this.after = after;
-
-        init();
-    }
-
-    public void init() {
         setFill(ColorUtils.PRIMARY_ACCENT);
         DropShadow shadow = new DropShadow();
-        shadow.setOffsetX(5.0);
-        shadow.setOffsetX(5.0);
+        shadow.setOffsetX(2);
+        shadow.setOffsetY(2);
         shadow.setColor((Color) getFill());
         setEffect(shadow);
     }
 
-    public void transform() {
+    /**
+     * translates the position of the node
+     */
+    public void translate() {
         counter+=0.01;
-        if (counter == 361) {
+        if (counter >= 360) {
             counter = 0;
         }
-        setLayoutX(xOffset*Math.sin(Math.toRadians(counter))*(Utils.WIDTH/3) + Utils.WIDTH/2);
-        setLayoutY(yOffset*Math.cos(Math.toRadians(counter))*(Utils.HEIGHT) + Utils.HEIGHT/2);
-    }
-
-    public DecorCircle getPrevious() {
-        return before;
-    }
-
-    public void setPrevious(DecorCircle before) {
-        this.before = before;
-    }
-
-    public DecorCircle getNext() {
-        return after;
-    }
-
-    public void setNext(DecorCircle after) {
-        this.after = after;
+        setLayoutX(xOffset*Math.sin(Math.toRadians(counter))*((double) Utils.WIDTH/3) + (double) Utils.WIDTH/2);
+        setLayoutY(yOffset*Math.cos(Math.toRadians(counter))*(Utils.HEIGHT) + (double) Utils.HEIGHT/2);
     }
 }

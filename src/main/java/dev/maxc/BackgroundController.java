@@ -23,12 +23,8 @@ public class BackgroundController implements Initializable {
         DecorController decorController = new DecorController(anchorPane);
         decorController.run();
 
-        HeadController headController = new HeadController(Utils.TITLE, anchorPane);
-        headController.run();
-
- /*       Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.01), evt -> updateLoadingPercent()));
-        timeline.setCycleCount(200);
-        timeline.play();*/
+        HeadController headController = new HeadController(anchorPane);
+        headController.init();
     }
 
 }

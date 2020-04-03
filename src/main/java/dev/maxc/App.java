@@ -22,7 +22,6 @@ public class App extends Application {
         scene = new Scene(loadFXML("primary"));
         stage.setScene(scene);
 
-        //closes process
         stage.setAlwaysOnTop(true);
         stage.setOnCloseRequest(t -> {
             Platform.exit();

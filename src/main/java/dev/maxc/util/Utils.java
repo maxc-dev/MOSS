@@ -9,6 +9,7 @@ import java.util.Random;
 public class Utils {
     public static final int UNKNOWN_VALUE = -1;
 
+    //TODO(auto generate res)
     public static final int HEIGHT = 864;
     public static final int WIDTH = 4608; //1536 <-- small systems
     public static final int RESOLUTION = WIDTH * HEIGHT;
@@ -25,6 +26,10 @@ public class Utils {
         return new Random().nextInt((max-min)+1)+min;
     }
 
+    /**
+     * Returns true on a chance
+     * @param chance chance out of 100
+     */
     public static boolean chance(int chance) {
         return randomInt(0, 100) < chance;
     }
