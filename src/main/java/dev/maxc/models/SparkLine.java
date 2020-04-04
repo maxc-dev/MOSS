@@ -17,10 +17,14 @@ import static dev.maxc.models.SparkUtils.*;
  */
 public class SparkLine extends Line {
     private static final int SHADOW_RADIUS = 12;
+    private static final int CHANCE_SPLIT = 8;
+
+    public int maxChainLength;
 
     private Pane pane;
     private int growthDirection;
-    private SparkLine previous, next = null;
+    private int biasDirection;
+    private SparkLine previous, next = null, next2 = null;
     private Timeline timeline;
 
     /**
@@ -31,6 +35,8 @@ public class SparkLine extends Line {
         this.pane = pane;
         this.previous = null;
         this.growthDirection = growthDirection;
+        this.biasDirection = growthDirection;
+        this.maxChainLength = Utils.randomInt(10, 20);
 
         setStartX(startX);
         setStartY(startY);
@@ -48,6 +54,8 @@ public class SparkLine extends Line {
         this.pane = pane;
         this.previous = previous;
         this.growthDirection = growthDirection;
+        this.biasDirection = previous.biasDirection;
+        this.maxChainLength = previous.maxChainLength;
 
         setStartX(previous.getEndX());
         setStartY(previous.getEndY());
@@ -62,7 +70,7 @@ public class SparkLine extends Line {
      */
     private void init() {
         setStroke(ColorUtils.CORE_FILL_SLIGHT);
-        setStrokeWidth(1);
+        setStrokeWidth(0.4);
         DropShadow shadow = new DropShadow(SHADOW_RADIUS, ColorUtils.CORE_FILL);
         shadow.setSpread(0.7);
         setEffect(shadow);
@@ -74,17 +82,49 @@ public class SparkLine extends Line {
     /**
      * The length of the spark line using pythagoras
      */
-    public double getLineLength() {
+    private double getLineLength() {
         double x = Math.abs(getStartX() - getEndX());
         double y = Math.abs(getStartY() - getEndY());
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    public int getChainLength() {
+        int leftNodes = 0;
+        int rightNodes = 0;
+
+        SparkLine leftSpark = this;
+        SparkLine rightSpark = next;
+
+        while (leftSpark != null) {
+            if (!pane.getChildren().contains(leftSpark)) {
+                leftSpark = null;
+            } else {
+                leftNodes++;
+                leftSpark = leftSpark.previous;
+            }
+        }
+
+        while (rightSpark != null) {
+            if (!pane.getChildren().contains(rightSpark)) {
+                rightSpark = null;
+            } else {
+                rightNodes++;
+                rightSpark = rightSpark.previous;
+            }
+        }
+
+        return leftNodes + rightNodes;
     }
 
     /**
      * Creates a new line node
      */
     private void grow() {
-        next = new SparkLine(this.pane, this, getNewDirection(growthDirection));
+        int newDirection = getNewDirection(growthDirection, biasDirection);
+        if (Utils.chance(CHANCE_SPLIT) && !isDiagonal(growthDirection)) {
+            next2 = new SparkLine(this.pane, this, getAdjacentDirection(newDirection));
+        }
+        next = new SparkLine(this.pane, this, newDirection);
     }
 
     /**
@@ -93,33 +133,36 @@ public class SparkLine extends Line {
     public void translate() {
         if (next != null) {
             next.translate();
+            if (next2 != null) {
+                next2.translate();
+            }
             return;
         }
 
         double length = getLineLength();
-        if ((length >= LINE_LENGTH_DIAGONAL - Utils.randomInt(0, 30) && SparkUtils.isDiagonal(growthDirection)) || length >= MAX_LINE_LENGTH || (length >= MIN_LINE_LENGTH && Utils.chance(95))) {
+        if ((length >= LINE_LENGTH_DIAGONAL - Utils.randomInt(0, 50) && SparkUtils.isDiagonal(growthDirection)) || length >= MAX_LINE_LENGTH || (length >= MIN_LINE_LENGTH && Utils.chance(86))) {
             grow();
             return;
         }
 
         //out of bounds
-        if (Math.abs(getEndX()) >= (double) Utils.WIDTH / 2 || Math.abs(getEndY()) >= (double) Utils.HEIGHT / 2) {
+        if (Math.abs(getEndX()) >= (double) Utils.WIDTH / 2 || Math.abs(getEndY()) >= (double) Utils.HEIGHT / 2 || getChainLength() >= maxChainLength) {
             if (previous != null) {
                 //tells all the other nodes to retreat
-                previous.retreat();
+                previous.traverse();
             }
-        } else {
-            setEndX(getEndX() + SparkUtils.sparkDirectionMap[growthDirection].getGrowthX());
-            setEndY(getEndY() + SparkUtils.sparkDirectionMap[growthDirection].getGrowthY());
         }
+        setEndX(getEndX() + SparkUtils.sparkDirectionMap[growthDirection].getX());
+        setEndY(getEndY() + SparkUtils.sparkDirectionMap[growthDirection].getY());
+        toBack();
     }
 
     /**
      * Calls the previous node to retreat, if it is the last one it will self delete
      */
-    private void retreat() {
+    private void traverse() {
         if (previous != null) {
-            previous.retreat();
+            previous.traverse();
         } else {
             delete();
         }
@@ -129,7 +172,10 @@ public class SparkLine extends Line {
      * Deletes the node
      */
     private void delete() {
-        timeline = new Timeline(new KeyFrame(Duration.seconds(0.01), evt -> shorten()));
+        if (previous != null) {
+            previous = null;
+        }
+        timeline = new Timeline(new KeyFrame(Duration.seconds(0.005), evt -> shorten()));
         timeline.setCycleCount((int) getLineLength());
         timeline.play();
     }
@@ -138,13 +184,16 @@ public class SparkLine extends Line {
      * Gradually shortens the node
      */
     private void shorten() {
-        setStartX(getStartX() + SparkUtils.sparkDirectionMap[growthDirection].getGrowthX());
-        setStartY(getStartY() + SparkUtils.sparkDirectionMap[growthDirection].getGrowthY());
-        if (getLineLength() <= 1) {
+        setStartX(getStartX() + SparkUtils.sparkDirectionMap[growthDirection].getX());
+        setStartY(getStartY() + SparkUtils.sparkDirectionMap[growthDirection].getY());
+        if (getLineLength() < 1) {
             timeline.stop();
             pane.getChildren().remove(this);
             if (next != null) {
                 next.delete();
+                if (next2 != null) {
+                    next2.delete();
+                }
             }
         }
     }

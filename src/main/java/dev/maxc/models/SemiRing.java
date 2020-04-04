@@ -1,5 +1,6 @@
 package dev.maxc.models;
 
+import dev.maxc.util.ColorUtils;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -15,47 +16,51 @@ public class SemiRing extends Path implements Rotatable {
     /**
      * Creates a semi ring object
      */
-    public SemiRing(double centerX, double centerY, double radius, double innerRadius, Color fill, Color strokeColor) {
+    public SemiRing(double centerX, double centerY, double outerRadius, double innerRadius, Color strokeColor) {
         super();
-        setFill(fill);
         setStroke(strokeColor);
-        setFillRule(FillRule.EVEN_ODD);
+        setStrokeWidth(3);
 
-        MoveTo moveTo = new MoveTo();
-        moveTo.setX(centerX + innerRadius);
-        moveTo.setY(centerY);
+        MoveTo moveOuterArc = new MoveTo();
+        moveOuterArc.setX(centerX + outerRadius);
+        moveOuterArc.setY(centerY);
 
-        ArcTo arcToInner = new ArcTo();
-        arcToInner.setX(centerX - innerRadius);
-        arcToInner.setY(centerY);
-        arcToInner.setRadiusX(innerRadius);
-        arcToInner.setRadiusY(innerRadius);
+        ArcTo arcOuter = new ArcTo();
+        arcOuter.setX(centerX - outerRadius);
+        arcOuter.setY(centerY);
+        arcOuter.setRadiusX(outerRadius);
+        arcOuter.setRadiusY(outerRadius);
 
-        MoveTo moveTo2 = new MoveTo();
-        moveTo2.setX(centerX + innerRadius);
-        moveTo2.setY(centerY);
+        HLineTo rightLeg = new HLineTo();
+        rightLeg.setX(centerX - innerRadius);
 
-        HLineTo hLineToRightLeg = new HLineTo();
-        hLineToRightLeg.setX(centerX + radius);
+        MoveTo moveLeftLeg = new MoveTo();
+        moveLeftLeg.setX(centerX + outerRadius);
+        moveLeftLeg.setY(centerY);
 
-        ArcTo arcTo = new ArcTo();
-        arcTo.setX(centerX - radius);
-        arcTo.setY(centerY);
-        arcTo.setRadiusX(radius);
-        arcTo.setRadiusY(radius);
+        HLineTo leftLeg = new HLineTo();
+        leftLeg.setX(centerX + innerRadius);
 
-        HLineTo hLineToLeftLeg = new HLineTo();
-        hLineToLeftLeg.setX(centerX - innerRadius);
+        ArcTo arcInner = new ArcTo();
+        arcInner.setX(centerX);
+        arcInner.setY(centerY - innerRadius);
+        arcInner.setRadiusX(innerRadius);
+        arcInner.setRadiusY(innerRadius);
 
-        DropShadow shadow = new DropShadow(10, (Color) getFill());
+        LineTo middleLeg = new LineTo();
+        middleLeg.setY(centerY - outerRadius);
+        middleLeg.setX(centerX);
+
+        DropShadow shadow = new DropShadow(12, ColorUtils.SURFACE_COLOUR);
         setEffect(shadow);
 
-        getElements().add(moveTo);
-        getElements().add(arcToInner);
-        getElements().add(moveTo2);
-        getElements().add(hLineToRightLeg);
-        getElements().add(arcTo);
-        getElements().add(hLineToLeftLeg);
+        getElements().add(moveOuterArc);
+        getElements().add(arcOuter);
+        getElements().add(rightLeg);
+        getElements().add(moveLeftLeg);
+        getElements().add(leftLeg);
+        getElements().add(arcInner);
+        getElements().add(middleLeg);
     }
 
     @Override

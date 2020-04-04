@@ -7,11 +7,17 @@ import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
@@ -20,19 +26,20 @@ import javafx.util.Duration;
  * @since 01/04/2020
  */
 public class HeadController {
-    private static final int SPARK_LINE_EXTENSION = 90;
-
     private AnchorPane anchorPane;
     private Pane pane, subPane;
-    private SubModule[] subModules;
+    private RotatablePane[] rotatableModules;
     private CoreRing coreRing;
-    private RingLines ringLines;
+    private RingLines ringLines, coreRingLines;
     private SparkLine[] sparkLines;
+
+    public String[] titles = new String[]{ "Terminal", "Settings", "Files", "Exit" };
 
     private volatile State state = State.CLOSED;
 
     /**
      * Creates a new head controller
+     *
      * @param anchorPane the pane to add the controller to
      */
     public HeadController(AnchorPane anchorPane) {
@@ -74,10 +81,10 @@ public class HeadController {
      * Opens the sub modules up
      */
     private void openSubModules() {
-        for (SubModule module : subModules) {
-            module.setOpacity(module.getOpacity() + 0.01);
-            module.setScaleX(module.getScaleX() + 0.01);
-            module.setScaleY(module.getScaleY() + 0.01);
+        for (RotatablePane rotatablePane : rotatableModules) {
+            rotatablePane.setOpacity(rotatablePane.getOpacity() + 0.01);
+            rotatablePane.setScaleX(rotatablePane.getScaleX() + 0.01);
+            rotatablePane.setScaleY(rotatablePane.getScaleY() + 0.01);
         }
     }
 
@@ -85,28 +92,27 @@ public class HeadController {
      * When an update event for the module occurs
      */
     private void onModuleUpdateEvent() {
-        for (SubModule module : subModules) {
-            module.spin();
+        for (RotatablePane modulesRotatable : rotatableModules) {
+            modulesRotatable.spin();
         }
         ringLines.spin();
         coreRing.glow();
+        coreRingLines.translate();
 
-        //TODO(add a bias to the spark lines)
-
-/*        for (int i = 0; i < sparkLines.length; i++) {
+        for (int i = 0; i < sparkLines.length; i++) {
             if (pane.getChildren().contains(sparkLines[i])) {
                 sparkLines[i].translate();
-            } else {
-                sparkLines[i] = new SparkLine(pane, SparkUtils.DIRECTION_NORTH_EAST, SPARK_LINE_EXTENSION, -SPARK_LINE_EXTENSION);
+            } else if (sparkLines[i].getChainLength() <= 1) {
+                sparkLines[i] = new SparkLine(pane, i, (int) SparkUtils.sparkStartingMap[i].getX(), (int) SparkUtils.sparkStartingMap[i].getY());
             }
-        }*/
+        }
     }
 
     /**
      * Initiates the UI
      */
     public void init() {
-        int headRadius = Utils.HEIGHT/4;
+        int headRadius = Utils.HEIGHT / 4;
 
         //creates base ring (hollow)
         Circle baseRing = new Circle();
@@ -115,39 +121,65 @@ public class HeadController {
         baseRing.setStroke(ColorUtils.SURFACE_COLOUR);
         baseRing.setRadius(headRadius);
 
-
         //glow effect to ring
-        DropShadow shadow = new DropShadow(30, (Color) baseRing.getFill());
+        DropShadow shadow = new DropShadow(10, ColorUtils.SURFACE_COLOUR);
         baseRing.setEffect(shadow);
 
         //inits the sub modules
-        subModules = new SubModule[4];
+        SubModule[] subModules = new SubModule[titles.length];
+        rotatableModules = new RotatablePane[subModules.length];
         for (int i = 0; i < subModules.length; i++) {
-            subModules[i] = new SubModule("Test" + i, i, headRadius);
+            rotatableModules[i] = new RotatablePane(i);
+            subModules[i] = new SubModule(rotatableModules[i], i, headRadius);
+            CurvedText text = new CurvedText(titles[i], rotatableModules[i], subModules[i].getInnerRadius() + 10, 275, ColorUtils.SURFACE_COLOUR);
 
             Rotate rotation = new Rotate();
-            rotation.pivotXProperty().bind(subModules[i].layoutXProperty());
-            rotation.pivotYProperty().bind(subModules[i].layoutYProperty());
+            rotation.pivotXProperty().bind(rotatableModules[i].layoutXProperty());
+            rotation.pivotYProperty().bind(rotatableModules[i].layoutYProperty());
             rotation.setAngle(i * ((double) 360 / subModules.length) + Utils.randomInt(0, 360));
-            subModules[i].getTransforms().add(rotation);
-            subModules[i].setRotation(rotation);
+            rotatableModules[i].getTransforms().add(rotation);
+            rotatableModules[i].setRotation(rotation);
 
-            subModules[i].setScaleX(0);
-            subModules[i].setScaleY(0);
-            subModules[i].setOpacity(0);
-            subPane.getChildren().add(subModules[i]);
+            rotatableModules[i].getChildren().add(subModules[i]);
+            RingLines lines = new RingLines(subModules[i].getInnerRadius(), subModules[i].getOuterRadius(), 0, 30, ColorUtils.SURFACE_COLOUR, 15, 14);
+            RingLines lines2 = new RingLines(subModules[i].getInnerRadius(), subModules[i].getOuterRadius(), 180, 60, ColorUtils.SURFACE_COLOUR, 15, 28);
+            rotatableModules[i].getChildren().add(lines);
+            rotatableModules[i].getChildren().add(lines2);
+
+            rotatableModules[i].setScaleX(0);
+            rotatableModules[i].setScaleY(0);
+            rotatableModules[i].setOpacity(0);
+            text.sendToFront();
+            subPane.getChildren().add(rotatableModules[i]);
         }
 
-/*        sparkLines = new SparkLine[6];
+        sparkLines = new SparkLine[6];
         for (int i = 0; i < sparkLines.length; i++) {
-            sparkLines[i] = new SparkLine(pane, i, 0, 0);
-        }*/
+            sparkLines[i] = new SparkLine(pane, i, (int) SparkUtils.sparkStartingMap[i].getX(), (int) SparkUtils.sparkStartingMap[i].getY());
+        }
 
         //creates the core ring
         coreRing = new CoreRing();
+        coreRingLines = new RingLines(coreRing.getRadius() - 45, coreRing.getRadius(), 0, 360, ColorUtils.CORE_FILL, 10, 16);
+
+        Text title = new Text("J.A.R.V.I.S");
+        title.setFill(ColorUtils.SURFACE_COLOUR);
+        title.setFont(new Font(null, 30));
+        DropShadow textShadow = new DropShadow(4, ColorUtils.SURFACE_COLOUR);
+        title.setEffect(textShadow);
+        title.setX(-62);
+        title.setY(-2);
+
+        Text author = new Text("Max Carter");
+        author.setFill(ColorUtils.SURFACE_COLOUR);
+        author.setFont(new Font(null, 20));
+        textShadow = new DropShadow(2, ColorUtils.SURFACE_COLOUR);
+        author.setEffect(textShadow);
+        author.setX(-48);
+        author.setY(18);
 
         //creates the ring lines
-        ringLines = new RingLines(headRadius - 60, headRadius, ColorUtils.SURFACE_COLOUR, 12);
+        ringLines = new RingLines(headRadius - 60, headRadius, ColorUtils.SURFACE_COLOUR, 12, 40);
         Rotate rotation = new Rotate();
         rotation.pivotXProperty().bind(ringLines.layoutXProperty());
         rotation.pivotYProperty().bind(ringLines.layoutYProperty());
@@ -160,6 +192,9 @@ public class HeadController {
         pane.getChildren().add(baseRing);
         pane.getChildren().add(ringLines);
         pane.getChildren().add(coreRing);
+        pane.getChildren().add(coreRingLines);
+        pane.getChildren().add(title);
+        pane.getChildren().add(author);
         anchorPane.getChildren().add(pane);
         open();
     }

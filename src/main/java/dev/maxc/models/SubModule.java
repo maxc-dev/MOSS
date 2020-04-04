@@ -7,36 +7,32 @@ import javafx.scene.Cursor;
  * @author Max Carter
  * @since 02/04/2020
  */
-public class SubModule extends SemiRing implements Spinnable {
-    private static final int LAYER_THICKNESS = 48;
-    private static final int LAYER_OVERLAP = 16;
+public class SubModule extends SemiRing {
+    private static final int LAYER_THICKNESS = 40;
+    private static final int LAYER_OVERLAP = 0;
 
-    private boolean clockwise;
-    private boolean hovered;
-
-    private String title;
+    private double innerRadius, outerRadius;
 
     /**
      * Creates a submodule which is a menu option on the UI core menu
      */
-    public SubModule(String title, int layer, int headRadius) {
-        super(0, 0, headRadius + (layer * LAYER_THICKNESS) + LAYER_OVERLAP + LAYER_THICKNESS, headRadius + (layer * LAYER_THICKNESS), ColorUtils.LOOSE_SURFACE_COLOUR, ColorUtils.SURFACE_COLOUR);
+    public SubModule(RotatablePane pane, int layer, int headRadius) {
+        super(0, 0, headRadius + (layer * LAYER_THICKNESS) + LAYER_OVERLAP + LAYER_THICKNESS, headRadius + (layer * LAYER_THICKNESS), ColorUtils.SURFACE_COLOUR);
         setCursor(Cursor.HAND);
-        this.title = title;
-        clockwise = layer % 2 != 0;
 
-        /*
-            TODO(write text on the label for `title`)
-         */
+        this.outerRadius = headRadius + (layer * LAYER_THICKNESS) + LAYER_OVERLAP + LAYER_THICKNESS;
+        this.innerRadius = headRadius + (layer * LAYER_THICKNESS);
 
-        setOnMouseEntered(t -> hovered = true);
-        setOnMouseExited(t -> hovered = false);
+        setOnMouseEntered(t -> pane.hovered = true);
+        setOnMouseExited(t -> pane.hovered = false);
     }
 
-    @Override
-    public void spin() {
-        if (!hovered) {
-            getRotation().setAngle(getRotation().getAngle() + (clockwise ? 0.1 : -0.1));
-        }
+    public double getOuterRadius() {
+        return outerRadius;
     }
+
+    public double getInnerRadius() {
+        return innerRadius;
+    }
+
 }
