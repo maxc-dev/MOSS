@@ -3,9 +3,9 @@ package dev.maxc;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import dev.maxc.ui.DecorController;
-import dev.maxc.ui.HeadController;
-import dev.maxc.util.Utils;
+import dev.maxc.ui.controllers.DecorController;
+import dev.maxc.ui.controllers.HeadController;
+import dev.maxc.ui.util.UiUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
@@ -16,8 +16,8 @@ public class BackgroundController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        anchorPane.setMaxWidth(Utils.WIDTH);
-        anchorPane.setMaxHeight(Utils.HEIGHT);
+        anchorPane.setMaxWidth(UiUtils.WIDTH);
+        anchorPane.setMaxHeight(UiUtils.HEIGHT);
         anchorPane.toBack();
 
         DecorController decorController = new DecorController(anchorPane);

@@ -1,5 +1,7 @@
-package dev.maxc.models;
+package dev.maxc.ui.models.panes;
 
+import dev.maxc.ui.models.interfaces.Rotatable;
+import dev.maxc.ui.models.interfaces.Spinnable;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Rotate;
 
@@ -11,7 +13,7 @@ public class RotatablePane extends Pane implements Rotatable, Spinnable {
     private Rotate rotation;
 
     protected boolean hovered;
-    private double increment;
+    private final double increment;
 
     public RotatablePane(int layer) {
         double incrementAbs = 0.1 + (layer * 0.02);

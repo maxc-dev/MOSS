@@ -1,7 +1,6 @@
-package dev.maxc.models;
+package dev.maxc.ui.models.spark;
 
-import dev.maxc.util.Utils;
-
+import dev.maxc.sim.bootup.system.SystemUtils;
 /**
  * @author Max Carter
  * @since 03/04/2020
@@ -39,7 +38,7 @@ public class SparkUtils {
 
     private static int getBiasDirection(int currentDirection, int biasDirection) {
         if (biasDirection == currentDirection) {
-            return currentDirection + (Utils.chance(50) ? 1 : -1);
+            return currentDirection + (SystemUtils.chance(50) ? 1 : -1);
         } else {
             return biasDirection;
         }
@@ -93,7 +92,8 @@ public class SparkUtils {
     };
 
     public static final class SparkPoint {
-        private double x, y;
+        private final double x;
+        private final double y;
 
         public SparkPoint(double xGrowth, double yGrowth) {
             this.x = xGrowth;

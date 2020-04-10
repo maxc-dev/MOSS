@@ -1,7 +1,7 @@
-package dev.maxc.ui;
+package dev.maxc.ui.controllers;
 
-import dev.maxc.models.DecorCircle;
-import dev.maxc.util.Utils;
+import dev.maxc.ui.models.DecorCircle;
+import dev.maxc.ui.util.UiUtils;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -10,7 +10,7 @@ import javafx.util.Duration;
 
 public class DecorController {
     public static final double UPDATE_DECOR = 0.01;
-    public static final int CIRCLE_COUNT = Utils.RESOLUTION/35000;
+    public static final int CIRCLE_COUNT = UiUtils.RESOLUTION/35000;
 
     private static DecorCircle[] decorCircles;
 

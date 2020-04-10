@@ -1,4 +1,4 @@
-package dev.maxc.util;
+package dev.maxc.ui.util;
 
 import javafx.scene.paint.Color;
 

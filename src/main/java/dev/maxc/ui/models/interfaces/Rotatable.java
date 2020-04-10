@@ -1,4 +1,4 @@
-package dev.maxc.models;
+package dev.maxc.ui.models.interfaces;
 
 import javafx.scene.transform.Rotate;
 

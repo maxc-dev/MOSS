@@ -1,6 +1,7 @@
-package dev.maxc.models;
+package dev.maxc.ui.models;
 
-import dev.maxc.util.ColorUtils;
+import dev.maxc.ui.models.interfaces.Rotatable;
+import dev.maxc.ui.util.ColorUtils;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;

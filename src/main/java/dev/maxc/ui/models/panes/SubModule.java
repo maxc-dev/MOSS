@@ -1,6 +1,7 @@
-package dev.maxc.models;
+package dev.maxc.ui.models.panes;
 
-import dev.maxc.util.ColorUtils;
+import dev.maxc.ui.models.SemiRing;
+import dev.maxc.ui.util.ColorUtils;
 import javafx.scene.Cursor;
 
 /**
@@ -11,7 +12,8 @@ public class SubModule extends SemiRing {
     private static final int LAYER_THICKNESS = 40;
     private static final int LAYER_OVERLAP = 0;
 
-    private double innerRadius, outerRadius;
+    private final double innerRadius;
+    private final double outerRadius;
 
     /**
      * Creates a submodule which is a menu option on the UI core menu

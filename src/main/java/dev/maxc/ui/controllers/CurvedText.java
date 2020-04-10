@@ -1,6 +1,5 @@
-package dev.maxc.models;
+package dev.maxc.ui.controllers;
 
-import dev.maxc.util.Utils;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;

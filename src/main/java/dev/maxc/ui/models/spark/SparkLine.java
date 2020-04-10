@@ -1,7 +1,8 @@
-package dev.maxc.models;
+package dev.maxc.ui.models.spark;
 
-import dev.maxc.util.ColorUtils;
-import dev.maxc.util.Utils;
+import dev.maxc.sim.bootup.system.SystemUtils;
+import dev.maxc.ui.util.ColorUtils;
+import dev.maxc.ui.util.UiUtils;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.effect.DropShadow;
@@ -9,7 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
 
-import static dev.maxc.models.SparkUtils.*;
+import static dev.maxc.ui.models.spark.SparkUtils.*;
 
 /**
  * @author Max Carter
@@ -21,9 +22,9 @@ public class SparkLine extends Line {
 
     public int maxChainLength;
 
-    private Pane pane;
-    private int growthDirection;
-    private int biasDirection;
+    private final Pane pane;
+    private final int growthDirection;
+    private final int biasDirection;
     private SparkLine previous, next = null, next2 = null;
     private Timeline timeline;
 
@@ -36,7 +37,7 @@ public class SparkLine extends Line {
         this.previous = null;
         this.growthDirection = growthDirection;
         this.biasDirection = growthDirection;
-        this.maxChainLength = Utils.randomInt(10, 20);
+        this.maxChainLength = SystemUtils.randomInt(10, 20);
 
         setStartX(startX);
         setStartY(startY);
@@ -121,7 +122,7 @@ public class SparkLine extends Line {
      */
     private void grow() {
         int newDirection = getNewDirection(growthDirection, biasDirection);
-        if (Utils.chance(CHANCE_SPLIT) && !isDiagonal(growthDirection)) {
+        if (SystemUtils.chance(CHANCE_SPLIT) && !isDiagonal(growthDirection)) {
             next2 = new SparkLine(this.pane, this, getAdjacentDirection(newDirection));
         }
         next = new SparkLine(this.pane, this, newDirection);
@@ -140,13 +141,13 @@ public class SparkLine extends Line {
         }
 
         double length = getLineLength();
-        if ((length >= LINE_LENGTH_DIAGONAL - Utils.randomInt(0, 50) && SparkUtils.isDiagonal(growthDirection)) || length >= MAX_LINE_LENGTH || (length >= MIN_LINE_LENGTH && Utils.chance(86))) {
+        if ((length >= LINE_LENGTH_DIAGONAL - SystemUtils.randomInt(0, 50) && SparkUtils.isDiagonal(growthDirection)) || length >= MAX_LINE_LENGTH || (length >= MIN_LINE_LENGTH && SystemUtils.chance(86))) {
             grow();
             return;
         }
 
         //out of bounds
-        if (Math.abs(getEndX()) >= (double) Utils.WIDTH / 2 || Math.abs(getEndY()) >= (double) Utils.HEIGHT / 2 || getChainLength() >= maxChainLength) {
+        if (Math.abs(getEndX()) >= (double) UiUtils.WIDTH / 2 || Math.abs(getEndY()) >= (double) UiUtils.HEIGHT / 2 || getChainLength() >= maxChainLength) {
             if (previous != null) {
                 //tells all the other nodes to retreat
                 previous.traverse();

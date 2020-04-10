@@ -1,19 +1,21 @@
-package dev.maxc.ui;
+package dev.maxc.ui.controllers;
 
-import dev.maxc.models.*;
-import dev.maxc.util.ColorUtils;
-import dev.maxc.util.Utils;
+import dev.maxc.sim.bootup.system.SystemUtils;
+import dev.maxc.ui.models.CoreRing;
+import dev.maxc.ui.models.RingLines;
+import dev.maxc.ui.models.panes.RotatablePane;
+import dev.maxc.ui.models.spark.SparkLine;
+import dev.maxc.ui.models.spark.SparkUtils;
+import dev.maxc.ui.models.panes.SubModule;
+import dev.maxc.ui.util.ColorUtils;
+import dev.maxc.ui.util.UiUtils;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
@@ -26,8 +28,9 @@ import javafx.util.Duration;
  * @since 01/04/2020
  */
 public class HeadController {
-    private AnchorPane anchorPane;
-    private Pane pane, subPane;
+    private final AnchorPane anchorPane;
+    private final Pane pane;
+    private final Pane subPane;
     private RotatablePane[] rotatableModules;
     private CoreRing coreRing;
     private RingLines ringLines, coreRingLines;
@@ -112,7 +115,7 @@ public class HeadController {
      * Initiates the UI
      */
     public void init() {
-        int headRadius = Utils.HEIGHT / 4;
+        int headRadius = UiUtils.HEIGHT / 4;
 
         //creates base ring (hollow)
         Circle baseRing = new Circle();
@@ -136,7 +139,7 @@ public class HeadController {
             Rotate rotation = new Rotate();
             rotation.pivotXProperty().bind(rotatableModules[i].layoutXProperty());
             rotation.pivotYProperty().bind(rotatableModules[i].layoutYProperty());
-            rotation.setAngle(i * ((double) 360 / subModules.length) + Utils.randomInt(0, 360));
+            rotation.setAngle(i * ((double) 360 / subModules.length) + SystemUtils.randomInt(0, 360));
             rotatableModules[i].getTransforms().add(rotation);
             rotatableModules[i].setRotation(rotation);
 
@@ -187,8 +190,8 @@ public class HeadController {
         ringLines.setRotation(rotation);
 
         //structures pane
-        pane.setLayoutX((double) Utils.WIDTH / 2);
-        pane.setLayoutY((double) Utils.HEIGHT / 2);
+        pane.setLayoutX((double) UiUtils.WIDTH / 2);
+        pane.setLayoutY((double) UiUtils.HEIGHT / 2);
         pane.getChildren().add(baseRing);
         pane.getChildren().add(ringLines);
         pane.getChildren().add(coreRing);
@@ -203,7 +206,7 @@ public class HeadController {
         CLOSED,
         OPENING,
         OPEN,
-        CLOSING;
+        CLOSING
     }
 
 }

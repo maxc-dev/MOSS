@@ -1,6 +1,6 @@
-package dev.maxc.models;
+package dev.maxc.ui.models;
 
-import dev.maxc.util.ColorUtils;
+import dev.maxc.ui.util.ColorUtils;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.shape.Circle;
 
@@ -15,7 +15,7 @@ public class CoreRing extends Circle {
     private static final int RADIUS_EXPANSION = 4;
 
     private double counter = 0;
-    private DropShadow shadow = new DropShadow();
+    private final DropShadow shadow = new DropShadow();
 
     /**
      * Creates the glowing core of the UI
