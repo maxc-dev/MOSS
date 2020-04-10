@@ -1,1 +1,17 @@
-#
+#system config
+
+clock_tick_frequency=10
+
+#cpu config
+
+cpu_cores=4
+cpu_cores_async=false
+
+#ram config
+
+main_memory_size=256
+virtual_memory_enabled=false
+
+#process config
+
+process_first_scheduling=true

@@ -14,18 +14,31 @@ public class ConfigurationReader {
     /**
      * Creates a system reader
      */
-    protected ConfigurationReader(SystemAPI system) {
+    public ConfigurationReader(SystemAPI system) {
         this.system = system;
     }
 
     /**
      * Reads the config file and updates the attributes in the config object
      */
-    protected void configure() {
+    public void configure() {
 
     }
 
-    protected SystemAPI getSystemAPI() {
+    public SystemAPI getSystemAPI() {
         return system;
+    }
+
+    protected static final class ConfigurationFileReader {
+        private static final char COMMENT_CHARACTER = '#';
+
+        protected String[] getConfigFileStream() {
+            /*
+                loop through file line by line
+                if line does not start with '#':
+                    send to observable
+             */
+            return new String[]{};
+        }
     }
 }

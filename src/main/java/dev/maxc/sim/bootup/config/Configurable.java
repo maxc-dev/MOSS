@@ -16,5 +16,5 @@ public @interface Configurable {
     String NO_DOCUMENTATION = "No documentation available.";
 
     String value() default FIELD_MATCHES_CONFIG_VAR;
-    String documentation() default NO_DOCUMENTATION;
+    String docs() default NO_DOCUMENTATION;
 }
