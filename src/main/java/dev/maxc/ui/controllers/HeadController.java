@@ -1,6 +1,9 @@
 package dev.maxc.ui.controllers;
 
-import dev.maxc.sim.bootup.system.SystemAPI;
+import dev.maxc.sim.bootup.LoadProgressUpdater;
+import dev.maxc.sim.bootup.SimulationBootup;
+import dev.maxc.sim.system.SystemAPI;
+import dev.maxc.ui.anchors.BackgroundController;
 import dev.maxc.ui.models.CoreRing;
 import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.models.RingLines;
@@ -23,34 +26,61 @@ import javafx.util.Duration;
  * @author Max Carter
  * @since 01/04/2020
  */
-public class HeadController {
+public class HeadController implements LoadProgressUpdater {
     private final AnchorPane anchorPane;
     private final Pane pane;
     private final Pane subPane;
     private CoreRing coreRing;
     private RingLines ringLines, coreRingLines;
 
+    private final SplashController splashController;
     private ModuleController moduleController;
     private SparkLineController sparkLineController;
 
-    private volatile State state = State.CLOSED;
+    private volatile State state = State.UNLOADED;
 
     /**
      * Creates a new head controller
      *
      * @param anchorPane the pane to add the controller to
      */
-    public HeadController(AnchorPane anchorPane) {
+    public HeadController(BackgroundController backgroundController, AnchorPane anchorPane) {
         this.anchorPane = anchorPane;
+        splashController = new SplashController(backgroundController, this);
         pane = new Pane();
         subPane = new Pane();
         pane.getChildren().add(subPane);
     }
 
+    public void loadSplash() {
+        if (state != State.UNLOADED) {
+            return;
+        }
+        state = State.LOADING;
+        anchorPane.getChildren().add(splashController);
+
+        Thread loadingThread = new Thread(() -> {
+            SimulationBootup bootup = new SimulationBootup();
+            bootup.addProgressUpdaterListener(splashController);
+            bootup.bootup();
+        });
+        loadingThread.start();
+    }
+
+    @Override
+    public void onUpdateProgression(String message, double percent, String timeLeft) {
+    }
+
+    @Override
+    public void onLoadComplete() {
+        state = State.LOADED;
+        anchorPane.getChildren().remove(splashController);
+    }
+
     /**
      * Initiates the UI
      */
-    public void init() {
+    public void loadMainUI() {
         int headRadius = (int) UiUtils.HEIGHT / 4;
 
         //creates base ring (hollow)
@@ -104,13 +134,13 @@ public class HeadController {
      * Opens the controller UI up
      */
     public void open() {
-        if (state != State.CLOSED) {
+        if (state == State.OPENING || state == State.OPEN) {
             return;
         }
         state = State.OPENING;
 
         //fades in the opening of the controller
-        FadeTransition fadeTransition = new FadeTransition(Duration.millis(4000), pane);
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(5000), pane);
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
         fadeTransition.play();
@@ -140,6 +170,9 @@ public class HeadController {
     }
 
     private enum State {
+        UNLOADED,
+        LOADING,
+        LOADED,
         CLOSED,
         OPENING,
         OPEN,

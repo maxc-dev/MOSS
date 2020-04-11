@@ -1,6 +1,6 @@
 package dev.maxc.ui.controllers;
 
-import dev.maxc.sim.bootup.system.SystemUtils;
+import dev.maxc.sim.system.SystemUtils;
 import dev.maxc.ui.models.RingLines;
 import dev.maxc.ui.models.panes.RotatablePane;
 import dev.maxc.ui.models.panes.SubModule;

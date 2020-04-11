@@ -1,4 +1,4 @@
-package dev.maxc.sim.bootup.system;
+package dev.maxc.sim.system;
 
 /*
     This class provides utility resources to application programs
@@ -9,6 +9,7 @@ import java.util.Random;
 
 import dev.maxc.sim.logs.Logger;
 import javafx.application.Platform;
+import javafx.stage.Stage;
 
 /**
  * @author Max Carter
@@ -41,5 +42,9 @@ public class SystemUtils {
         Logger.log("Shutting down...");
         Platform.exit();
         System.exit(0);
+    }
+
+    public static void setTitle(Stage stage, String title) {
+        stage.setTitle(title + " | " + SystemAPI.SYSTEM_NAME + " by " + SystemAPI.SYSTEM_AUTHOR);
     }
 }

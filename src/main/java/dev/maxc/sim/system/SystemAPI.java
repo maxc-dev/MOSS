@@ -4,7 +4,7 @@
     options.
  */
 
-package dev.maxc.sim.bootup.system;
+package dev.maxc.sim.system;
 
 import dev.maxc.sim.bootup.config.Configurable;
 

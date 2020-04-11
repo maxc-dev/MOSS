@@ -1,6 +1,6 @@
 package dev.maxc.sim.bootup.config;
 
-import dev.maxc.sim.bootup.system.SystemAPI;
+import dev.maxc.sim.system.SystemAPI;
 
 /**
  * @author Max Carter
