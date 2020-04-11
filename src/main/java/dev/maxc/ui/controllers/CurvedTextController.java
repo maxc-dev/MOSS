@@ -11,7 +11,7 @@ import javafx.scene.text.TextAlignment;
  * @author Max Carter
  * @since 03/04/2020
  */
-public class CurvedText {
+public class CurvedTextController {
     private Text[] chars;
 
     /**
@@ -19,7 +19,7 @@ public class CurvedText {
      *
      * @param startingAngle The initial angle of the rings
      */
-    public CurvedText(String text, Pane pane, double radius, int startingAngle, Color fill) {
+    public CurvedTextController(String text, Pane pane, double radius, int startingAngle, Color fill) {
         text = text.toUpperCase();
         chars = new Text[text.length()];
         for (int i = 0; i < chars.length; i++) {

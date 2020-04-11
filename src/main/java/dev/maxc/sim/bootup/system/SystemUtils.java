@@ -1,16 +1,20 @@
 package dev.maxc.sim.bootup.system;
 
+/*
+    This class provides utility resources to application programs
+    and programs within the kernel.
+ */
+
 import java.util.Random;
+
+import dev.maxc.sim.logs.Logger;
+import javafx.application.Platform;
 
 /**
  * @author Max Carter
- * @since 10/04/2020
+ * @since  10/04/2020
  */
 public class SystemUtils {
-    /*
-        This class provides utility resources to application programs
-        and programs within the kernel.
-     */
 
     /**
      * Returns a random number between two numbers.
@@ -28,5 +32,14 @@ public class SystemUtils {
      */
     public static boolean chance(int chance) {
         return randomInt(0, 100) < chance;
+    }
+
+    /**
+     * Closes the simulation and the system.
+     */
+    public static void shutdown() {
+        Logger.log("Shutting down...");
+        Platform.exit();
+        System.exit(0);
     }
 }

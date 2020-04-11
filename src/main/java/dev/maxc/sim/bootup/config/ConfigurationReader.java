@@ -4,7 +4,7 @@ import dev.maxc.sim.bootup.system.SystemAPI;
 
 /**
  * @author Max Carter
- * @since 10/04/2020
+ * @since  10/04/2020
  */
 public class ConfigurationReader {
     private static final String CONFIG_FILE_NAME = "config.txt";

@@ -10,7 +10,7 @@ import javafx.util.Duration;
 
 public class DecorController {
     public static final double UPDATE_DECOR = 0.01;
-    public static final int CIRCLE_COUNT = UiUtils.RESOLUTION/35000;
+    public static final int CIRCLE_COUNT = (int) UiUtils.RESOLUTION/35000;
 
     private static DecorCircle[] decorCircles;
 

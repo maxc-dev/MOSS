@@ -10,7 +10,7 @@ import dev.maxc.sim.bootup.config.Configurable;
 
 /**
  * @author Max Carter
- * @since 10/04/2020
+ * @since  10/04/2020
  */
 public class SystemAPI {
 
@@ -18,6 +18,10 @@ public class SystemAPI {
 
     @Configurable(docs = "The amount of time between each CPU execution in ms.")
     public int CLOCK_TICK_FREQUENCY;
+
+    public static final String SYSTEM_NAME = "M.O.S.S";
+
+    public static final String SYSTEM_AUTHOR = "Max Carter";
 
     //cpu config
 
