@@ -5,7 +5,7 @@ package dev.maxc.sim.bootup;
  * @since 11/04/2020
  */
 public interface LoadProgressUpdater {
-    void onUpdateProgression(String message, double percent, String timeLeft);
+    void onUpdateProgression(String message, double percent);
 
     void onLoadComplete();
 }

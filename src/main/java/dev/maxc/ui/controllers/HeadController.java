@@ -14,6 +14,7 @@ import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -46,7 +47,7 @@ public class HeadController implements LoadProgressUpdater {
      */
     public HeadController(BackgroundController backgroundController, AnchorPane anchorPane) {
         this.anchorPane = anchorPane;
-        splashController = new SplashController(backgroundController, this);
+        splashController = new SplashController(backgroundController);
         pane = new Pane();
         subPane = new Pane();
         pane.getChildren().add(subPane);
@@ -62,19 +63,20 @@ public class HeadController implements LoadProgressUpdater {
         Thread loadingThread = new Thread(() -> {
             SimulationBootup bootup = new SimulationBootup();
             bootup.addProgressUpdaterListener(splashController);
+            bootup.addProgressUpdaterListener(this);
             bootup.bootup();
         });
         loadingThread.start();
     }
 
     @Override
-    public void onUpdateProgression(String message, double percent, String timeLeft) {
+    public void onUpdateProgression(String message, double percent) {
     }
 
     @Override
     public void onLoadComplete() {
         state = State.LOADED;
-        anchorPane.getChildren().remove(splashController);
+        Platform.runLater(() -> anchorPane.getChildren().remove(splashController));
     }
 
     /**

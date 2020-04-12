@@ -17,6 +17,8 @@ public class BackgroundController implements Initializable, SplashController.OnS
     @FXML
     public AnchorPane anchorPane;
 
+    private HeadController headController;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         anchorPane.setMaxWidth(UiUtils.WIDTH);
@@ -26,12 +28,12 @@ public class BackgroundController implements Initializable, SplashController.OnS
         DecorController decorController = new DecorController(anchorPane);
         decorController.run();
 
-        HeadController headController = new HeadController(this, anchorPane);
+        headController = new HeadController(this, anchorPane);
         headController.loadSplash();
     }
 
     @Override
-    public void onSplashComplete(HeadController headController) {
+    public void onSplashComplete() {
         Platform.runLater(headController::loadMainUI);
     }
 }

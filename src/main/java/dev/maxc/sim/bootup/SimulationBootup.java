@@ -6,7 +6,6 @@ import java.util.List;
 import dev.maxc.sim.bootup.config.ConfigurationReader;
 import dev.maxc.sim.system.SystemAPI;
 import dev.maxc.sim.logs.Logger;
-import dev.maxc.sim.system.SystemUtils;
 
 /**
  * @author Max Carter
@@ -30,26 +29,22 @@ public class SimulationBootup {
         Logger.log("Attempting to boot simulation...");
         Logger.log("Initializing configuration...");
 
+        ComponentLoader componentLoader = new ComponentLoader(loadProgressListeners);
+
+        //creating system api
+        componentLoader.componentLoaded();
         SystemAPI systemAPI = new SystemAPI();
+        componentLoader.componentLoaded();
+
+        //initializing system api
+        componentLoader.componentLoaded();
         ConfigurationReader configurationReader = new ConfigurationReader(systemAPI);
         configurationReader.configure();
+        componentLoader.componentLoaded();
 
         //todo create components
 
-        //demo simulates the loading screen
-        for (int i = 0; i < 100; i++) {
-            try {
-                //random delay which would be replaced with component loading
-                Thread.sleep(SystemUtils.randomInt(20, 200));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            for (LoadProgressUpdater loadProgressUpdater : loadProgressListeners) {
-                loadProgressUpdater.onUpdateProgression("", i, (1000 - i * 10) + "ms");
-            }
-        }
-
-        Logger.log("Configuration initialization successful...");
+        Logger.log("Configuration initialization successful.");
         for (LoadProgressUpdater loadProgressUpdater : loadProgressListeners) {
             loadProgressUpdater.onLoadComplete();
         }

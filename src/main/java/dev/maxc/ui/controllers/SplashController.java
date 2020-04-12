@@ -1,7 +1,6 @@
 package dev.maxc.ui.controllers;
 
 import dev.maxc.sim.bootup.LoadProgressUpdater;
-import dev.maxc.sim.logs.Logger;
 import dev.maxc.ui.util.ColorUtils;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -20,21 +19,20 @@ public class SplashController extends Pane implements LoadProgressUpdater {
     private static final int SPLASH_RADIUS = 200;
     private static final int SPLASH_PADDING = 10;
 
-    private int percentIndex = 0;
+    private volatile boolean incrementing = false;
+    private volatile double progressArcSpeed = 0.005;
+    private double maxLength = 0;
     private final Arc progressArc;
 
     private final OnSplashComplete loadingCompleteListener;
-    private final HeadController headController;
 
     /**
      * Creates a controller for the Splash screen.
      *
      * @param loadingCompleteListener Listens to the when the splash is unloaded
-     * @param headController          Head controller to pass to the complete listener
      */
-    public SplashController(OnSplashComplete loadingCompleteListener, HeadController headController) {
+    public SplashController(OnSplashComplete loadingCompleteListener) {
         this.loadingCompleteListener = loadingCompleteListener;
-        this.headController = headController;
 
         //creates the main circle
         Circle mainCircle = new Circle(SPLASH_RADIUS, SPLASH_RADIUS, SPLASH_RADIUS - SPLASH_PADDING, ColorUtils.BACKGROUND_COLOUR);
@@ -42,7 +40,7 @@ public class SplashController extends Pane implements LoadProgressUpdater {
 
         //creates an arc which is the loading bar
         int innerPadding = 4;
-        progressArc = new Arc(SPLASH_RADIUS, SPLASH_RADIUS, SPLASH_RADIUS - SPLASH_PADDING, SPLASH_RADIUS - SPLASH_PADDING, 90, 90);
+        progressArc = new Arc(SPLASH_RADIUS, SPLASH_RADIUS, SPLASH_RADIUS - SPLASH_PADDING, SPLASH_RADIUS - SPLASH_PADDING, 90, 0);
         progressArc.setFill(ColorUtils.SURFACE_COLOUR);
 
         //creates the inner circle that overlaps the arc
@@ -55,30 +53,29 @@ public class SplashController extends Pane implements LoadProgressUpdater {
     }
 
     @Override
-    public synchronized void onUpdateProgression(String message, double percent, String timeLeft) {
-        Logger.log("Updating splash screen for: " + message + " \t(" + percent + "%)");
-        //animates a change from the previous percent to the new one
-        Timeline subRotateTimeline = new Timeline(new KeyFrame(Duration.seconds(0.01), evt -> move(percent)));
-        subRotateTimeline.setCycleCount(20);
-        subRotateTimeline.play();
+    public synchronized void onUpdateProgression(String message, double percent) {
+        maxLength = percent * 360;
+        if (!incrementing) {
+            increment();
+        }
     }
 
-    /**
-     * Increases the loading bar
-     *
-     * @param increment How much to increase it by
-     */
-    private synchronized void move(double increment) {
-        if (percentIndex < 20) {
-            percentIndex++;
-            progressArc.setLength((increment * 3.60) + (double) percentIndex / 20);
+    public void increment() {
+        if (progressArc.getLength() < maxLength) {
+            progressArc.setLength((progressArc.getLength() - maxLength)*0.5);
+            incrementing = true;
+            new Timeline(new KeyFrame(Duration.seconds(progressArcSpeed), evt -> increment())).play();
         } else {
-            percentIndex = 0;
+            incrementing = false;
         }
     }
 
     @Override
     public synchronized void onLoadComplete() {
+        if (incrementing) {
+            progressArcSpeed = 0.001;
+        }
+
         //animate fade out of the splash
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(2000), this);
         fadeTransition.setFromValue(1.0);
@@ -86,10 +83,10 @@ public class SplashController extends Pane implements LoadProgressUpdater {
         fadeTransition.play();
 
         //when faded out, start loading main ui
-        fadeTransition.setOnFinished(actionEvent -> loadingCompleteListener.onSplashComplete(headController));
+        fadeTransition.setOnFinished(actionEvent -> loadingCompleteListener.onSplashComplete());
     }
 
     public interface OnSplashComplete {
-        void onSplashComplete(HeadController headController);
+        void onSplashComplete();
     }
 }
