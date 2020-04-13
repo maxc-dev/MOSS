@@ -1,6 +1,8 @@
 package dev.maxc.ui.controllers;
 
 import dev.maxc.sim.bootup.LoadProgressUpdater;
+import dev.maxc.sim.system.SystemAPI;
+import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.util.ColorUtils;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -16,13 +18,14 @@ import javafx.util.Duration;
  * @since 11/04/2020
  */
 public class SplashController extends Pane implements LoadProgressUpdater {
-    private static final int SPLASH_RADIUS = 200;
-    private static final int SPLASH_PADDING = 10;
+    private static final int SPLASH_RADIUS = 240;
+    private static final int SPLASH_PADDING = 8;
 
     private volatile boolean incrementing = false;
     private volatile double progressArcSpeed = 0.005;
     private double maxLength = 0;
     private final Arc progressArc;
+    private final FloatingText progressDisplay;
 
     private final OnSplashComplete loadingCompleteListener;
 
@@ -35,25 +38,34 @@ public class SplashController extends Pane implements LoadProgressUpdater {
         this.loadingCompleteListener = loadingCompleteListener;
 
         //creates the main circle
-        Circle mainCircle = new Circle(SPLASH_RADIUS, SPLASH_RADIUS, SPLASH_RADIUS - SPLASH_PADDING, ColorUtils.BACKGROUND_COLOUR);
+        Circle mainCircle = new Circle(0, 0, SPLASH_RADIUS - SPLASH_PADDING, ColorUtils.BACKGROUND_COLOUR);
         mainCircle.setEffect(new DropShadow((double) SPLASH_PADDING * 0.8, ColorUtils.BACKGROUND_COLOUR));
 
         //creates an arc which is the loading bar
         int innerPadding = 4;
-        progressArc = new Arc(SPLASH_RADIUS, SPLASH_RADIUS, SPLASH_RADIUS - SPLASH_PADDING, SPLASH_RADIUS - SPLASH_PADDING, 90, 0);
+        progressArc = new Arc(0, 0, SPLASH_RADIUS - SPLASH_PADDING, SPLASH_RADIUS - SPLASH_PADDING, 90, 0);
         progressArc.setFill(ColorUtils.SURFACE_COLOUR);
 
         //creates the inner circle that overlaps the arc
-        Circle innerCircle = new Circle(SPLASH_RADIUS, SPLASH_RADIUS, SPLASH_RADIUS - SPLASH_PADDING - innerPadding, ColorUtils.BACKGROUND_COLOUR);
+        Circle innerCircle = new Circle(0, 0, SPLASH_RADIUS - SPLASH_PADDING - innerPadding, ColorUtils.BACKGROUND_COLOUR);
+
+        //creates the text displays
+        FloatingText floatingTextTitle = new FloatingText(SystemAPI.SYSTEM_NAME, -20, 100);
+        floatingTextTitle.centerText();
+        progressDisplay = new FloatingText("Loading...", 10, 14);
+        progressDisplay.setOffsetX(-(double) SPLASH_RADIUS * 0.75);
 
         //adds to pane
         getChildren().add(mainCircle);
         getChildren().add(progressArc);
         getChildren().add(innerCircle);
+        getChildren().add(floatingTextTitle);
+        getChildren().add(progressDisplay);
     }
 
     @Override
     public synchronized void onUpdateProgression(String message, double percent) {
+        progressDisplay.setText(message + " (" + (int) (percent * 100) + "%)");
         maxLength = percent * 360;
         if (!incrementing) {
             increment();
@@ -62,7 +74,7 @@ public class SplashController extends Pane implements LoadProgressUpdater {
 
     public void increment() {
         if (progressArc.getLength() < maxLength) {
-            progressArc.setLength((progressArc.getLength() - maxLength)*0.5);
+            progressArc.setLength((progressArc.getLength() - maxLength) * 0.5);
             incrementing = true;
             new Timeline(new KeyFrame(Duration.seconds(progressArcSpeed), evt -> increment())).play();
         } else {
@@ -73,6 +85,7 @@ public class SplashController extends Pane implements LoadProgressUpdater {
     @Override
     public synchronized void onLoadComplete() {
         if (incrementing) {
+            maxLength = 360;
             progressArcSpeed = 0.001;
         }
 

@@ -1,5 +1,6 @@
 package dev.maxc.ui.controllers;
 
+import dev.maxc.ui.util.UiUtils;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -29,7 +30,7 @@ public class CurvedTextController {
 
             chars[i].setRotate(2);
             chars[i].setTextAlignment(TextAlignment.CENTER);
-            chars[i].setFont(new Font(null, 25));
+            chars[i].setFont(UiUtils.getFont(25));
             chars[i].setFill(fill);
             chars[i].setStroke(fill);
             chars[i].setStrokeWidth(1.7);

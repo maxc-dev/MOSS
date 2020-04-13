@@ -24,6 +24,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML(Display.PRIMARY));
+        scene.getStylesheets().add(getClass().getResource("fontstyle.css").toExternalForm());
 
         SystemUtils.setTitle(stage, "Booting up...");
         stage.setScene(scene);

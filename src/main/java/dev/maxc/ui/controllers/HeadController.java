@@ -27,7 +27,7 @@ import javafx.util.Duration;
  * @author Max Carter
  * @since 01/04/2020
  */
-public class HeadController implements LoadProgressUpdater {
+public class HeadController implements SplashController.OnSplashComplete {
     private final AnchorPane anchorPane;
     private final Pane pane;
     private final Pane subPane;
@@ -49,6 +49,8 @@ public class HeadController implements LoadProgressUpdater {
         this.anchorPane = anchorPane;
         splashController = new SplashController(backgroundController);
         pane = new Pane();
+        pane.setLayoutX(UiUtils.WIDTH / 2);
+        pane.setLayoutY(UiUtils.HEIGHT / 2);
         subPane = new Pane();
         pane.getChildren().add(subPane);
     }
@@ -58,25 +60,19 @@ public class HeadController implements LoadProgressUpdater {
             return;
         }
         state = State.LOADING;
-        anchorPane.getChildren().add(splashController);
+        anchorPane.getChildren().add(pane);
+        pane.getChildren().add(splashController);
 
-        Thread loadingThread = new Thread(() -> {
-            SimulationBootup bootup = new SimulationBootup();
-            bootup.addProgressUpdaterListener(splashController);
-            bootup.addProgressUpdaterListener(this);
-            bootup.bootup();
-        });
+        SimulationBootup bootup = new SimulationBootup();
+        bootup.addProgressUpdaterListener(splashController);
+        Thread loadingThread = new Thread(bootup::bootup);
         loadingThread.start();
     }
 
     @Override
-    public void onUpdateProgression(String message, double percent) {
-    }
-
-    @Override
-    public void onLoadComplete() {
+    public void onSplashComplete() {
         state = State.LOADED;
-        Platform.runLater(() -> anchorPane.getChildren().remove(splashController));
+        Platform.runLater(() -> pane.getChildren().remove(splashController));
     }
 
     /**
@@ -116,19 +112,18 @@ public class HeadController implements LoadProgressUpdater {
         ringLines.getTransforms().add(rotation);
         ringLines.setRotation(rotation);
 
-        FloatingText floatingTextTitle = new FloatingText(SystemAPI.SYSTEM_NAME, -42, -3);
-        FloatingText floatingTextAuthor = new FloatingText(SystemAPI.SYSTEM_AUTHOR, -56, 20);
+        FloatingText floatingTextTitle = new FloatingText(SystemAPI.SYSTEM_NAME, -10, 30);
+        floatingTextTitle.centerText();
+        FloatingText floatingTextAuthor = new FloatingText(SystemAPI.SYSTEM_AUTHOR, 15, 25);
+        floatingTextAuthor.centerText();
 
         //structures pane
-        pane.setLayoutX(UiUtils.WIDTH / 2);
-        pane.setLayoutY(UiUtils.HEIGHT / 2);
         pane.getChildren().add(baseRing);
         pane.getChildren().add(ringLines);
         pane.getChildren().add(coreRing);
         pane.getChildren().add(coreRingLines);
         pane.getChildren().add(floatingTextTitle);
         pane.getChildren().add(floatingTextAuthor);
-        anchorPane.getChildren().add(pane);
         open();
     }
 

@@ -13,15 +13,14 @@ import dev.maxc.sim.bootup.config.Configurable;
  * @since  10/04/2020
  */
 public class SystemAPI {
+    //system constants
+    public static final String SYSTEM_NAME = "MaxOS";
+    public static final String SYSTEM_AUTHOR = "Max Carter";
 
     //system config
 
     @Configurable(docs = "The amount of time between each CPU execution in ms.")
     public int CLOCK_TICK_FREQUENCY;
-
-    public static final String SYSTEM_NAME = "M.O.S.S";
-
-    public static final String SYSTEM_AUTHOR = "Max Carter";
 
     //cpu config
 
@@ -41,6 +40,6 @@ public class SystemAPI {
 
     //process config
 
-    @Configurable("When set to true, threads will be scheduled along with their parent Process. When set to false, threads wil be executed independently from their parent Process.")
+    @Configurable(docs = "When set to true, threads will be scheduled along with their parent Process. When set to false, threads wil be executed independently from their parent Process.")
     public boolean PROCESS_FIRST_SCHEDULING;
 }

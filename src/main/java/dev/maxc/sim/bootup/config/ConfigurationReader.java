@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dev.maxc.App;
+import dev.maxc.sim.bootup.ComponentLoader;
 import dev.maxc.sim.logs.Logger;
 import dev.maxc.sim.system.SystemAPI;
 
@@ -21,12 +22,14 @@ public class ConfigurationReader {
     private static final String CONFIG_FILE_NAME = "config.txt";
 
     private final SystemAPI system;
+    private ComponentLoader componentLoader;
 
     /**
      * Creates a system reader
      */
-    public ConfigurationReader(SystemAPI system) {
+    public ConfigurationReader(SystemAPI system, ComponentLoader componentLoader) {
         this.system = system;
+        this.componentLoader = componentLoader;
     }
 
     /**
@@ -40,12 +43,14 @@ public class ConfigurationReader {
         for (Map.Entry<String, String> config : configurationFileReader.getConfigFileMap().entrySet()) {
             for (Field field : fields) {
                 if (config.getKey().equalsIgnoreCase(field.getName())) {
+                    componentLoader.componentLoaded();
                     try {
                         field.set(system, getDeducedType(config.getValue()));
                     } catch (IllegalAccessException | NullPointerException ex) {
                         Logger.log("Config", "Unable to configure value for: " + config.getKey().toUpperCase());
                         ex.printStackTrace();
                     }
+                    componentLoader.componentLoaded();
                     Logger.log("Config", "Set config option [" + config.getKey().toUpperCase() + "] to [" + config.getValue().toLowerCase() + "]");
                     found = field;
                     break;

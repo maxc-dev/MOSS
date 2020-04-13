@@ -38,7 +38,7 @@ public class SimulationBootup {
 
         //initializing system api
         componentLoader.componentLoaded();
-        ConfigurationReader configurationReader = new ConfigurationReader(systemAPI);
+        ConfigurationReader configurationReader = new ConfigurationReader(systemAPI, componentLoader);
         configurationReader.configure();
         componentLoader.componentLoaded();
 
