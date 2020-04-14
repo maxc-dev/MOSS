@@ -5,4 +5,5 @@ package dev.maxc.os.components.virtual;
  * @since 14/04/2020
  */
 public class Instruction {
+
 }
