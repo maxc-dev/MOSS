@@ -1,8 +1,8 @@
-package dev.maxc.sim.bootup;
+package dev.maxc.os.bootup;
 
 import java.util.List;
 
-import dev.maxc.sim.logs.Logger;
+import dev.maxc.logs.Logger;
 
 /**
  * @author Max Carter

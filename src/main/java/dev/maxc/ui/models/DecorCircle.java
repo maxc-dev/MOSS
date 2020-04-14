@@ -1,6 +1,6 @@
 package dev.maxc.ui.models;
 
-import dev.maxc.sim.system.SystemUtils;
+import dev.maxc.os.system.SystemUtils;
 import dev.maxc.ui.util.ColorUtils;
 import dev.maxc.ui.util.UiUtils;
 import javafx.scene.effect.DropShadow;

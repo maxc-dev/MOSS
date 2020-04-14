@@ -1,4 +1,4 @@
-package dev.maxc.sim.bootup.config;
+package dev.maxc.os.bootup.config;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dev.maxc.App;
-import dev.maxc.sim.bootup.ComponentLoader;
-import dev.maxc.sim.logs.Logger;
-import dev.maxc.sim.system.SystemAPI;
+import dev.maxc.os.bootup.ComponentLoader;
+import dev.maxc.logs.Logger;
+import dev.maxc.os.system.SystemAPI;
 
 /**
  * @author Max Carter
@@ -22,7 +22,7 @@ public class ConfigurationReader {
     private static final String CONFIG_FILE_NAME = "config.txt";
 
     private final SystemAPI system;
-    private ComponentLoader componentLoader;
+    private final ComponentLoader componentLoader;
 
     /**
      * Creates a system reader

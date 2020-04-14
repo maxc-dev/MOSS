@@ -1,10 +1,10 @@
-package dev.maxc.sim.logs;
+package dev.maxc.logs;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import dev.maxc.sim.system.SystemAPI;
+import dev.maxc.os.system.SystemAPI;
 
 /**
  * @author Max Carter

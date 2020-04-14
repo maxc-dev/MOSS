@@ -4,9 +4,15 @@
     options.
  */
 
-package dev.maxc.sim.system;
+package dev.maxc.os.system;
 
-import dev.maxc.sim.bootup.config.Configurable;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import dev.maxc.os.bootup.config.Configurable;
+import dev.maxc.logs.Logger;
+import dev.maxc.os.components.virtual.Process;
+import dev.maxc.os.components.virtual.Thread;
+import javafx.stage.Stage;
 
 /**
  * @author Max Carter
@@ -14,7 +20,7 @@ import dev.maxc.sim.bootup.config.Configurable;
  */
 public class SystemAPI {
     //system constants
-    public static final String SYSTEM_NAME = "MaxOS";
+    public static final String SYSTEM_NAME = "MOSS";
     public static final String SYSTEM_AUTHOR = "Max Carter";
 
     //system config
@@ -42,4 +48,42 @@ public class SystemAPI {
 
     @Configurable(docs = "When set to true, threads will be scheduled along with their parent Process. When set to false, threads wil be executed independently from their parent Process.")
     public boolean PROCESS_FIRST_SCHEDULING;
+
+    //system calls - methods
+
+    private static final AtomicInteger processCount = new AtomicInteger();
+    private static final AtomicInteger threadCount = new AtomicInteger();
+
+    /**
+     * Creates a new Process and a main thread.
+     */
+    public static Process getNewProcess() {
+        Process process = new Process(processCount.addAndGet(1));
+        addNewThreadToProcess(process);
+        return process;
+    }
+
+    /**
+     * Creates a new Thread
+     */
+    public static Thread getNewThread() {
+        return new Thread(threadCount.addAndGet(1));
+    }
+
+    /**
+     * Adds a new Thread to a Process
+     */
+    public static void addNewThreadToProcess(Process process) {
+        process.getThreads().add(getNewThread());
+    }
+
+    //ui methods
+
+    public static void setTitle(Stage stage, String title) {
+        String completeTitle = title + " | " + SystemAPI.SYSTEM_NAME + " by " + SystemAPI.SYSTEM_AUTHOR;
+        stage.setTitle(completeTitle);
+        Logger.log("Title changed to [" + completeTitle + "]");
+    }
+
+
 }

@@ -1,14 +1,13 @@
 package dev.maxc;
 
-import dev.maxc.sim.system.SystemAPI;
-import dev.maxc.sim.system.SystemUtils;
-import dev.maxc.sim.logs.Logger;
+import dev.maxc.os.system.SystemAPI;
+import dev.maxc.os.system.SystemUtils;
+import dev.maxc.logs.Logger;
 import dev.maxc.ui.util.Display;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -23,10 +22,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        SystemAPI.setTitle(stage, "Booting up...");
         scene = new Scene(loadFXML(Display.PRIMARY));
         scene.getStylesheets().add(getClass().getResource("fontstyle.css").toExternalForm());
 
-        SystemUtils.setTitle(stage, "Booting up...");
         stage.setScene(scene);
         stage.setAlwaysOnTop(true);
         stage.setFullScreen(true);
@@ -52,5 +51,4 @@ public class App extends Application {
         Logger.log("App started.");
         launch();
     }
-
 }

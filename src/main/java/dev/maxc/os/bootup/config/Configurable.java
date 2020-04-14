@@ -1,4 +1,4 @@
-package dev.maxc.sim.bootup.config;
+package dev.maxc.os.bootup.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

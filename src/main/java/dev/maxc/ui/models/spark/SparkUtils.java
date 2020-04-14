@@ -1,6 +1,6 @@
 package dev.maxc.ui.models.spark;
 
-import dev.maxc.sim.system.SystemUtils;
+import dev.maxc.os.system.SystemUtils;
 /**
  * @author Max Carter
  * @since 03/04/2020

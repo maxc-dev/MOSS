@@ -1,7 +1,8 @@
 package dev.maxc.ui.controllers;
 
-import dev.maxc.sim.bootup.LoadProgressUpdater;
-import dev.maxc.sim.system.SystemAPI;
+import dev.maxc.os.bootup.LoadProgressUpdater;
+import dev.maxc.os.system.SystemAPI;
+import dev.maxc.os.system.SystemUtils;
 import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.util.ColorUtils;
 import javafx.animation.FadeTransition;
@@ -65,7 +66,7 @@ public class SplashController extends Pane implements LoadProgressUpdater {
 
     @Override
     public synchronized void onUpdateProgression(String message, double percent) {
-        progressDisplay.setText(message + " (" + (int) (percent * 100) + "%)");
+        progressDisplay.setText(message + " (" + SystemUtils.getRoundedPercent(percent) + "%)");
         maxLength = percent * 360;
         if (!incrementing) {
             increment();

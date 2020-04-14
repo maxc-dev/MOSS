@@ -1,8 +1,7 @@
 package dev.maxc.ui.controllers;
 
-import dev.maxc.sim.bootup.LoadProgressUpdater;
-import dev.maxc.sim.bootup.SimulationBootup;
-import dev.maxc.sim.system.SystemAPI;
+import dev.maxc.os.bootup.SimulationBootup;
+import dev.maxc.os.system.SystemAPI;
 import dev.maxc.ui.anchors.BackgroundController;
 import dev.maxc.ui.models.CoreRing;
 import dev.maxc.ui.models.FloatingText;

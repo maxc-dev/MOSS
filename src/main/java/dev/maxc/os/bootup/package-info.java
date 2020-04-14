@@ -4,4 +4,4 @@
  * @author Max Carter
  * @since 10/04/2020
  */
-package dev.maxc.sim.bootup;
+package dev.maxc.os.bootup;

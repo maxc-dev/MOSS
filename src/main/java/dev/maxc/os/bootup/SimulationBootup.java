@@ -1,11 +1,11 @@
-package dev.maxc.sim.bootup;
+package dev.maxc.os.bootup;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.maxc.sim.bootup.config.ConfigurationReader;
-import dev.maxc.sim.system.SystemAPI;
-import dev.maxc.sim.logs.Logger;
+import dev.maxc.os.bootup.config.ConfigurationReader;
+import dev.maxc.os.system.SystemAPI;
+import dev.maxc.logs.Logger;
 
 /**
  * @author Max Carter

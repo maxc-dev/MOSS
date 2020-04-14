@@ -1,4 +1,4 @@
-package dev.maxc.sim.bootup;
+package dev.maxc.os.bootup;
 
 /**
  * @author Max Carter

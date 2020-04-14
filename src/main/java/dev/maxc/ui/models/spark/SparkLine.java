@@ -1,6 +1,6 @@
 package dev.maxc.ui.models.spark;
 
-import dev.maxc.sim.system.SystemUtils;
+import dev.maxc.os.system.SystemUtils;
 import dev.maxc.ui.util.ColorUtils;
 import dev.maxc.ui.util.UiUtils;
 import javafx.animation.KeyFrame;
