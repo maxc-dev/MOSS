@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import dev.maxc.os.bootup.config.Configurable;
 import dev.maxc.logs.Logger;
 import dev.maxc.os.components.virtual.Process;
+import dev.maxc.os.components.virtual.ProcessState;
 import dev.maxc.os.components.virtual.Thread;
 import javafx.stage.Stage;
 
@@ -49,33 +50,9 @@ public class SystemAPI {
     @Configurable(docs = "When set to true, threads will be scheduled along with their parent Process. When set to false, threads wil be executed independently from their parent Process.")
     public boolean PROCESS_FIRST_SCHEDULING;
 
-    //system calls - methods
-
-    private static final AtomicInteger processCount = new AtomicInteger();
-    private static final AtomicInteger threadCount = new AtomicInteger();
-
-    /**
-     * Creates a new Process and a main thread.
-     */
-    public static Process getNewProcess() {
-        Process process = new Process(processCount.addAndGet(1));
-        addNewThreadToProcess(process);
-        return process;
-    }
-
-    /**
-     * Creates a new Thread
-     */
-    public static Thread getNewThread() {
-        return new Thread(threadCount.addAndGet(1));
-    }
-
-    /**
-     * Adds a new Thread to a Process
-     */
-    public static void addNewThreadToProcess(Process process) {
-        process.getThreads().add(getNewThread());
-    }
+    //system calls - processes & threads
+    public static final ThreadAPI threadAPI = new ThreadAPI();
+    public static final ProcessAPI processAPI = new ProcessAPI(threadAPI);
 
     //ui methods
 
