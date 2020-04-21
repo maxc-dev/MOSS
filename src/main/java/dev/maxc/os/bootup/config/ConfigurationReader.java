@@ -109,7 +109,7 @@ public class ConfigurationReader {
          * there is an internal error with the file reader.
          */
         protected HashMap<String, String> getConfigFileMap() {
-            Logger.log("Gathering config file into map...");
+            Logger.log("Config", "Gathering config file into map...");
             HashMap<String, String> configMap = new HashMap<>();
             String line;
             try {
@@ -122,14 +122,14 @@ public class ConfigurationReader {
                     }
                 }
             } catch (IOException ex) {
-                Logger.log("IOException occurred during config file reading.");
+                Logger.log("Config", "IOException occurred during config file reading.");
                 ex.printStackTrace();
             } catch (IndexOutOfBoundsException ex) {
-                Logger.log("Config file formatted incorrectly.");
+                Logger.log("Config", "Config file formatted incorrectly.");
                 ex.printStackTrace();
             }
 
-            Logger.log("Gathered config file and parsed to map successfully.");
+            Logger.log("Config", "Gathered config file and parsed to map successfully.");
             return configMap;
         }
     }

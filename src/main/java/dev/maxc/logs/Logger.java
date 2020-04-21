@@ -24,4 +24,8 @@ public class Logger {
     public static void log(String prefix, String message) {
         log("[" + prefix + "] " + message);
     }
+
+    public static void log(Thread thread, String message) {
+        log("[" + thread.toString() + "] " + message);
+    }
 }

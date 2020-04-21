@@ -25,7 +25,7 @@ public class ProcessAPI {
      * Also creates a new main thread to add with the process.
      */
     public Process getNewProcess(int parentProcessIdentifier) {
-        Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier));
+        Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier), this);
         threadAPI.addNewThreadToProcess(process);
         return process;
     }

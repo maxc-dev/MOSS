@@ -5,13 +5,24 @@ package dev.maxc.os.components.memory;
  * @since 14/04/2020
  */
 public class MemoryAddress {
-    private final int memoryAddressCode;
+    private final Page parentPage;
+    private final int index;
 
-    public MemoryAddress(int memoryAddressCode) {
-        this.memoryAddressCode = memoryAddressCode;
+    public MemoryAddress(Page parentPage, int index) {
+        this.parentPage = parentPage;
+        this.index = index;
     }
 
-    public int getMemoryAddressCode() {
-        return memoryAddressCode;
+    public Page getParentPage() {
+        return parentPage;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    @Override
+    public String toString() {
+        return parentPage.toString() + Integer.toHexString(index);
     }
 }

@@ -21,7 +21,7 @@ public class UserInterfaceAPI {
             Platform.runLater(() -> {
                 stage.setTitle(completeTitle);
             });
-            Logger.log("Title changed to [" + completeTitle + "]");
+            Logger.log("UiAPI", "Title changed to [" + completeTitle + "]");
         } else {
             Logger.log("UiAPI", "The `stage` has not been set, hence the title cannot be changed.");
         }

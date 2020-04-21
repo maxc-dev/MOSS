@@ -16,7 +16,6 @@ import javafx.application.Platform;
  * @since  10/04/2020
  */
 public class SystemUtils {
-
     /**
      * Returns a random number between two numbers.
      * @param min minimum

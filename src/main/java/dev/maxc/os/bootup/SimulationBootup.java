@@ -26,14 +26,15 @@ public class SimulationBootup {
      * Loads all the OS simulator components
      */
     public void bootup() {
-        Logger.log("Attempting to boot simulation...");
-        Logger.log("Initializing configuration...");
+        Logger.log("Bootup", "Attempting to boot simulation...");
+        Logger.log("Config", "Initializing configuration...");
 
         ComponentLoader componentLoader = new ComponentLoader(loadProgressListeners);
 
         //creating system api
         componentLoader.componentLoaded();
         SystemAPI systemAPI = new SystemAPI();
+        addProgressUpdaterListener(systemAPI);
         componentLoader.componentLoaded();
 
         //initializing system api
@@ -44,7 +45,7 @@ public class SimulationBootup {
 
         //todo create components
 
-        Logger.log("Configuration initialization successful.");
+        Logger.log("Config", "Configuration initialization successful.");
         for (LoadProgressUpdater loadProgressUpdater : loadProgressListeners) {
             loadProgressUpdater.onLoadComplete();
         }

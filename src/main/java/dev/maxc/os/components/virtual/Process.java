@@ -2,6 +2,7 @@ package dev.maxc.os.components.virtual;
 
 import java.util.ArrayList;
 
+import dev.maxc.os.system.api.ProcessAPI;
 import dev.maxc.os.system.api.SystemAPI;
 
 /**
@@ -11,23 +12,25 @@ import dev.maxc.os.system.api.SystemAPI;
 public class Process {
     private final ArrayList<Thread> threads = new ArrayList<>();
     private final ProcessControlBlock processControlBlock;
+    private final ProcessAPI processAPI;
 
-    public Process(ProcessControlBlock processControlBlock) {
+    public Process(ProcessControlBlock processControlBlock, ProcessAPI processAPI) {
         this.processControlBlock = processControlBlock;
+        this.processAPI = processAPI;
     }
 
     /**
      * Exits the process.
      */
     public void exit() {
-        SystemAPI.processAPI.exitProcess(this);
+        processAPI.exitProcess(this);
     }
 
     /**
      * Forks a new process using the same parent Process ID
      */
     public void fork() {
-        SystemAPI.processAPI.getNewProcess(processControlBlock.getParentProcessID());
+        processAPI.getNewProcess(processControlBlock.getParentProcessID());
     }
 
     public ArrayList<Thread> getThreads() {
