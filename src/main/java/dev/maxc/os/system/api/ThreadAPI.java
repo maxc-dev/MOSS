@@ -1,4 +1,4 @@
-package dev.maxc.os.system;
+package dev.maxc.os.system.api;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

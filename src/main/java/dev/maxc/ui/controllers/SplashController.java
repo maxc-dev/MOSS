@@ -1,8 +1,8 @@
 package dev.maxc.ui.controllers;
 
 import dev.maxc.os.bootup.LoadProgressUpdater;
-import dev.maxc.os.system.SystemAPI;
-import dev.maxc.os.system.SystemUtils;
+import dev.maxc.os.system.api.SystemAPI;
+import dev.maxc.os.system.api.SystemUtils;
 import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.util.ColorUtils;
 import javafx.animation.FadeTransition;
@@ -64,27 +64,29 @@ public class SplashController extends Pane implements LoadProgressUpdater {
         getChildren().add(progressDisplay);
     }
 
-    @Override
-    public synchronized void onUpdateProgression(String message, double percent) {
-        progressDisplay.setText(message + " (" + SystemUtils.getRoundedPercent(percent) + "%)");
-        maxLength = percent * 360;
-        if (!incrementing) {
-            increment();
-        }
-    }
-
-    public void increment() {
+    public void incrementProgressBar() {
         if (progressArc.getLength() < maxLength) {
             progressArc.setLength((progressArc.getLength() - maxLength) * 0.5);
             incrementing = true;
-            new Timeline(new KeyFrame(Duration.seconds(progressArcSpeed), evt -> increment())).play();
+            new Timeline(new KeyFrame(Duration.seconds(progressArcSpeed), evt -> incrementProgressBar())).play();
         } else {
             incrementing = false;
         }
     }
 
     @Override
+    public synchronized void onUpdateProgression(String message, double percent) {
+        SystemAPI.uiAPI.setTitle(SystemUtils.getRoundedPercent(percent) + "% Loaded");
+        progressDisplay.setText(message + " (" + SystemUtils.getRoundedPercent(percent) + "%)");
+        maxLength = percent * 360;
+        if (!incrementing) {
+            incrementProgressBar();
+        }
+    }
+
+    @Override
     public synchronized void onLoadComplete() {
+        SystemAPI.uiAPI.setTitle("Home");
         if (incrementing) {
             maxLength = 360;
             progressArcSpeed = 0.001;

@@ -10,12 +10,12 @@ public class ProcessControlBlock {
     private ProcessState processState = ProcessState.NEW;
     private final int processIdentifier;
     private final int parentProcessIdentifier;
-    private final ProgramCounter programCounter;
+   // private final ProgramCounter programCounter;
 
-    public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier, ProgramCounter programCounter) {
+    public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier) { //ProgramCounter programCounter
         this.processIdentifier = processIdentifier;
         this.parentProcessIdentifier = parentProcessIdentifier;
-        this.programCounter = programCounter;
+        //this.programCounter = programCounter;
     }
 
     public int getProcessID() {

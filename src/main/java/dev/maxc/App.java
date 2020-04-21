@@ -1,7 +1,7 @@
 package dev.maxc;
 
-import dev.maxc.os.system.SystemAPI;
-import dev.maxc.os.system.SystemUtils;
+import dev.maxc.os.system.api.SystemAPI;
+import dev.maxc.os.system.api.SystemUtils;
 import dev.maxc.logs.Logger;
 import dev.maxc.ui.util.Display;
 import javafx.application.Application;
@@ -22,7 +22,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        SystemAPI.setTitle(stage, "Booting up...");
+        SystemAPI.uiAPI.setStage(stage);
+        SystemAPI.uiAPI.setTitle("Booting up...");
+
         scene = new Scene(loadFXML(Display.PRIMARY));
         scene.getStylesheets().add(getClass().getResource("fontstyle.css").toExternalForm());
 

@@ -1,4 +1,4 @@
-package dev.maxc.os.system;
+package dev.maxc.os.system.api;
 
 /*
     This class provides utility resources to application programs
@@ -45,6 +45,6 @@ public class SystemUtils {
     }
 
     public static int getRoundedPercent(double percent) {
-        return (int) percent * 100;
+        return (int) (percent * 100);
     }
 }

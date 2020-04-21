@@ -4,16 +4,10 @@
     options.
  */
 
-package dev.maxc.os.system;
-
-import java.util.concurrent.atomic.AtomicInteger;
+package dev.maxc.os.system.api;
 
 import dev.maxc.os.bootup.config.Configurable;
-import dev.maxc.logs.Logger;
-import dev.maxc.os.components.virtual.Process;
-import dev.maxc.os.components.virtual.ProcessState;
-import dev.maxc.os.components.virtual.Thread;
-import javafx.stage.Stage;
+import dev.maxc.ui.api.UserInterfaceAPI;
 
 /**
  * @author Max Carter
@@ -54,13 +48,5 @@ public class SystemAPI {
     public static final ThreadAPI threadAPI = new ThreadAPI();
     public static final ProcessAPI processAPI = new ProcessAPI(threadAPI);
 
-    //ui methods
-
-    public static void setTitle(Stage stage, String title) {
-        String completeTitle = title + " | " + SystemAPI.SYSTEM_NAME + " by " + SystemAPI.SYSTEM_AUTHOR;
-        stage.setTitle(completeTitle);
-        Logger.log("Title changed to [" + completeTitle + "]");
-    }
-
-
+    public static final UserInterfaceAPI uiAPI = new UserInterfaceAPI();
 }

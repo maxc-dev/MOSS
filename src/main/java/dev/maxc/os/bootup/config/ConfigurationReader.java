@@ -12,7 +12,7 @@ import java.util.Map;
 import dev.maxc.App;
 import dev.maxc.os.bootup.ComponentLoader;
 import dev.maxc.logs.Logger;
-import dev.maxc.os.system.SystemAPI;
+import dev.maxc.os.system.api.SystemAPI;
 
 /**
  * @author Max Carter
