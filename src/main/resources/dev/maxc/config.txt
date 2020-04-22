@@ -7,9 +7,9 @@ cpu_cores_async=false
 
 #ram config
 main_memory_size=256
-memory_page_size=32
+page_size=64
+page_increase_increment=8
 virtual_memory_enabled=false
-static_memory_allocation=true
 dynamic_memory_allocation=false
 
 #process config

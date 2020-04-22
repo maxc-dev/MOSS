@@ -1,4 +1,4 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.cpu;
 
 /**
  * @author Max Carter

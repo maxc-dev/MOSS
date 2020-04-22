@@ -1,9 +1,8 @@
-package dev.maxc.os.components.virtual;
+package dev.maxc.os.components.virtual.process;
+
+import dev.maxc.os.components.virtual.thread.Thread;
 
 import java.util.ArrayList;
-
-import dev.maxc.os.system.api.ProcessAPI;
-import dev.maxc.os.system.api.SystemAPI;
 
 /**
  * @author Max Carter

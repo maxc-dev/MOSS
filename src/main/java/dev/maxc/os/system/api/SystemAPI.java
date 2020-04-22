@@ -9,7 +9,10 @@ package dev.maxc.os.system.api;
 import dev.maxc.logs.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
+import dev.maxc.os.components.memory.MemoryAPI;
 import dev.maxc.os.components.memory.RandomAccessMemory;
+import dev.maxc.os.components.virtual.process.ProcessAPI;
+import dev.maxc.os.components.virtual.thread.ThreadAPI;
 import dev.maxc.ui.api.UserInterfaceAPI;
 
 /**
@@ -40,16 +43,16 @@ public class SystemAPI implements LoadProgressUpdater {
     public int MAIN_MEMORY_SIZE;
 
     @Configurable(docs = "The amount of memory locations that are available for each page.")
-    public int MEMORY_PAGE_SIZE;
+    public int PAGE_SIZE;
+
+    @Configurable(docs = "The amount of memory locations that are allocated to a page when the page increases in size.")
+    public int PAGE_INCREASE_INCREMENT;
 
     @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
     public boolean VIRTUAL_MEMORY_ENABLED;
 
     @Configurable(docs = "Memory is allocated to a process when it needs it during execution. This does not bypass the maximum amount of memory per process.")
     public boolean DYNAMIC_MEMORY_ALLOCATION;
-
-    @Configurable(docs = "A set amount of memory is allocated when the process is created.")
-    public boolean STATIC_MEMORY_ALLOCATION;
 
     @Configurable(docs = "The maximum amount of memory a process can be allocated.")
     public int MAX_MEMORY_PER_PROCESS;
@@ -71,7 +74,7 @@ public class SystemAPI implements LoadProgressUpdater {
 
     @Override
     public void onLoadComplete() {
-        memoryAPI = new MemoryAPI(new RandomAccessMemory(MAIN_MEMORY_SIZE), MEMORY_PAGE_SIZE);
+        memoryAPI = new MemoryAPI(new RandomAccessMemory(MAIN_MEMORY_SIZE, PAGE_SIZE, VIRTUAL_MEMORY_ENABLED), DYNAMIC_MEMORY_ALLOCATION, PAGE_INCREASE_INCREMENT);
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI);
         Logger.log("System", "Created memory, thread and process APIs.");

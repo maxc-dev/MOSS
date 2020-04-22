@@ -1,6 +1,4 @@
-package dev.maxc.os.components.virtual;
-
-import dev.maxc.os.components.cpu.ProgramCounter;
+package dev.maxc.os.components.virtual.process;
 
 /**
  * @author Max Carter

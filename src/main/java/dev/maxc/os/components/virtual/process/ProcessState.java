@@ -1,4 +1,4 @@
-package dev.maxc.os.components.virtual;
+package dev.maxc.os.components.virtual.process;
 
 /**
  * @author Max Carter

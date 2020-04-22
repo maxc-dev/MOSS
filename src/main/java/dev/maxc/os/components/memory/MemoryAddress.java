@@ -13,10 +13,6 @@ public class MemoryAddress {
         this.index = index;
     }
 
-    public Page getParentPage() {
-        return parentPage;
-    }
-
     public int getIndex() {
         return index;
     }
