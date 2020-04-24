@@ -5,20 +5,25 @@ package dev.maxc.os.components.memory;
  * @since 14/04/2020
  */
 public class MemoryAddress {
-    private final Page parentPage;
-    private final int index;
+    private final Page parent;
+    private final int offset;
+    private final MemoryUnit memoryUnit = new MemoryUnit(this);
 
-    public MemoryAddress(Page parentPage, int index) {
-        this.parentPage = parentPage;
-        this.index = index;
+    public MemoryAddress(Page parentPage, int offset) {
+        this.parent = parentPage;
+        this.offset = offset;
     }
 
-    public int getIndex() {
-        return index;
+    public int getOffset() {
+        return offset;
+    }
+
+    public MemoryUnit getMemoryUnit() {
+        return memoryUnit;
     }
 
     @Override
     public String toString() {
-        return parentPage.toString() + Integer.toHexString(index);
+        return parent.toString() + Integer.toHexString(offset);
     }
 }
