@@ -12,6 +12,7 @@ import java.util.Map;
 import dev.maxc.App;
 import dev.maxc.os.bootup.ComponentLoader;
 import dev.maxc.logs.Logger;
+import dev.maxc.os.bootup.DynamicComponentLoader;
 import dev.maxc.os.system.api.SystemAPI;
 
 /**
@@ -22,12 +23,12 @@ public class ConfigurationReader {
     private static final String CONFIG_FILE_NAME = "config.txt";
 
     private final SystemAPI system;
-    private final ComponentLoader componentLoader;
+    private final DynamicComponentLoader componentLoader;
 
     /**
      * Creates a system reader
      */
-    public ConfigurationReader(SystemAPI system, ComponentLoader componentLoader) {
+    public ConfigurationReader(SystemAPI system, DynamicComponentLoader componentLoader) {
         this.system = system;
         this.componentLoader = componentLoader;
     }
@@ -43,14 +44,14 @@ public class ConfigurationReader {
         for (Map.Entry<String, String> config : configurationFileReader.getConfigFileMap().entrySet()) {
             for (Field field : fields) {
                 if (config.getKey().equalsIgnoreCase(field.getName())) {
-                    componentLoader.componentLoaded();
+                    componentLoader.componentLoaded("Parsing " + field.getName().toLowerCase().replace("_", " ") + " config option.");
                     try {
                         field.set(system, getDeducedType(config.getValue()));
                     } catch (IllegalAccessException | NullPointerException ex) {
                         Logger.log("Config", "Unable to configure value for: " + config.getKey().toUpperCase());
                         ex.printStackTrace();
                     }
-                    componentLoader.componentLoaded();
+                    componentLoader.componentLoaded("Parsed " + field.getName().toLowerCase().replace("_", " ") + ".");
                     Logger.log("Config", "Set config option [" + config.getKey().toUpperCase() + "] to [" + config.getValue().toLowerCase() + "]");
                     found = field;
                     break;
@@ -116,9 +117,15 @@ public class ConfigurationReader {
                 String file = App.class.getResource(CONFIG_FILE_NAME).getFile();
                 BufferedReader re = new BufferedReader(new FileReader(file));
                 while ((line = re.readLine()) != null) {
-                    if (!line.startsWith(COMMENT_CHARACTER) && !line.isBlank()) {
+                    if (!line.trim().startsWith(COMMENT_CHARACTER) && !line.trim().isBlank()) {
                         String[] content = line.trim().split("=");
-                        configMap.put(content[0], content[1]);
+                        if (content.length == 0) {
+                            Logger.log("Config", "Unknown error in the config file, a config option name is null.");
+                        } else if (content.length == 1) {
+                            Logger.log("Config", "Config option [" + content[0] + "] does not have a value");
+                        } else {
+                            configMap.put(content[0], content[1]);
+                        }
                     }
                 }
             } catch (IOException ex) {

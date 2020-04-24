@@ -29,19 +29,20 @@ public class SimulationBootup {
         Logger.log("Bootup", "Attempting to boot simulation...");
         Logger.log("Config", "Initializing configuration...");
 
-        ComponentLoader componentLoader = new ComponentLoader(loadProgressListeners);
+        DynamicComponentLoader componentLoader = new DynamicComponentLoader(loadProgressListeners);
+        componentLoader.addToSize(30);
 
         //creating system api
-        componentLoader.componentLoaded();
+        componentLoader.componentLoaded("Creating System API...");
         SystemAPI systemAPI = new SystemAPI();
         addProgressUpdaterListener(systemAPI);
-        componentLoader.componentLoaded();
+        componentLoader.componentLoaded("System API created.");
 
         //initializing system api
-        componentLoader.componentLoaded();
+        componentLoader.componentLoaded("Configuring System API...");
         ConfigurationReader configurationReader = new ConfigurationReader(systemAPI, componentLoader);
         configurationReader.configure();
-        componentLoader.componentLoaded();
+        componentLoader.componentLoaded("System API successfully configured.");
 
         //todo create components
 

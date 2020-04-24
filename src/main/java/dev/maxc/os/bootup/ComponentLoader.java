@@ -25,6 +25,10 @@ public class ComponentLoader {
             "Parsed page size config option.",
             "Parsing page increase increment size config option...",
             "Parsed page increase increment size config option.",
+            "Parsing max page size config option...",
+            "Parsed max page size size config option.",
+            "Parsing dynamic paging config option...",
+            "Parsed dynamic paging config option.",
             "Parsing virtual memory config option...",
             "Parsed virtual memory config option.",
             "Parsing dynamic memory allocation config option...",
@@ -42,7 +46,10 @@ public class ComponentLoader {
 
     /**
      * Adds a component listener for when a component is loaded.
+     *
+     * Deprecated since it has been replaced with a dynamic component loader
      */
+    @Deprecated(since = "24/10/2020")
     public ComponentLoader(List<LoadProgressUpdater> loadProgressListeners) {
         this.loadProgressListeners = loadProgressListeners;
     }
