@@ -8,13 +8,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Max Carter
  * @since 21/04/2020
  */
-public class MemoryAPI {
+public class MemoryManagementUnit {
     private final RandomAccessMemory ram;
     private final int pageIncreaseIncrement;
     private final boolean isDynamicAllocation;
     private final AtomicInteger pageCount = new AtomicInteger(-1);
 
-    public MemoryAPI(RandomAccessMemory ram, boolean isDynamicAllocation, int pageIncreaseIncrement) {
+    public MemoryManagementUnit(RandomAccessMemory ram, boolean isDynamicAllocation, int pageIncreaseIncrement) {
         this.ram = ram;
         this.pageIncreaseIncrement = pageIncreaseIncrement;
         this.isDynamicAllocation = isDynamicAllocation;
@@ -52,5 +52,9 @@ public class MemoryAPI {
             Logger.log("Memory", "Unable to allocate more memory to process [" + processIdentifier + "] because dynamic memory allocation is disabled in the config.");
         }
         return false;
+    }
+
+    public void clearProcessPage(int processIdentifier) {
+        ram.clearProcessPage(processIdentifier);
     }
 }

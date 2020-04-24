@@ -1,16 +1,38 @@
 #system config
-clock_tick_frequency=10
+    clock_tick_frequency=100
 
 #cpu config
-cpu_cores=4
-cpu_cores_async=false
+    cpu_cores=4
+    cpu_cores_async=false
 
-#ram config
-main_memory_size=256
-page_size=64
-page_increase_increment=8
-virtual_memory_enabled=false
-dynamic_memory_allocation=false
+#memory config
+    main_memory_base=2
+    main_memory_power=10
+
+    dynamic_memory_allocation=true
+
+    #memory allocation algorithm which is used by the mmu
+    #if both algorithms have the same value, segmentation is prioritised
+        malloc_algorithm_use_segmentation=true
+        malloc_algorithm_use_paging=false
+
+    #paging config
+        page_size_base=2
+        page_size_power=8
+
+    #segmentation config
+        segment_base=2
+        segment_initial_power=8
+        segment_increase_power=1
+
+    #allocation algorithm used by the mmu to determine where to allocate a new page/segment
+    #if both algorithms have the same value, the order of prioritisation is: best, first then worst
+        first_fit_alloc=false
+        best_fit_alloc=true
+        worst_fit_alloc=false
+
+    #virtual memory
+        virtual_memory=false
 
 #process config
-process_first_scheduling=true
+    process_first_scheduling=true

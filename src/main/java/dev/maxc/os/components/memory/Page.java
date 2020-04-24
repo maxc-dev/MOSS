@@ -1,5 +1,7 @@
 package dev.maxc.os.components.memory;
 
+import dev.maxc.logs.Logger;
+
 import java.util.ArrayList;
 
 /**
@@ -9,10 +11,10 @@ import java.util.ArrayList;
 public class Page extends ArrayList<MemoryAddress> {
     private final int pageId;
     private int size;
-    private final int parentProcess;
+    private final int parentProcessID;
 
-    public Page(int parentProcess, int pageId, int initialSize) {
-        this.parentProcess = parentProcess;
+    public Page(int parentProcessID, int pageId, int initialSize) {
+        this.parentProcessID = parentProcessID;
         this.pageId = pageId;
         this.size = initialSize;
         allocate(initialSize);
@@ -28,8 +30,15 @@ public class Page extends ArrayList<MemoryAddress> {
         }
     }
 
-    public int getParentProcess() {
-        return parentProcess;
+    public void clear() {
+        while (!this.isEmpty()) {
+            this.remove(0);
+        }
+        Logger.log("Memory", "Page [" + toString() + "] has been cleared.");
+    }
+
+    public int getParentProcessID() {
+        return parentProcessID;
     }
 
     public int getSize() {
