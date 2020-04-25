@@ -2,59 +2,104 @@ package dev.maxc.os.components.memory;
 
 import dev.maxc.logs.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Max Carter
  * @since 21/04/2020
  */
-public class MemoryManagementUnit {
+public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
     private final RandomAccessMemory ram;
-    private final int pageIncreaseIncrement;
-    private final boolean isDynamicAllocation;
-    private final AtomicInteger pageCount = new AtomicInteger(-1);
-
-    public MemoryManagementUnit(RandomAccessMemory ram, boolean isDynamicAllocation, int pageIncreaseIncrement) {
-        this.ram = ram;
-        this.pageIncreaseIncrement = pageIncreaseIncrement;
-        this.isDynamicAllocation = isDynamicAllocation;
-    }
+    private final Class<T> logicalHandlerClass;
+    private final ArrayList<T> logicalHandlers = new ArrayList<>();
+    private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
+    private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
 
     /**
-     * Creates a new Page
+     * Creates a Memory Management Unit which is responsible for managing
+     * various operations in the main memory such as allocating memory to
+     * new processes, allocating additional memory to processes and freeing
+     * processes of their memory.
+     *
+     * @param ram                       Instance of the main memory to control.
+     * @param logicalHandler            The class of the handler used to control the ram.
+     * @param logicalMemoryHandlerUtils A util class for the controller's config.
      */
-    protected Page createNewPage(int processIdentifier) {
-        return new Page(processIdentifier, pageCount.addAndGet(1), ram.getInitialPageSize());
+    public MemoryManagementUnit(RandomAccessMemory ram, Class<T> logicalHandler, LogicalMemoryHandlerUtils logicalMemoryHandlerUtils) {
+        this.ram = ram;
+        this.logicalHandlerClass = logicalHandler;
+        this.logicalMemoryHandlerUtils = logicalMemoryHandlerUtils;
     }
 
     /**
-     * Allocates static memory to a new process
+     * Allocates a specified amount of memory addresses to a specified
+     * process by creating a Logical Address handler (Paging, Segmentation etc...)
+     */
+    private void allocate(int processIdentifier, int space) {
+        T allocator = null;
+        try {
+            allocator = logicalHandlerClass.getConstructor().newInstance(this, logicalHandlerCount.addAndGet(1), processIdentifier);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        if (allocator != null) {
+            allocator.allocate(ram.getGroupedMemoryAddress(processIdentifier, space));
+            logicalHandlers.add(allocator);
+        } else {
+            Logger.log("Memory", "Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
+            throw new RuntimeException("Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
+        }
+    }
+
+    /**
+     * Allocates memory to a new process. The amount of memory that
+     * is allocated is dependent on whether the system allocates
+     * memory with Segmentation or Paging, this can all be modified
+     * in the config file.
      */
     public boolean allocateMemoryNewProcess(int processIdentifier) {
-        if (ram.getMemoryStatus().getAllocateNewProcess()) {
-            createNewPage(processIdentifier);
-            ram.reconfigureMemoryStatus();
+        if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getInitialSize()) {
+            allocate(processIdentifier, logicalMemoryHandlerUtils.getInitialSize());
             return true;
         }
-        Logger.log("Memory", "Unable to allocate memory to process [" + processIdentifier + "] for reason [" + ram.getMemoryStatus().toString() + "]");
+        Logger.log("Memory", "Unable to allocate memory to process [" + processIdentifier + "] because the RAM is full.");
         return false;
     }
 
     /**
-     * Allocates additional memory to a page, this operation fails if dynamic memory allocation is disabled in the config
+     * Allocates additional memory to a specified process. The amount
+     * that is additionally allocated is variable whether the system
+     * allocates memory with Segmentation or Paging, this can all be
+     * modified in the config file.
      */
-    public boolean allocateMoreMemory(int processIdentifier) {
-        if (isDynamicAllocation) {
-            if (pageIncreaseIncrement <= ram.getFreeMemory()) {
-                ram.allocateToProcess(processIdentifier, pageIncreaseIncrement);
+    public boolean allocateAdditionalMemory(int processIdentifier) {
+        if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
+            for (LogicalMemoryHandler handler : logicalHandlers) {
+                if (handler.getParentProcessID() == processIdentifier) {
+                    handler.allocate(ram.getGroupedMemoryAddress(processIdentifier, logicalMemoryHandlerUtils.getIncrease()));
+                }
             }
+            return true;
         } else {
-            Logger.log("Memory", "Unable to allocate more memory to process [" + processIdentifier + "] because dynamic memory allocation is disabled in the config.");
+            Logger.log("Memory", "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
+            return false;
         }
-        return false;
     }
 
-    public void clearProcessPage(int processIdentifier) {
-        ram.clearProcessPage(processIdentifier);
+    /**
+     * Clears a process from memory by identifying the handler for the process,
+     * then making the handler free it's pointers, and then the handler is
+     * removed from the memory's list of handlers. This means that the handler
+     * will no longer be able to be accessed.
+     */
+    public void clearProcessMemory(int processIdentifier) {
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.getParentProcessID() == processIdentifier) {
+                handler.free();
+                logicalHandlers.remove(handler);
+            }
+        }
     }
 }

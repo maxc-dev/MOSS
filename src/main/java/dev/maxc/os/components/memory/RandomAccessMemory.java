@@ -1,6 +1,6 @@
 package dev.maxc.os.components.memory;
 
-import dev.maxc.logs.Logger;
+import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
 
 import java.util.ArrayList;
 
@@ -8,101 +8,63 @@ import java.util.ArrayList;
  * @author Max Carter
  * @since 14/04/2020
  */
-public class RandomAccessMemory extends ArrayList<Page> {
-    private final int maxMemorySize;
-    private final int initialPageSize;
-    private final int maxMemoryPerPage;
-    private final boolean useMaxPageSize;
+public class RandomAccessMemory extends ArrayList<MemoryAddress> {
+    private final int memoryBaseSize;
+    private final int memoryPowerSize;
+    private final MemoryAllocationIndexer mallocIndexer;
     private final boolean usingVirtualMemory;
-    private MemoryStatus memoryStatus = MemoryStatus.EMPTY;
 
-    public RandomAccessMemory(int maxMemorySize, int initialPageSize, boolean useMaxPageSize, int maxMemoryPerPage, boolean usingVirtualMemory) {
-        this.maxMemorySize = maxMemorySize;
-        this.initialPageSize = initialPageSize;
-        this.maxMemoryPerPage = maxMemoryPerPage;
-        this.useMaxPageSize = useMaxPageSize;
+    public RandomAccessMemory(int memoryBaseSize, int memoryPowerSize, MemoryAllocationIndexer mallocIndexer, boolean usingVirtualMemory) {
+        this.memoryBaseSize = memoryBaseSize;
+        this.mallocIndexer = mallocIndexer;
+        this.memoryPowerSize = memoryPowerSize;
         this.usingVirtualMemory = usingVirtualMemory;
-    }
 
-    public MemoryStatus getMemoryStatus() {
-        return memoryStatus;
-    }
-
-    /**
-     * Reconfigures the RAM status
-     */
-    protected void reconfigureMemoryStatus() {
-        int freeMemory = getFreeMemory();
-        if (freeMemory == 0) {
-            memoryStatus = MemoryStatus.FULL;
-
-        } else if (freeMemory == maxMemorySize) {
-            memoryStatus = MemoryStatus.EMPTY;
-
-        } else if (freeMemory >= initialPageSize) {
-            memoryStatus = MemoryStatus.SPACIOUS;
-
-        } else {
-            memoryStatus = MemoryStatus.LIMITED_ROOM;
+        /*
+            Populates the main memory with individual memory addresses.
+            Each address is assigned a different index which represents
+            its position in the main memory.
+         */
+        for (int i = 0; i < getMemorySize(); i++) {
+            add(new MemoryAddress(i));
         }
     }
 
-    public int getInitialPageSize() {
-        return initialPageSize;
+    public int getMemorySize() {
+        return (int) Math.pow(memoryBaseSize, memoryPowerSize);
     }
 
     /**
      * Calculates the amount of locations in memory that are free
      */
     protected int getFreeMemory() {
-        int memory = maxMemorySize;
-        for (Page page : this) {
-            memory -= page.getSize();
+        int memory = getMemorySize();
+        for (MemoryAddress memoryAddress : this) {
+            if (!memoryAddress.getMemoryUnit().isActive()) {
+                memory--;
+            }
         }
         //TODO if virtual memory is being used, find out how much can be allocated
         return memory;
     }
 
     /**
-     * Allocates a process with a specific amount of memory
+     * Uses the Memory Allocation Indexer to allocate a space in the memory to store
+     * the process. A start pointer and an end pointer are returned and are used to
+     * identify which parts of the memory will be allocated to the process.
+     *
+     * The memory addresses are then looped between the two pointers, a logical
+     * address (offset) and the parent process identifier are assigned to the
+     * memory unit so it knows it's logical position and what process it belongs to.
      */
-    protected void allocateToProcess(int processIdentifier, int amount) {
-        for (Page page : this) {
-            if (page.getParentProcessID() == processIdentifier) {
-                if (page.size() + amount > maxMemoryPerPage) {
-                    Logger.log("Memory", "Unable to allocate [" + amount + "] to Page [" + page.toString() + "] because the new page size would exceed the maximum page size in the config.");
-                    return;
-                }
-                page.allocate(amount);
-                Logger.log("Memory", "Page [" + page.toString() + "] was allocated an additional [" + amount + "] location addresses.");
-                reconfigureMemoryStatus();
-                return;
-            }
+    protected GroupedMemoryAddress getGroupedMemoryAddress(int processIdentifier, int size) {
+        GroupedMemoryAddress memAddress = mallocIndexer.getIndexAddressSlot(size);
+        int offsetCount = 0;
+        for (int i = memAddress.getStartPointer(); i < memAddress.getEndPointer(); i++) {
+            get(i).getMemoryUnit().setOffset(offsetCount);
+            get(i).getMemoryUnit().setProcessIdentifier(processIdentifier);
+            offsetCount++;
         }
-    }
-
-    protected void clearProcessPage(int processIdentifier) {
-        for (Page page : this) {
-            if (page.getParentProcessID() == processIdentifier) {
-
-            }
-        }
-    }
-
-    protected enum MemoryStatus {
-        EMPTY(true),          //ram is empty
-        SPACIOUS(true),       //ram has some pages but is not full
-        LIMITED_ROOM(false),   //there is room but not enough for a new page
-        FULL(false);           //there is no more room in the main memory
-
-        private final boolean canAllocateNewProcess;
-
-        MemoryStatus(boolean canAllocateNewProcess) {
-            this.canAllocateNewProcess = canAllocateNewProcess;
-        }
-
-        public boolean getAllocateNewProcess() {
-            return canAllocateNewProcess;
-        }
+        return memAddress;
     }
 }
