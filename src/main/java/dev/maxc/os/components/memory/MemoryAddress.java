@@ -5,17 +5,19 @@ package dev.maxc.os.components.memory;
  * @since 14/04/2020
  */
 public class MemoryAddress {
-    private final Page parent;
-    private final int offset;
+    private LogicalMemoryHandler parentMemoryHandler;
+    private final int index;
     private final MemoryUnit memoryUnit = new MemoryUnit(this);
 
-    public MemoryAddress(Page parentPage, int offset) {
-        this.parent = parentPage;
-        this.offset = offset;
+    public MemoryAddress(int index) {
+        this.index = index;
     }
 
-    public int getOffset() {
-        return offset;
+    /**
+     * Gets the index of the memory address in the RAM
+     */
+    public int getIndex() {
+        return index;
     }
 
     public MemoryUnit getMemoryUnit() {
@@ -24,6 +26,6 @@ public class MemoryAddress {
 
     @Override
     public String toString() {
-        return parent.toString() + Integer.toHexString(offset);
+        return parentMemoryHandler.toString() + Integer.toHexString(index);
     }
 }

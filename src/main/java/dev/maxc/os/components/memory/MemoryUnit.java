@@ -10,11 +10,33 @@ import dev.maxc.os.io.exceptions.memory.MutatingLockedUnitException;
  */
 public class MemoryUnit {
     private boolean locked = false;
+    private boolean active = true;
     private int content;
+    private int offset;
+    private int processIdentifier;
     private final MemoryAddress memoryAddress;
 
     public MemoryUnit(MemoryAddress memoryAddress) {
         this.memoryAddress = memoryAddress;
+    }
+
+    /**
+     * Gets the logical address in the logical memory handler (paging, segmentation etc...)
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    public int getProcessIdentifier() {
+        return processIdentifier;
+    }
+
+    public void setProcessIdentifier(int processIdentifier) {
+        this.processIdentifier = processIdentifier;
     }
 
     /**
@@ -28,6 +50,7 @@ public class MemoryUnit {
             Logger.log("Memory", "Attempting to access a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new AccessingLockedUnitException(memoryAddress);
         } else {
+            lock();
             return content;
         }
     }
@@ -44,6 +67,23 @@ public class MemoryUnit {
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
             this.content = content;
+            this.active = true;
+        }
+    }
+
+    /**
+     * Clears the memory unit of it's data, setting the value to the default (0).
+     * The memory unit state will be changed to
+     *
+     * @throws MutatingLockedUnitException
+     */
+    public void clear() throws MutatingLockedUnitException {
+        if (locked) {
+            Logger.log("Memory", "Attempting to clear a locked memory unit at address [" + memoryAddress.toString() + "]");
+            throw new MutatingLockedUnitException(memoryAddress);
+        } else {
+            this.content = 0;
+            this.active = false;
         }
     }
 
@@ -57,5 +97,9 @@ public class MemoryUnit {
 
     public void unlock() {
         locked = false;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }
