@@ -9,21 +9,17 @@
     main_memory_base=2
     main_memory_power=10
 
-    dynamic_memory_allocation=true
-
     #memory allocation algorithm which is used by the mmu
     #if both algorithms have the same value, segmentation is prioritised
         malloc_algorithm_use_segmentation=true
         malloc_algorithm_use_paging=false
 
-    #paging config
-        page_size_base=2
-        page_size_power=8
+    malloc_size_base=2
+    malloc_size_power=4
 
     #segmentation config
-        segment_base=2
-        segment_initial_power=8
-        segment_increase_power=1
+        #the segment will increase in size by base^x
+        segment_increase_power=2
 
     #allocation algorithm used by the mmu to determine where to allocate a new page/segment
     #if both algorithms have the same value, the order of prioritisation is: best, first then worst

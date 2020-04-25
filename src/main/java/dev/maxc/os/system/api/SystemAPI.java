@@ -9,8 +9,8 @@ package dev.maxc.os.system.api;
 import dev.maxc.logs.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
-import dev.maxc.os.components.memory.MemoryManagementUnit;
-import dev.maxc.os.components.memory.RandomAccessMemory;
+import dev.maxc.os.components.memory.*;
+import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.virtual.process.ProcessAPI;
 import dev.maxc.os.components.virtual.thread.ThreadAPI;
 import dev.maxc.ui.api.UserInterfaceAPI;
@@ -45,9 +45,6 @@ public class SystemAPI implements LoadProgressUpdater {
     @Configurable(docs = "The amount of memory locations available.")
     public int MAIN_MEMORY_POWER;
 
-    @Configurable(docs = "Memory is allocated to a process when it needs it during execution.")
-    public boolean DYNAMIC_MEMORY_ALLOCATION;
-
     @Configurable(value = "malloc_algorithm_use_segmentation", docs = "If the MMU uses segmentation to allocate memory.")
     public boolean USE_SEGMENTATION;
 
@@ -56,25 +53,21 @@ public class SystemAPI implements LoadProgressUpdater {
 
     //paging config
 
-    @Configurable(docs = "Base of the paging system.")
-    public int PAGE_SIZE_BASE;
+    @Configurable(value="malloc_size_base", docs = "The base of the allocation system.")
+    public int ALLOCATION_BASE;
 
-    @Configurable(docs = "The power of each page.")
-    public int PAGE_SIZE_POWER;
+    @Configurable(value="malloc_size_power", docs = "The power of allocation system.")
+    public int ALLOCATION_POWER;
 
     //segmentation config
 
-    @Configurable(docs = "Base of the paging system.")
-    public int SEGMENTATION_SIZE_BASE;
-
-    @Configurable(docs = "The power of each page.")
-    public int SEGMENTATION_SIZE_POWER;
+    @Configurable(docs = "The power by which the segments will increase by (Base^x).")
+    public int SEGMENTATION_INCREASE_POWER;
 
     //virtual memory config
 
     @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
     public boolean VIRTUAL_MEMORY;
-
 
     //process config
 
@@ -94,7 +87,15 @@ public class SystemAPI implements LoadProgressUpdater {
     @Override
     public void onLoadComplete() {
         //TODO update ram and mmu with new paging/segmentation algorithm arch
-        //memoryAPI = new MemoryManagementUnit(new RandomAccessMemory(MAIN_MEMORY_SIZE, PAGE_SIZE, DYNAMIC_MAX_PAGE_SIZE, MAX_MEMORY_PER_PAGE, VIRTUAL_MEMORY), DYNAMIC_MEMORY_ALLOCATION, PAGE_INCREASE_INCREMENT);
+        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, ALLOCATION_POWER, new FirstFit(), VIRTUAL_MEMORY);
+        LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
+        if (USE_SEGMENTATION) {
+            memoryAPI = new MemoryManagementUnit<Segment>(ram, Segment.class, handlerUtils);
+        } else {
+            memoryAPI = new MemoryManagementUnit<Page>(ram, Page.class, handlerUtils);
+        }
+
+
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI);
         Logger.log("System", "Created memory, thread and process APIs.");
