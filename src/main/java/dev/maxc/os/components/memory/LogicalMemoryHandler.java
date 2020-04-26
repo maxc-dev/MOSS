@@ -13,11 +13,11 @@ public abstract class LogicalMemoryHandler {
         this.parentProcessID = parentProcessID;
     }
 
-    public int getId() {
+    public final int getId() {
         return id;
     }
 
-    public int getParentProcessID() {
+    public final int getParentProcessID() {
         return parentProcessID;
     }
 

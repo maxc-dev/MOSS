@@ -90,10 +90,10 @@ public class SystemAPI implements LoadProgressUpdater {
         LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
         if (USE_SEGMENTATION) {
             USE_PAGING = false;
-            memoryAPI = new MemoryManagementUnit<Segment>(ram, Segment.class, handlerUtils);
+            memoryAPI = new MemoryManagementUnit<Segmentation>(ram, Segmentation.class, handlerUtils);
         } else {
             USE_PAGING = true;
-            memoryAPI = new MemoryManagementUnit<Page>(ram, Page.class, handlerUtils);
+            memoryAPI = new MemoryManagementUnit<Paging>(ram, Paging.class, handlerUtils);
         }
 
         threadAPI = new ThreadAPI();
