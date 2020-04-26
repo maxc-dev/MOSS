@@ -5,7 +5,7 @@ import java.util.List;
 
 import dev.maxc.os.bootup.config.ConfigurationReader;
 import dev.maxc.os.system.api.SystemAPI;
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.log.Logger;
 
 /**
  * @author Max Carter
@@ -26,8 +26,7 @@ public class SimulationBootup {
      * Loads all the OS simulator components
      */
     public void bootup() {
-        Logger.log("Bootup", "Attempting to boot simulation...");
-        Logger.log("Config", "Initializing configuration...");
+        Logger.log(this, "Attempting to boot simulation...");
 
         DynamicComponentLoader componentLoader = new DynamicComponentLoader(loadProgressListeners);
         componentLoader.addToSize(30);
@@ -46,7 +45,7 @@ public class SimulationBootup {
 
         //todo create components
 
-        Logger.log("Config", "Configuration initialization successful.");
+        Logger.log(this, "Configuration initialization successful.");
         for (LoadProgressUpdater loadProgressUpdater : loadProgressListeners) {
             loadProgressUpdater.onLoadComplete();
         }

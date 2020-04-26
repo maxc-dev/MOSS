@@ -5,17 +5,28 @@ package dev.maxc.os.components.memory;
  * @since 25/04/2020
  */
 public class Segment extends LogicalMemoryHandler {
-    public Segment(RandomAccessMemory ram, int id, int parentProcessID) {
-        super(ram, id, parentProcessID);
+    private final RandomAccessMemory ram;
+    private final LogicalMemoryHandlerUtils utils;
+
+    public Segment(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, int id, int parentProcessID) {
+        super(id, parentProcessID);
+        this.ram = ram;
+        this.utils = utils;
+    }
+
+
+    @Override
+    protected void allocate(GroupedMemoryAddress groupedMemoryAddress) {
+
     }
 
     @Override
-    protected void handle(GroupedMemoryAddress groupedMemoryAddress) {
-        /*
-            todo (
-             memory is allocated by increasing the segment size
-             the size is obtained by the pointers in the param
-             )
-         */
+    protected MemoryUnit getMemoryUnit(int offset) {
+        return null;
+    }
+
+    @Override
+    protected void free() {
+
     }
 }

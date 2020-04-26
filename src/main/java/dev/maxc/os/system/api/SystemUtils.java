@@ -8,7 +8,7 @@ package dev.maxc.os.system.api;
 
 import java.util.Random;
 
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.log.Logger;
 import javafx.application.Platform;
 
 /**
@@ -38,7 +38,7 @@ public class SystemUtils {
      * Closes the simulation and the system.
      */
     public static void shutdown() {
-        Logger.log("Shutting down...");
+        Logger.log("SystemUtils", "Shutting down...");
         Platform.exit();
         System.exit(0);
     }

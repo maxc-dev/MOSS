@@ -19,6 +19,9 @@ public class DynamicComponentLoader {
         this.size += size;
     }
 
+    /**
+     * Loads a component which allows the user to see the loading progress.
+     */
     public void componentLoaded(String message) {
         for (LoadProgressUpdater loadProgressUpdater : loadProgressListeners) {
             loadProgressUpdater.onUpdateProgression(message, (double) (pointer +1)/size);

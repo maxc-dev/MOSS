@@ -2,7 +2,7 @@ package dev.maxc;
 
 import dev.maxc.os.system.api.SystemAPI;
 import dev.maxc.os.system.api.SystemUtils;
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.ui.util.Display;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -50,7 +50,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        Logger.log("App started.");
+        Logger.log("Main", "App started.");
         launch();
     }
 }

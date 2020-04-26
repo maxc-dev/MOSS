@@ -1,6 +1,6 @@
 package dev.maxc.ui.api;
 
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.system.api.SystemAPI;
 import javafx.application.Platform;
 import javafx.stage.Stage;

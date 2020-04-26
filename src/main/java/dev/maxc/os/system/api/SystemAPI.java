@@ -6,7 +6,7 @@
 
 package dev.maxc.os.system.api;
 
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
 import dev.maxc.os.components.memory.*;
@@ -86,18 +86,18 @@ public class SystemAPI implements LoadProgressUpdater {
 
     @Override
     public void onLoadComplete() {
-        //TODO update ram and mmu with new paging/segmentation algorithm arch
         RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, ALLOCATION_POWER, new FirstFit(), VIRTUAL_MEMORY);
         LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
         if (USE_SEGMENTATION) {
+            USE_PAGING = false;
             memoryAPI = new MemoryManagementUnit<Segment>(ram, Segment.class, handlerUtils);
         } else {
+            USE_PAGING = true;
             memoryAPI = new MemoryManagementUnit<Page>(ram, Page.class, handlerUtils);
         }
 
-
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI);
-        Logger.log("System", "Created memory, thread and process APIs.");
+        Logger.log(this, "Created memory, thread and process APIs.");
     }
 }

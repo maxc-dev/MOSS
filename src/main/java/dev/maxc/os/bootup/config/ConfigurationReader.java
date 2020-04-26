@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dev.maxc.App;
-import dev.maxc.os.bootup.ComponentLoader;
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.DynamicComponentLoader;
+import dev.maxc.os.io.log.Status;
 import dev.maxc.os.system.api.SystemAPI;
 
 /**
@@ -48,11 +48,11 @@ public class ConfigurationReader {
                     try {
                         field.set(system, getDeducedType(config.getValue()));
                     } catch (IllegalAccessException | NullPointerException ex) {
-                        Logger.log("Config", "Unable to configure value for: " + config.getKey().toUpperCase());
+                        Logger.log(Status.WARN, this, "Unable to configure value for: " + config.getKey().toUpperCase());
                         ex.printStackTrace();
                     }
                     componentLoader.componentLoaded("Parsed " + field.getName().toLowerCase().replace("_", " ") + ".");
-                    Logger.log("Config", "Set config option [" + config.getKey().toUpperCase() + "] to [" + config.getValue().toLowerCase() + "]");
+                    Logger.log(this, "Set config option [" + config.getKey().toUpperCase() + "] to [" + config.getValue().toLowerCase() + "]");
                     found = field;
                     break;
                 }
@@ -65,9 +65,9 @@ public class ConfigurationReader {
         }
 
         if (!fields.isEmpty()) {
-            Logger.log("Config", "There are missing attributes in the config file.");
+            Logger.log(Status.WARN, this, "There are missing attributes in the config file.");
         }
-        Logger.log("Config", "Successfully configured the SystemAPI.");
+        Logger.log(this, "Successfully configured the SystemAPI.");
     }
 
     /**
@@ -110,7 +110,7 @@ public class ConfigurationReader {
          * there is an internal error with the file reader.
          */
         protected HashMap<String, String> getConfigFileMap() {
-            Logger.log("Config", "Gathering config file into map...");
+            Logger.log(this, "Gathering config file into map...");
             HashMap<String, String> configMap = new HashMap<>();
             String line;
             try {
@@ -120,23 +120,23 @@ public class ConfigurationReader {
                     if (!line.trim().startsWith(COMMENT_CHARACTER) && !line.trim().isBlank()) {
                         String[] content = line.trim().split("=");
                         if (content.length == 0) {
-                            Logger.log("Config", "Unknown error in the config file, a config option name is null.");
+                            Logger.log(Status.ERROR, this, "Unknown error in the config file, a config option name is null.");
                         } else if (content.length == 1) {
-                            Logger.log("Config", "Config option [" + content[0] + "] does not have a value");
+                            Logger.log(Status.ERROR, this, "Config option [" + content[0] + "] does not have a value");
                         } else {
                             configMap.put(content[0], content[1]);
                         }
                     }
                 }
             } catch (IOException ex) {
-                Logger.log("Config", "IOException occurred during config file reading.");
+                Logger.log(Status.CRIT, this, "IOException occurred during config file reading.");
                 ex.printStackTrace();
             } catch (IndexOutOfBoundsException ex) {
-                Logger.log("Config", "Config file formatted incorrectly.");
+                Logger.log(Status.CRIT, this, "Config file formatted incorrectly.");
                 ex.printStackTrace();
             }
 
-            Logger.log("Config", "Gathered config file and parsed to map successfully.");
+            Logger.log(this, "Gathered config file and parsed to map successfully.");
             return configMap;
         }
     }
