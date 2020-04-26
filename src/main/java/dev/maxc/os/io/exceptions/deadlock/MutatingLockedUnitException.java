@@ -1,4 +1,4 @@
-package dev.maxc.os.io.exceptions.memory;
+package dev.maxc.os.io.exceptions.deadlock;
 
 import dev.maxc.os.components.memory.MemoryAddress;
 
