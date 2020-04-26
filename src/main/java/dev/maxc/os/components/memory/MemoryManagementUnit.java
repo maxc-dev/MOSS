@@ -1,6 +1,8 @@
 package dev.maxc.os.components.memory;
 
-import dev.maxc.logs.Logger;
+import dev.maxc.os.io.exceptions.memory.InvalidLogicalMemoryHandler;
+import dev.maxc.os.io.log.Logger;
+import dev.maxc.os.io.log.Status;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -37,19 +39,19 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
      * Allocates a specified amount of memory addresses to a specified
      * process by creating a Logical Address handler (Paging, Segmentation etc...)
      */
-    private void allocate(int processIdentifier, int space) {
+    private void allocate(int processIdentifier, int space) throws InvalidLogicalMemoryHandler {
         T allocator = null;
         try {
-            allocator = logicalHandlerClass.getConstructor().newInstance(this, logicalHandlerCount.addAndGet(1), processIdentifier);
+            allocator = logicalHandlerClass.getConstructor().newInstance(ram, logicalHandlerCount.addAndGet(1), processIdentifier);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         if (allocator != null) {
-            allocator.allocate(ram.getGroupedMemoryAddress(processIdentifier, space));
+            allocator.allocate(ram.getGroupedMemoryAddress(space));
             logicalHandlers.add(allocator);
         } else {
-            Logger.log("Memory", "Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
-            throw new RuntimeException("Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
+            Logger.log(Status.CRIT, this, "Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
+            throw new InvalidLogicalMemoryHandler(logicalHandlerClass, processIdentifier);
         }
     }
 
@@ -61,10 +63,15 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
      */
     public boolean allocateMemoryNewProcess(int processIdentifier) {
         if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getInitialSize()) {
-            allocate(processIdentifier, logicalMemoryHandlerUtils.getInitialSize());
+            try {
+                allocate(processIdentifier, logicalMemoryHandlerUtils.getInitialSize());
+            } catch (InvalidLogicalMemoryHandler ex) {
+                ex.printStackTrace();
+                return false;
+            }
             return true;
         }
-        Logger.log("Memory", "Unable to allocate memory to process [" + processIdentifier + "] because the RAM is full.");
+        Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
         return false;
     }
 
@@ -78,14 +85,24 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
         if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
             for (LogicalMemoryHandler handler : logicalHandlers) {
                 if (handler.getParentProcessID() == processIdentifier) {
-                    handler.allocate(ram.getGroupedMemoryAddress(processIdentifier, logicalMemoryHandlerUtils.getIncrease()));
+                    handler.allocate(ram.getGroupedMemoryAddress(logicalMemoryHandlerUtils.getIncrease()));
                 }
             }
             return true;
         } else {
-            Logger.log("Memory", "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
+            Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
             return false;
         }
+    }
+
+    public MemoryUnit getMemoryUnitFromProcess(int processIdentifier, int offset) {
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.getParentProcessID() == processIdentifier) {
+                return handler.getMemoryUnit(offset);
+            }
+        }
+        Logger.log(Status.ERROR, this, "Unable to get a Memory Unit for process [" + processIdentifier + "] at offset [" + offset + "]");
+        return null;
     }
 
     /**

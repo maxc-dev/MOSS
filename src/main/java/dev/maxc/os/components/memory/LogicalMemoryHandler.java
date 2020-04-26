@@ -1,19 +1,14 @@
 package dev.maxc.os.components.memory;
 
-import java.util.ArrayList;
-
 /**
  * @author Max Carter
  * @since 25/04/2020
  */
 public abstract class LogicalMemoryHandler {
-    private final RandomAccessMemory ram;
     private final int id;
     private final int parentProcessID;
-    private ArrayList<GroupedMemoryAddress> memoryAddresses = new ArrayList<>();
 
-    public LogicalMemoryHandler(RandomAccessMemory ram, int id, int parentProcessID) {
-        this.ram = ram;
+    public LogicalMemoryHandler(int id, int parentProcessID) {
         this.id = id;
         this.parentProcessID = parentProcessID;
     }
@@ -26,50 +21,20 @@ public abstract class LogicalMemoryHandler {
         return parentProcessID;
     }
 
-    protected ArrayList<GroupedMemoryAddress> getMemoryAddresses() {
-        return memoryAddresses;
-    }
+    /**
+     * Allocates a pointer range of more memory addresses
+     */
+    protected abstract void allocate(GroupedMemoryAddress groupedMemoryAddress);
 
-    private int getSize() {
-        int size = 0;
-        for (GroupedMemoryAddress groupedMemoryAddress : memoryAddresses) {
-            size += groupedMemoryAddress.getEndPointer() - groupedMemoryAddress.getStartPointer();
-        }
-        return size;
-    }
+    /**
+     * Gets the memory unit at a specific offset in the logical memory
+     */
+    protected abstract MemoryUnit getMemoryUnit(int offset);
 
     /**
      * Frees the memory used by the process
      */
-    public void free() {
-        memoryAddresses.clear();
-    }
-
-    /**
-     * Allocates a pointer range of more memory addresses
-     */
-    protected void allocate(GroupedMemoryAddress groupedMemoryAddress) {
-        memoryAddresses.add(groupedMemoryAddress);
-        handle(groupedMemoryAddress);
-    }
-
-    protected abstract void handle(GroupedMemoryAddress groupedMemoryAddress);
-
-    public int getUsedSpace() {
-        int usedSpace = 0;
-        for (GroupedMemoryAddress groupedMemoryAddress : memoryAddresses) {
-            for (int i = groupedMemoryAddress.getStartPointer(); i < groupedMemoryAddress.getEndPointer(); i++) {
-                if (ram.get(i).getMemoryUnit().isActive()) {
-                    usedSpace++;
-                }
-            }
-        }
-        return usedSpace;
-    }
-
-    public int getFreeSpace() {
-        return getSize() - getUsedSpace();
-    }
+    protected abstract void free();
 
     @Override
     public String toString() {

@@ -52,19 +52,8 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * Uses the Memory Allocation Indexer to allocate a space in the memory to store
      * the process. A start pointer and an end pointer are returned and are used to
      * identify which parts of the memory will be allocated to the process.
-     *
-     * The memory addresses are then looped between the two pointers, a logical
-     * address (offset) and the parent process identifier are assigned to the
-     * memory unit so it knows it's logical position and what process it belongs to.
      */
-    protected GroupedMemoryAddress getGroupedMemoryAddress(int processIdentifier, int size) {
-        GroupedMemoryAddress memAddress = mallocIndexer.getIndexAddressSlot(size);
-        int offsetCount = 0;
-        for (int i = memAddress.getStartPointer(); i < memAddress.getEndPointer(); i++) {
-            get(i).getMemoryUnit().setOffset(offsetCount);
-            get(i).getMemoryUnit().setProcessIdentifier(processIdentifier);
-            offsetCount++;
-        }
-        return memAddress;
+    protected GroupedMemoryAddress getGroupedMemoryAddress(int size) {
+        return mallocIndexer.getIndexAddressSlot(size);
     }
 }

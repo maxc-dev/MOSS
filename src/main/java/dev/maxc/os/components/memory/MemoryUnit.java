@@ -1,8 +1,9 @@
 package dev.maxc.os.components.memory;
 
-import dev.maxc.logs.Logger;
-import dev.maxc.os.io.exceptions.memory.AccessingLockedUnitException;
-import dev.maxc.os.io.exceptions.memory.MutatingLockedUnitException;
+import dev.maxc.os.io.log.Logger;
+import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
+import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
+import dev.maxc.os.io.log.Status;
 
 /**
  * @author Max Carter
@@ -12,31 +13,10 @@ public class MemoryUnit {
     private boolean locked = false;
     private boolean active = true;
     private int content;
-    private int offset;
-    private int processIdentifier;
     private final MemoryAddress memoryAddress;
 
     public MemoryUnit(MemoryAddress memoryAddress) {
         this.memoryAddress = memoryAddress;
-    }
-
-    /**
-     * Gets the logical address in the logical memory handler (paging, segmentation etc...)
-     */
-    public int getOffset() {
-        return offset;
-    }
-
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    public int getProcessIdentifier() {
-        return processIdentifier;
-    }
-
-    public void setProcessIdentifier(int processIdentifier) {
-        this.processIdentifier = processIdentifier;
     }
 
     /**
@@ -47,7 +27,7 @@ public class MemoryUnit {
      */
     public int access() throws AccessingLockedUnitException {
         if (locked) {
-            Logger.log("Memory", "Attempting to access a locked memory unit at address [" + memoryAddress.toString() + "]");
+            Logger.log(Status.CRIT, this, "Attempting to access a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new AccessingLockedUnitException(memoryAddress);
         } else {
             lock();
@@ -63,7 +43,7 @@ public class MemoryUnit {
      */
     public void mutate(int content) throws MutatingLockedUnitException {
         if (locked) {
-            Logger.log("Memory", "Attempting to mutate a locked memory unit at address [" + memoryAddress.toString() + "]");
+            Logger.log(Status.CRIT, this, "Attempting to mutate a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
             this.content = content;
@@ -79,7 +59,7 @@ public class MemoryUnit {
      */
     public void clear() throws MutatingLockedUnitException {
         if (locked) {
-            Logger.log("Memory", "Attempting to clear a locked memory unit at address [" + memoryAddress.toString() + "]");
+            Logger.log(Status.CRIT, this, "Attempting to clear a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
             this.content = 0;

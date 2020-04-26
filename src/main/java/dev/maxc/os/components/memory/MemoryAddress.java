@@ -5,7 +5,6 @@ package dev.maxc.os.components.memory;
  * @since 14/04/2020
  */
 public class MemoryAddress {
-    private LogicalMemoryHandler parentMemoryHandler;
     private final int index;
     private final MemoryUnit memoryUnit = new MemoryUnit(this);
 
@@ -26,6 +25,6 @@ public class MemoryAddress {
 
     @Override
     public String toString() {
-        return parentMemoryHandler.toString() + Integer.toHexString(index);
+        return Integer.toHexString(index);
     }
 }
