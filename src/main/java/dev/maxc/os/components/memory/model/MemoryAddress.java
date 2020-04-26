@@ -1,4 +1,4 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.memory.model;
 
 /**
  * @author Max Carter
@@ -13,7 +13,7 @@ public class MemoryAddress {
     }
 
     /**
-     * Gets the index of the memory address in the RAM
+     * Gets the physical index of the memory address in the RAM
      */
     public int getIndex() {
         return index;

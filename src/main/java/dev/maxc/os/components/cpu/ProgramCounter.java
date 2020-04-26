@@ -1,6 +1,6 @@
 package dev.maxc.os.components.cpu;
 
-import dev.maxc.os.components.memory.MemoryAddress;
+import dev.maxc.os.components.memory.model.MemoryAddress;
 import dev.maxc.os.structures.Queue;
 
 /**

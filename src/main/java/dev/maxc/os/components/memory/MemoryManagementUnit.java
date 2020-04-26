@@ -1,5 +1,8 @@
 package dev.maxc.os.components.memory;
 
+import dev.maxc.os.components.memory.allocation.LogicalMemoryHandler;
+import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.io.exceptions.memory.InvalidLogicalMemoryHandler;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;

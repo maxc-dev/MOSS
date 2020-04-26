@@ -6,6 +6,9 @@
 
 package dev.maxc.os.system.api;
 
+import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.memory.allocation.Paging;
+import dev.maxc.os.components.memory.allocation.Segmentation;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;

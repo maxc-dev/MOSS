@@ -1,5 +1,6 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.memory.allocation;
 
+import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 

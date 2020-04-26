@@ -1,5 +1,8 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.memory.allocation;
 
+import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.io.log.Logger;
 
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ public class Paging extends LogicalMemoryHandler {
      * list.
      */
     @Override
-    protected void allocate(GroupedMemoryAddress groupedMemoryAddress) {
+    public void allocate(GroupedMemoryAddress groupedMemoryAddress) {
         Page page = null;
         for (int i = 0; i < groupedMemoryAddress.getEndPointer() - groupedMemoryAddress.getStartPointer(); i++) {
             if (i % utils.getInitialSize() == 0) {
@@ -40,7 +43,7 @@ public class Paging extends LogicalMemoryHandler {
      * Gets the Memory Unit which has it's own offset in the page.
      */
     @Override
-    protected MemoryUnit getMemoryUnit(int offset) {
+    public MemoryUnit getMemoryUnit(int offset) {
         int pageId = (int) Math.floor((double) offset/utils.getInitialSize());
         int pageOffset = offset % utils.getInitialSize();
         return pages.get(pageId).getMemoryUnit(pageOffset);
@@ -50,7 +53,7 @@ public class Paging extends LogicalMemoryHandler {
      * Clears up all the memory used by all the different pages.
      */
     @Override
-    protected void free() {
+    public void free() {
         pages.clear();
         Logger.log(this, "The Memory Units for [" + super.toString() + "] have been cleared.");
     }

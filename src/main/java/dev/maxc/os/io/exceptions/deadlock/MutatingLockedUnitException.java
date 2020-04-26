@@ -1,6 +1,6 @@
 package dev.maxc.os.io.exceptions.deadlock;
 
-import dev.maxc.os.components.memory.MemoryAddress;
+import dev.maxc.os.components.memory.model.MemoryAddress;
 
 /**
  * @author Max Carter

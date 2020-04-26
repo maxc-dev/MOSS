@@ -1,6 +1,8 @@
 package dev.maxc.os.components.memory;
 
 import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
+import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.MemoryAddress;
 
 import java.util.ArrayList;
 

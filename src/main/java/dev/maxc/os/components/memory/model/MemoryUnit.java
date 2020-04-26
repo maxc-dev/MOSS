@@ -1,4 +1,4 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.memory.model;
 
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;

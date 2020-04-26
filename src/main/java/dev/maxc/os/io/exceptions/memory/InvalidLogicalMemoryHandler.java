@@ -1,6 +1,6 @@
 package dev.maxc.os.io.exceptions.memory;
 
-import dev.maxc.os.components.memory.LogicalMemoryHandler;
+import dev.maxc.os.components.memory.allocation.LogicalMemoryHandler;
 
 /**
  * @author Max Carter

@@ -1,4 +1,7 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.memory.allocation;
+
+import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.MemoryUnit;
 
 /**
  * @author Max Carter
@@ -24,17 +27,17 @@ public abstract class LogicalMemoryHandler {
     /**
      * Allocates a pointer range of more memory addresses
      */
-    protected abstract void allocate(GroupedMemoryAddress groupedMemoryAddress);
+    public abstract void allocate(GroupedMemoryAddress groupedMemoryAddress);
 
     /**
      * Gets the memory unit at a specific offset in the logical memory
      */
-    protected abstract MemoryUnit getMemoryUnit(int offset);
+    public abstract MemoryUnit getMemoryUnit(int offset);
 
     /**
      * Frees the memory used by the process
      */
-    protected abstract void free();
+    public abstract void free();
 
     @Override
     public String toString() {

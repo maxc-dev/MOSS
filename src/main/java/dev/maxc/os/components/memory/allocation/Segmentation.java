@@ -1,5 +1,8 @@
-package dev.maxc.os.components.memory;
+package dev.maxc.os.components.memory.allocation;
 
+import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.io.log.Logger;
 
 /**
@@ -17,7 +20,7 @@ public class Segmentation extends LogicalMemoryHandler {
     }
 
     @Override
-    protected void allocate(GroupedMemoryAddress groupedMemoryAddress) {
+    public void allocate(GroupedMemoryAddress groupedMemoryAddress) {
         for (int i = groupedMemoryAddress.getStartPointer(); i < groupedMemoryAddress.getEndPointer(); i++) {
             while (!segment.addMemoryUnit(ram.get(i).getMemoryUnit())) { //todo needs testing
                 segment.increase();
@@ -26,12 +29,12 @@ public class Segmentation extends LogicalMemoryHandler {
     }
 
     @Override
-    protected MemoryUnit getMemoryUnit(int offset) {
+    public MemoryUnit getMemoryUnit(int offset) {
         return segment.getMemoryUnit(offset);
     }
 
     @Override
-    protected void free() {
+    public void free() {
         segment.free();
         Logger.log(this, "The Memory Units for [" + super.toString() + "] have been cleared.");
     }

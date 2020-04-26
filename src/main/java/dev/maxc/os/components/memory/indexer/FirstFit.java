@@ -1,6 +1,6 @@
 package dev.maxc.os.components.memory.indexer;
 
-import dev.maxc.os.components.memory.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
 
 /**
  * @author Max Carter
