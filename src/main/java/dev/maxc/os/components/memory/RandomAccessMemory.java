@@ -1,9 +1,13 @@
 package dev.maxc.os.components.memory;
 
+import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
 import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
 import dev.maxc.os.components.memory.model.MemoryAddress;
+import dev.maxc.os.io.log.Logger;
+import dev.maxc.os.io.log.Status;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
@@ -13,13 +17,20 @@ import java.util.ArrayList;
 public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     private final int memoryBaseSize;
     private final int memoryPowerSize;
-    private final MemoryAllocationIndexer mallocIndexer;
+    private MemoryAllocationIndexer mallocIndexer;
     private final boolean usingVirtualMemory;
 
-    public RandomAccessMemory(int memoryBaseSize, int memoryPowerSize, MemoryAllocationIndexer mallocIndexer, boolean usingVirtualMemory) {
+    public <T extends MemoryAllocationIndexer> RandomAccessMemory(int memoryBaseSize, int memoryPowerSize, Class<T> mallocIndexerClass, boolean usingVirtualMemory) {
         this.memoryBaseSize = memoryBaseSize;
-        this.mallocIndexer = mallocIndexer;
         this.memoryPowerSize = memoryPowerSize;
+        Logger.log(this, "Main memory created of size [" + getMemorySize() + "]");
+        try {
+            this.mallocIndexer = mallocIndexerClass.getConstructor().newInstance(this);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            Logger.log(Status.ERROR, this, "Unable to initialize the configured memory allocation indexer [" + mallocIndexerClass.getSimpleName() + ".class] Defaulting to Best Fit.");
+            //e.printStackTrace();
+            this.mallocIndexer = new FirstFit(this); //todo once bestfit is created, use that instead of first fit
+        }
         this.usingVirtualMemory = usingVirtualMemory;
 
         /*
@@ -54,8 +65,15 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * Uses the Memory Allocation Indexer to allocate a space in the memory to store
      * the process. A start pointer and an end pointer are returned and are used to
      * identify which parts of the memory will be allocated to the process.
+     *
+     * The returned address set is used to mark all the corresponding memory
+     * units as active.
      */
-    protected GroupedMemoryAddress getGroupedMemoryAddress(int size) {
-        return mallocIndexer.getIndexAddressSlot(size);
+    public GroupedMemoryAddress getGroupedMemoryAddress(int size) {
+        GroupedMemoryAddress addressSet = mallocIndexer.getIndexAddressSlot(size);
+        for (int i = addressSet.getStartPointer(); i < addressSet.getEndPointer() + 1; i++) {
+            get(i).getMemoryUnit().setActive(true);
+        }
+        return addressSet;
     }
 }
