@@ -30,7 +30,7 @@ public class Paging extends LogicalMemoryHandler {
     @Override
     public void allocate(GroupedMemoryAddress groupedMemoryAddress) {
         Page page = null;
-        for (int i = 0; i < groupedMemoryAddress.getEndPointer() - groupedMemoryAddress.getStartPointer(); i++) {
+        for (int i = 0; i < groupedMemoryAddress.getEndPointer() - groupedMemoryAddress.getStartPointer() + 1; i++) {
             if (i % utils.getInitialSize() == 0) {
                 page = new Page(utils);
                 pages.add(page);

@@ -12,9 +12,9 @@ public class GroupedMemoryAddress {
     private final int endPointer;
 
     public GroupedMemoryAddress(int startPointer, int endPointer) {
-        if (endPointer >= startPointer) {
+        if (endPointer < startPointer) {
             Logger.log(Status.ERROR, this, "A grouped memory address pointer set was created whereby the end pointer is greater than the start pointer.");
-            throw new IllegalArgumentException("The end pointer [" + endPointer + "] must be smaller than the start pointer [" + startPointer + "].");
+            throw new IllegalArgumentException("The end pointer [" + endPointer + "] must be greater than the start pointer [" + startPointer + "].");
         }
         this.startPointer = startPointer;
         this.endPointer = endPointer;

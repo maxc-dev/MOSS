@@ -21,7 +21,7 @@ public class Segmentation extends LogicalMemoryHandler {
 
     @Override
     public void allocate(GroupedMemoryAddress groupedMemoryAddress) {
-        for (int i = groupedMemoryAddress.getStartPointer(); i < groupedMemoryAddress.getEndPointer(); i++) {
+        for (int i = groupedMemoryAddress.getStartPointer(); i < groupedMemoryAddress.getEndPointer() + 1; i++) {
             while (!segment.addMemoryUnit(ram.get(i).getMemoryUnit())) { //todo needs testing
                 segment.increase();
             }

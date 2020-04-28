@@ -21,6 +21,9 @@ public abstract class LogicalMemoryInterface {
     }
 
     public final void free() {
+        for (MemoryUnit unit : memoryUnits) {
+            unit.setActive(false);
+        }
         memoryUnits.clear();
     }
 
