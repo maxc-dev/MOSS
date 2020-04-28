@@ -11,7 +11,7 @@ import dev.maxc.os.io.log.Status;
  */
 public class MemoryUnit {
     private boolean locked = false;
-    private boolean active = true;
+    private boolean active = false;
     private int content;
     private final MemoryAddress memoryAddress;
 
@@ -81,5 +81,9 @@ public class MemoryUnit {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
