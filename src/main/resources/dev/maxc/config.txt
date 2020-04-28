@@ -23,9 +23,9 @@
 
     #allocation algorithm used by the mmu to determine where to allocate a new page/segment
     #if both algorithms have the same value, the order of prioritisation is: best, first then worst
-        first_fit_alloc=false
-        best_fit_alloc=true
-        worst_fit_alloc=false
+        alloc_best_fit=false
+        alloc_first_fit=true
+        alloc_worst_fit=false
 
     #virtual memory
         virtual_memory=false

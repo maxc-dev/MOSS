@@ -9,6 +9,7 @@ package dev.maxc.os.system.api;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.allocation.Paging;
 import dev.maxc.os.components.memory.allocation.Segmentation;
+import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
@@ -67,6 +68,17 @@ public class SystemAPI implements LoadProgressUpdater {
     @Configurable(docs = "The power by which the segments will increase by (Base^x).")
     public int SEGMENTATION_INCREASE_POWER;
 
+    //memory allocation config
+
+    @Configurable(value = "malloc_best_fit", docs = "The memory given to a new allocation is the smallest possible, but just big enough.")
+    public boolean ALLOCATION_BEST_FIT;
+
+    @Configurable(value = "malloc_first_fit", docs = "The memory given to a new allocation is the first occurrence available which is big enough.")
+    public boolean ALLOCATION_FIRST_FIT;
+
+    @Configurable(value = "malloc_worst_fit", docs = "The memory given to a new allocation is the largest space available.")
+    public boolean ALLOCATION_WORST_FIT;
+
     //virtual memory config
 
     @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
@@ -89,7 +101,8 @@ public class SystemAPI implements LoadProgressUpdater {
 
     @Override
     public void onLoadComplete() {
-        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, ALLOCATION_POWER, new FirstFit(), VIRTUAL_MEMORY);
+        //todo change malloc indexer to configured version
+        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class, VIRTUAL_MEMORY);
         LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
         if (USE_SEGMENTATION) {
             USE_PAGING = false;
