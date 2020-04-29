@@ -104,12 +104,9 @@ public class SystemAPI implements LoadProgressUpdater {
         //todo change malloc indexer to configured version
         RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class, VIRTUAL_MEMORY);
         LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
-        if (USE_SEGMENTATION) {
+        memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils);
+        if (USE_SEGMENTATION && USE_PAGING) {
             USE_PAGING = false;
-            memoryAPI = new MemoryManagementUnit<Segmentation>(ram, Segmentation.class, handlerUtils);
-        } else {
-            USE_PAGING = true;
-            memoryAPI = new MemoryManagementUnit<Paging>(ram, Paging.class, handlerUtils);
         }
 
         threadAPI = new ThreadAPI();
