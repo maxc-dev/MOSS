@@ -22,8 +22,9 @@ public abstract class LogicalMemoryInterface {
 
     public final void free() {
         for (MemoryUnit unit : memoryUnits) {
-            unit.setActive(false);
+            unit.setAllocated(false);
         }
+        Logger.log(Status.DEBUG, this, "Memory Units cleared [" + memoryUnits.size() + "]");
         memoryUnits.clear();
     }
 
@@ -33,9 +34,10 @@ public abstract class LogicalMemoryInterface {
 
     protected final boolean addMemoryUnit(MemoryUnit memoryUnit) {
         if (memoryUnits.size() + 1 > initialSize) {
-            Logger.log(Status.WARN, this, "Attempted to add a Memory Unit to a page which is full.");
+            Logger.log(Status.WARN, this, "Attempted to add a Memory Unit to a handler which is full.");
             return false;
         }
+        memoryUnit.setAllocated(true);
         memoryUnits.add(memoryUnit);
         return true;
     }

@@ -2,7 +2,7 @@ package dev.maxc.os.components.memory;
 
 import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
-import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryAddress;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
@@ -25,11 +25,11 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
         this.memoryPowerSize = memoryPowerSize;
         Logger.log(this, "Main memory created of size [" + getMemorySize() + "]");
         try {
-            this.mallocIndexer = mallocIndexerClass.getConstructor().newInstance(this);
+            this.mallocIndexer = mallocIndexerClass.getConstructor(RandomAccessMemory.class).newInstance(this);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            Logger.log(Status.ERROR, this, "Unable to initialize the configured memory allocation indexer [" + mallocIndexerClass.getSimpleName() + ".class] Defaulting to Best Fit.");
-            //e.printStackTrace();
-            this.mallocIndexer = new FirstFit(this); //todo once bestfit is created, use that instead of first fit
+            Logger.log(Status.ERROR, this, "Unable to initialize the configured memory allocation indexer [" + mallocIndexerClass.getSimpleName() + ".class] Defaulting to manual First Fit initialization.");
+            e.printStackTrace();
+            this.mallocIndexer = new FirstFit(this);
         }
         this.usingVirtualMemory = usingVirtualMemory;
 
@@ -53,7 +53,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     public int getFreeMemory() {
         int memory = getMemorySize();
         for (MemoryAddress memoryAddress : this) {
-            if (memoryAddress.getMemoryUnit().isActive()) {
+            if (memoryAddress.getMemoryUnit().isAllocated()) {
                 memory--;
             }
         }
@@ -67,7 +67,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     public int getUsedMemory() {
         int memory = 0;
         for (MemoryAddress memoryAddress : this) {
-            if (memoryAddress.getMemoryUnit().isActive()) {
+            if (memoryAddress.getMemoryUnit().isAllocated()) {
                 memory++;
             }
         }
@@ -86,10 +86,10 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * The returned address set is used to mark all the corresponding memory
      * units as active.
      */
-    public GroupedMemoryAddress allocateMemory(int size) {
-        GroupedMemoryAddress addressSet = mallocIndexer.getIndexAddressSlot(size);
+    public AddressPointerSet indexMemory(int size) {
+        AddressPointerSet addressSet = mallocIndexer.getIndexedAddressSlot(size);
         for (int i = addressSet.getStartPointer(); i < addressSet.getEndPointer() + 1; i++) {
-            get(i).getMemoryUnit().setActive(true);
+            get(i).getMemoryUnit().setAllocated(true);
         }
         return addressSet;
     }

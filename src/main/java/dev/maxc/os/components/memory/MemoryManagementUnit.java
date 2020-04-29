@@ -2,12 +2,12 @@ package dev.maxc.os.components.memory;
 
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandler;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.memory.allocation.Paging;
+import dev.maxc.os.components.memory.allocation.Segmentation;
 import dev.maxc.os.components.memory.model.MemoryUnit;
-import dev.maxc.os.io.exceptions.memory.InvalidLogicalMemoryHandler;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -15,10 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Max Carter
  * @since 21/04/2020
  */
-public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
+public class MemoryManagementUnit {
     private final RandomAccessMemory ram;
-    private final Class<T> logicalHandlerClass;
-    private final ArrayList<T> logicalHandlers = new ArrayList<>();
+    private final boolean useSegmentation;
+    private final ArrayList<LogicalMemoryHandler> logicalHandlers = new ArrayList<>();
     private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
     private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
 
@@ -29,33 +29,13 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
      * processes of their memory.
      *
      * @param ram                       Instance of the main memory to control.
-     * @param logicalHandler            The class of the handler used to control the ram.
+     * @param useSegmentation           Whether to use segmentation or paging
      * @param logicalMemoryHandlerUtils A util class for the controller's config.
      */
-    public MemoryManagementUnit(RandomAccessMemory ram, Class<T> logicalHandler, LogicalMemoryHandlerUtils logicalMemoryHandlerUtils) {
+    public MemoryManagementUnit(RandomAccessMemory ram, boolean useSegmentation, LogicalMemoryHandlerUtils logicalMemoryHandlerUtils) {
         this.ram = ram;
-        this.logicalHandlerClass = logicalHandler;
+        this.useSegmentation = useSegmentation;
         this.logicalMemoryHandlerUtils = logicalMemoryHandlerUtils;
-    }
-
-    /**
-     * Allocates a specified amount of memory addresses to a specified
-     * process by creating a Logical Address handler (Paging, Segmentation etc...)
-     */
-    private void allocate(int processIdentifier, int space) throws InvalidLogicalMemoryHandler {
-        T allocator = null;
-        try {
-            allocator = logicalHandlerClass.getConstructor().newInstance(ram, logicalHandlerCount.addAndGet(1), processIdentifier);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        if (allocator != null) {
-            allocator.allocate(ram.allocateMemory(space));
-            logicalHandlers.add(allocator);
-        } else {
-            Logger.log(Status.CRIT, this, "Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
-            throw new InvalidLogicalMemoryHandler(logicalHandlerClass, processIdentifier);
-        }
     }
 
     /**
@@ -64,14 +44,22 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
      * memory with Segmentation or Paging, this can all be modified
      * in the config file.
      */
-    public boolean allocateMemoryNewProcess(int processIdentifier) {
-        if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getInitialSize()) {
-            try {
-                allocate(processIdentifier, logicalMemoryHandlerUtils.getInitialSize());
-            } catch (InvalidLogicalMemoryHandler ex) {
-                ex.printStackTrace();
+    public boolean allocateMemory(int processIdentifier) {
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.getParentProcessID() == processIdentifier) {
+                Logger.log(Status.ERROR, this, "Attempted to allocate new memory to a process [" + processIdentifier + "] which already has memory. Processes which already have memory must allocate additional memory instead since it saves memory space.");
                 return false;
             }
+        }
+        if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getInitialSize()) {
+            LogicalMemoryHandler allocator;
+            if (useSegmentation) {
+                allocator = new Segmentation(ram, logicalMemoryHandlerUtils, logicalHandlerCount.addAndGet(1), processIdentifier);
+            } else {
+                allocator = new Paging(ram, logicalMemoryHandlerUtils, logicalHandlerCount.addAndGet(1), processIdentifier);
+            }
+            allocator.allocate(ram.indexMemory(logicalMemoryHandlerUtils.getInitialSize()));
+            logicalHandlers.add(allocator);
             return true;
         }
         Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
@@ -88,14 +76,15 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
         if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
             for (LogicalMemoryHandler handler : logicalHandlers) {
                 if (handler.getParentProcessID() == processIdentifier) {
-                    handler.allocate(ram.allocateMemory(logicalMemoryHandlerUtils.getIncrease()));
+                    handler.allocate(ram.indexMemory(useSegmentation ? logicalMemoryHandlerUtils.getIncrease() : logicalMemoryHandlerUtils.getInitialSize()));
+                    return true;
                 }
             }
-            return true;
+            Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the process ID could not be linked to a memory handler.");
         } else {
             Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
-            return false;
         }
+        return false;
     }
 
     public MemoryUnit getMemoryUnitFromProcess(int processIdentifier, int offset) {
@@ -115,10 +104,11 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
      * will no longer be able to be accessed.
      */
     public void clearProcessMemory(int processIdentifier) {
-        for (LogicalMemoryHandler handler : logicalHandlers) {
-            if (handler.getParentProcessID() == processIdentifier) {
-                handler.free();
-                logicalHandlers.remove(handler);
+        for (int i = 0; i < logicalHandlers.size(); i++) {
+            if (logicalHandlers.get(i).getParentProcessID() == processIdentifier) {
+                logicalHandlers.get(i).free();
+                logicalHandlers.remove(i);
+                return;
             }
         }
     }

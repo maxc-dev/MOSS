@@ -1,6 +1,6 @@
 package dev.maxc.os.components.memory.allocation;
 
-import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 
 /**
@@ -27,7 +27,7 @@ public abstract class LogicalMemoryHandler {
     /**
      * Allocates a pointer range of more memory addresses
      */
-    public abstract void allocate(GroupedMemoryAddress groupedMemoryAddress);
+    public abstract void allocate(AddressPointerSet groupedMemoryAddress);
 
     /**
      * Gets the memory unit at a specific offset in the logical memory

@@ -11,7 +11,7 @@ import dev.maxc.os.io.log.Status;
  */
 public class MemoryUnit {
     private boolean locked = false;
-    private boolean active = false;
+    private boolean allocated = false;
     private int content;
     private final MemoryAddress memoryAddress;
 
@@ -47,7 +47,7 @@ public class MemoryUnit {
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
             this.content = content;
-            this.active = true;
+            this.allocated = true;
         }
     }
 
@@ -63,7 +63,7 @@ public class MemoryUnit {
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
             this.content = 0;
-            this.active = false;
+            this.allocated = false;
         }
     }
 
@@ -79,11 +79,21 @@ public class MemoryUnit {
         locked = false;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isAllocated() {
+        return allocated;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setAllocated(boolean allocated) {
+        this.allocated = allocated;
+    }
+
+    @Override
+    public String toString() {
+        return "MemoryUnit{" +
+                "locked=" + locked +
+                ", allocated=" + allocated +
+                ", content=" + content +
+                ", memoryAddress=" + memoryAddress.toString() +
+                '}';
     }
 }

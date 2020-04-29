@@ -1,7 +1,7 @@
 package dev.maxc.os.components.memory.indexer;
 
 import dev.maxc.os.components.memory.RandomAccessMemory;
-import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -15,8 +15,8 @@ public class FirstFit extends MemoryAllocationIndexer {
     }
 
     @Override
-    public GroupedMemoryAddress getIndexAddressSlot(int size) {
-        Logger.log(this, "Attempting to find an allocation of size [" + size + "]");
+    public AddressPointerSet getIndexedAddressSlot(int size) {
+        Logger.log(this, "Attempting to find an allocation of size [" + size + "] using First Fit.");
         if (size > getRam().getMemorySize() || getRam().isFull()) {
             super.throwOutOfMemory();
             return null;
@@ -29,7 +29,7 @@ public class FirstFit extends MemoryAllocationIndexer {
 
         for (int i = 0; i < ramSize; i++) {
             if (endPointer != -1) {
-                if (getRam().get(i).getMemoryUnit().isActive()) {
+                if (getRam().get(i).getMemoryUnit().isAllocated()) {
                     Logger.log(Status.DEBUG, this, "RAM slot " + i + " is already active, resetting pointers.");
                     //one of the mem units is active so cant be used
                     endPointer = -1;
@@ -37,10 +37,10 @@ public class FirstFit extends MemoryAllocationIndexer {
                 } else if (i == endPointer) {
                     //the whole section is clear
                     Logger.log(this, "Successfully allocated [" + size + "] to the main memory.");
-                    return new GroupedMemoryAddress(startPointer, endPointer);
+                    return new AddressPointerSet(startPointer, endPointer);
                 }
             } else if (i + size -1 < ramSize) {
-                if (!getRam().get(i + size - 1).getMemoryUnit().isActive() && !getRam().get(i).getMemoryUnit().isActive()) {
+                if (!getRam().get(i + size - 1).getMemoryUnit().isAllocated() && !getRam().get(i).getMemoryUnit().isAllocated()) {
                     startPointer = i;
                     endPointer = i + size - 1;
                     i--;

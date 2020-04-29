@@ -1,6 +1,6 @@
 package dev.maxc.os.components.memory.allocation;
 
-import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.io.log.Logger;
@@ -20,9 +20,9 @@ public class Segmentation extends LogicalMemoryHandler {
     }
 
     @Override
-    public void allocate(GroupedMemoryAddress groupedMemoryAddress) {
-        for (int i = groupedMemoryAddress.getStartPointer(); i < groupedMemoryAddress.getEndPointer() + 1; i++) {
-            while (!segment.addMemoryUnit(ram.get(i).getMemoryUnit())) { //todo needs testing
+    public void allocate(AddressPointerSet pointerSet) {
+        for (int i = pointerSet.getStartPointer(); i < pointerSet.getEndPointer() + 1; i++) {
+            while (!segment.addMemoryUnit(ram.get(i).getMemoryUnit())) {
                 segment.increase();
             }
         }
@@ -36,7 +36,7 @@ public class Segmentation extends LogicalMemoryHandler {
     @Override
     public void free() {
         segment.free();
-        Logger.log(this, "The Memory Units for [" + super.toString() + "] have been cleared.");
+        Logger.log(this, "The Memory Units for [" + super.toString() + "] have been unallocated.");
     }
 
     private static final class Segment extends LogicalMemoryInterface {

@@ -1,6 +1,6 @@
 package dev.maxc.os.components.memory.allocation;
 
-import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.io.log.Logger;
@@ -28,14 +28,16 @@ public class Paging extends LogicalMemoryHandler {
      * list.
      */
     @Override
-    public void allocate(GroupedMemoryAddress groupedMemoryAddress) {
+    public void allocate(AddressPointerSet point) {
         Page page = null;
-        for (int i = 0; i < groupedMemoryAddress.getEndPointer() - groupedMemoryAddress.getStartPointer() + 1; i++) {
-            if (i % utils.getInitialSize() == 0) {
+        int count = 0;
+        for (int i = point.getStartPointer(); i <= point.getEndPointer(); i++) {
+            if (count % utils.getInitialSize() == 0) {
                 page = new Page(utils);
                 pages.add(page);
             }
             page.addMemoryUnit(ram.get(i).getMemoryUnit());
+            count++;
         }
     }
 
@@ -54,8 +56,11 @@ public class Paging extends LogicalMemoryHandler {
      */
     @Override
     public void free() {
+        for (Page page : pages) {
+            page.free();
+        }
         pages.clear();
-        Logger.log(this, "The Memory Units for [" + super.toString() + "] have been cleared.");
+        Logger.log(this, "The Memory Units for [" + super.toString() + "] have been unallocated.");
     }
 
     /**
@@ -72,7 +77,7 @@ public class Paging extends LogicalMemoryHandler {
          * and they cannot override.
          */
         @Override
-        public void increase() {
+        public final void increase() {
         }
     }
 }

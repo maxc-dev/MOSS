@@ -1,7 +1,7 @@
 package dev.maxc.os.components.memory.indexer;
 
 import dev.maxc.os.components.memory.RandomAccessMemory;
-import dev.maxc.os.components.memory.model.GroupedMemoryAddress;
+import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -25,5 +25,5 @@ public abstract class MemoryAllocationIndexer {
         throw new OutOfMemoryError();
     }
 
-    public abstract GroupedMemoryAddress getIndexAddressSlot(int size);
+    public abstract AddressPointerSet getIndexedAddressSlot(int size);
 }
