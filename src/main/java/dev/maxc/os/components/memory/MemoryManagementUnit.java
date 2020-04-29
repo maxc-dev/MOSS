@@ -50,7 +50,7 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
             e.printStackTrace();
         }
         if (allocator != null) {
-            allocator.allocate(ram.getGroupedMemoryAddress(space));
+            allocator.allocate(ram.allocateMemory(space));
             logicalHandlers.add(allocator);
         } else {
             Logger.log(Status.CRIT, this, "Unable to interpret the Logical Memory Handler for process [" + processIdentifier + "]");
@@ -88,7 +88,7 @@ public class MemoryManagementUnit<T extends LogicalMemoryHandler> {
         if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
             for (LogicalMemoryHandler handler : logicalHandlers) {
                 if (handler.getParentProcessID() == processIdentifier) {
-                    handler.allocate(ram.getGroupedMemoryAddress(logicalMemoryHandlerUtils.getIncrease()));
+                    handler.allocate(ram.allocateMemory(logicalMemoryHandlerUtils.getIncrease()));
                 }
             }
             return true;

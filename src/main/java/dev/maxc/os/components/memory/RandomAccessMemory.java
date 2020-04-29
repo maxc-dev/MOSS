@@ -50,15 +50,32 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     /**
      * Calculates the amount of locations in memory that are free
      */
-    protected int getFreeMemory() {
+    public int getFreeMemory() {
         int memory = getMemorySize();
         for (MemoryAddress memoryAddress : this) {
-            if (!memoryAddress.getMemoryUnit().isActive()) {
+            if (memoryAddress.getMemoryUnit().isActive()) {
                 memory--;
             }
         }
         //TODO if virtual memory is being used, find out how much can be allocated
         return memory;
+    }
+
+    /**
+     * Calculates the amount of locations in memory that are in use.
+     */
+    public int getUsedMemory() {
+        int memory = 0;
+        for (MemoryAddress memoryAddress : this) {
+            if (memoryAddress.getMemoryUnit().isActive()) {
+                memory++;
+            }
+        }
+        return memory;
+    }
+
+    public boolean isFull() {
+        return getFreeMemory() == 0;
     }
 
     /**
@@ -69,7 +86,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * The returned address set is used to mark all the corresponding memory
      * units as active.
      */
-    public GroupedMemoryAddress getGroupedMemoryAddress(int size) {
+    public GroupedMemoryAddress allocateMemory(int size) {
         GroupedMemoryAddress addressSet = mallocIndexer.getIndexAddressSlot(size);
         for (int i = addressSet.getStartPointer(); i < addressSet.getEndPointer() + 1; i++) {
             get(i).getMemoryUnit().setActive(true);
