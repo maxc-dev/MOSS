@@ -37,13 +37,13 @@ public class MemoryManagementUnit {
      * @param useSegmentation           Whether to use segmentation or paging
      * @param logicalMemoryHandlerUtils A util class for the controller's config.
      */
-    public MemoryManagementUnit(RandomAccessMemory ram, boolean useSegmentation, LogicalMemoryHandlerUtils logicalMemoryHandlerUtils) {
+    public MemoryManagementUnit(RandomAccessMemory ram, boolean useSegmentation, LogicalMemoryHandlerUtils logicalMemoryHandlerUtils, int cacheSize) {
         this.ram = ram;
         this.useSegmentation = useSegmentation;
         this.logicalMemoryHandlerUtils = logicalMemoryHandlerUtils;
 
         //dummy values for cache declaration.
-        cache = new Cache(2);
+        cache = new Cache(cacheSize);
     }
 
     /**

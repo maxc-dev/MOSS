@@ -79,6 +79,9 @@ public class SystemAPI implements LoadProgressUpdater {
     @Configurable(value = "malloc_worst_fit", docs = "The memory given to a new allocation is the largest space available.")
     public boolean ALLOCATION_WORST_FIT;
 
+    @Configurable(value = "cache_size_level_1", docs = "The amount of memory that the cache can store.")
+    public int CACHE_SIZE;
+
     //virtual memory config
 
     @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
@@ -104,7 +107,7 @@ public class SystemAPI implements LoadProgressUpdater {
         //todo change malloc indexer to configured version
         RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class, VIRTUAL_MEMORY);
         LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
-        memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils);
+        memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils, CACHE_SIZE);
         if (USE_SEGMENTATION && USE_PAGING) {
             USE_PAGING = false;
         }

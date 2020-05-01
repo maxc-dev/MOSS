@@ -19,7 +19,7 @@ class MemoryManagementUnitTest {
     }
 
     public MemoryManagementUnit getTestMMU(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, boolean useSegmentation) {
-        return new MemoryManagementUnit(ram, useSegmentation, utils);
+        return new MemoryManagementUnit(ram, useSegmentation, utils, 5);
     }
 
     @Test
