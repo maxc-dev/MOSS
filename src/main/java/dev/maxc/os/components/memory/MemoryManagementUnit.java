@@ -1,14 +1,18 @@
 package dev.maxc.os.components.memory;
 
+import dev.maxc.os.components.cpu.Cache;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandler;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.allocation.Paging;
 import dev.maxc.os.components.memory.allocation.Segmentation;
+import dev.maxc.os.components.memory.model.CacheMemoryNode;
+import dev.maxc.os.components.memory.model.MemoryAddress;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,6 +25,7 @@ public class MemoryManagementUnit {
     private final ArrayList<LogicalMemoryHandler> logicalHandlers = new ArrayList<>();
     private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
     private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
+    private final Cache cache;
 
     /**
      * Creates a Memory Management Unit which is responsible for managing
@@ -36,6 +41,9 @@ public class MemoryManagementUnit {
         this.ram = ram;
         this.useSegmentation = useSegmentation;
         this.logicalMemoryHandlerUtils = logicalMemoryHandlerUtils;
+
+        //dummy values for cache declaration.
+        cache = new Cache(2);
     }
 
     /**
@@ -87,10 +95,24 @@ public class MemoryManagementUnit {
         return false;
     }
 
-    public MemoryUnit getMemoryUnitFromProcess(int processIdentifier, int offset) {
+    /**
+     * Gets the memory unit for a process at a specific offset.
+     */
+    public MemoryUnit getMemoryUnit(int processIdentifier, int offset) {
+        //checks the cache before searching the ram
+        for (CacheMemoryNode node : cache) {
+            if (node.getParentProcessID() == processIdentifier && node.getOffset() == offset) {
+                Logger.log(this, "Fetched memory unit from cache instead of memory for process [" + processIdentifier + "] at offset [" + offset + "]");
+                return node.getMemoryUnit();
+            }
+        }
+
+        //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
-                return handler.getMemoryUnit(offset);
+                MemoryUnit unit = handler.getMemoryUnit(offset);
+                cache.add(new CacheMemoryNode(processIdentifier, offset, unit));
+                return unit;
             }
         }
         Logger.log(Status.ERROR, this, "Unable to get a Memory Unit for process [" + processIdentifier + "] at offset [" + offset + "]");
@@ -111,5 +133,9 @@ public class MemoryManagementUnit {
                 return;
             }
         }
+    }
+
+    private void addToCache(MemoryAddress address) {
+
     }
 }

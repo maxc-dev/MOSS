@@ -10,7 +10,9 @@ import dev.maxc.os.io.log.Status;
  * @since 24/04/2020
  */
 public class MemoryUnit {
-    private boolean locked = false;
+    public static final int UNLOCKED = -1;
+
+    private int lockedToProcess = UNLOCKED;
     private boolean allocated = false;
     private int content;
     private final MemoryAddress memoryAddress;
@@ -25,12 +27,12 @@ public class MemoryUnit {
      *
      * @throws AccessingLockedUnitException Thrown when the unit is accessed whilst it is still locked.
      */
-    public int access() throws AccessingLockedUnitException {
-        if (locked) {
+    public int access(int processIdentifier) throws AccessingLockedUnitException {
+        if (!isLockedToProcess(processIdentifier)) {
             Logger.log(Status.CRIT, this, "Attempting to access a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new AccessingLockedUnitException(memoryAddress);
         } else {
-            lock();
+            lock(processIdentifier);
             return content;
         }
     }
@@ -41,8 +43,8 @@ public class MemoryUnit {
      *
      * @throws MutatingLockedUnitException Thrown when the unit is mutated whilst is it still locked.
      */
-    public void mutate(int content) throws MutatingLockedUnitException {
-        if (locked) {
+    public void mutate(int processIdentifier, int content) throws MutatingLockedUnitException {
+        if (!isLockedToProcess(processIdentifier)) {
             Logger.log(Status.CRIT, this, "Attempting to mutate a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
@@ -57,8 +59,8 @@ public class MemoryUnit {
      *
      * @throws MutatingLockedUnitException
      */
-    public void clear() throws MutatingLockedUnitException {
-        if (locked) {
+    public void clear(int processIdentifier) throws MutatingLockedUnitException {
+        if (!isLockedToProcess(processIdentifier)) {
             Logger.log(Status.CRIT, this, "Attempting to clear a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
@@ -67,16 +69,20 @@ public class MemoryUnit {
         }
     }
 
-    public boolean isLocked() {
-        return locked;
+    public boolean isLockedToProcess(int processIdentifier) {
+        return lockedToProcess == processIdentifier;
     }
 
-    public void lock() {
-        locked = true;
+    public boolean isLocked() {
+        return lockedToProcess != UNLOCKED;
+    }
+
+    public void lock(int processIdentifier) {
+        lockedToProcess = processIdentifier;
     }
 
     public void unlock() {
-        locked = false;
+        lockedToProcess = UNLOCKED;
     }
 
     public boolean isAllocated() {
@@ -90,7 +96,7 @@ public class MemoryUnit {
     @Override
     public String toString() {
         return "MemoryUnit{" +
-                "locked=" + locked +
+                "lockedProcess=" + lockedToProcess +
                 ", allocated=" + allocated +
                 ", content=" + content +
                 ", memoryAddress=" + memoryAddress.toString() +
