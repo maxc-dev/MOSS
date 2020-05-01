@@ -80,26 +80,31 @@ class MemoryManagementUnitTest {
         MemoryManagementUnit mmu = getTestMMU(ram, utils, false);
 
         mmu.allocateMemory(0);
-        MemoryUnit unit = mmu.getMemoryUnitFromProcess(0, 0);
+        MemoryUnit unit = mmu.getMemoryUnit(0, 0);
         assertFalse(unit.isLocked());
+        assertFalse(unit.isLockedToProcess(0));
+        unit.lock(0);
+        assertTrue(unit.isLocked());
+        assertTrue(unit.isLockedToProcess(0));
 
         try {
-            unit.mutate(5647);
+            unit.mutate(0, 5647);
         } catch (MutatingLockedUnitException e) {
             e.printStackTrace();
         }
 
+
         try {
-            assertEquals(5647, unit.access());
+            assertEquals(5647, unit.access(0));
         } catch (AccessingLockedUnitException e) {
             e.printStackTrace();
         }
 
-        unit.lock();
-        assertTrue(unit.isLocked());
+        unit.unlock();
+        assertFalse(unit.isLocked());
 
-        assertThrows(AccessingLockedUnitException.class, unit::access);
-        assertThrows(MutatingLockedUnitException.class, () -> unit.mutate(45));
+        assertThrows(AccessingLockedUnitException.class, () -> unit.access(0));
+        assertThrows(MutatingLockedUnitException.class, () -> unit.mutate(0, 45));
     }
 
     @Test
@@ -109,25 +114,98 @@ class MemoryManagementUnitTest {
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
 
         mmu.allocateMemory(0);
-        MemoryUnit unit = mmu.getMemoryUnitFromProcess(0, 0);
+        MemoryUnit unit = mmu.getMemoryUnit(0, 0);
         assertFalse(unit.isLocked());
+        assertFalse(unit.isLockedToProcess(0));
+        unit.lock(0);
+        assertTrue(unit.isLocked());
+        assertTrue(unit.isLockedToProcess(0));
 
         try {
-            unit.mutate(5647);
+            unit.mutate(0, 5647);
         } catch (MutatingLockedUnitException e) {
             e.printStackTrace();
         }
 
         try {
-            assertEquals(5647, unit.access());
+            assertEquals(5647, unit.access(0));
         } catch (AccessingLockedUnitException e) {
             e.printStackTrace();
         }
 
-        unit.lock();
-        assertTrue(unit.isLocked());
+        unit.unlock();
+        assertFalse(unit.isLocked());
 
-        assertThrows(AccessingLockedUnitException.class, unit::access);
-        assertThrows(MutatingLockedUnitException.class, () -> unit.mutate(45));
+        assertThrows(AccessingLockedUnitException.class, () -> unit.access(0));
+        assertThrows(MutatingLockedUnitException.class, () -> unit.mutate(0, 45));
+    }
+
+    @Test
+    public void testCache() {
+        RandomAccessMemory ram = getTestRAM();
+        LogicalMemoryHandlerUtils utils = getTestUtils();
+        MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
+
+        mmu.allocateMemory(0);
+        MemoryUnit unit1 = mmu.getMemoryUnit(0, 0);
+        unit1.lock(0);
+        try {
+            unit1.mutate(0, 78);
+            assertEquals(78, unit1.access(0));
+        } catch (MutatingLockedUnitException | AccessingLockedUnitException e) {
+            e.printStackTrace();
+        }
+
+        MemoryUnit unit2 = mmu.getMemoryUnit(0, 1);
+        unit2.lock(0);
+        try {
+            unit2.mutate(0, 32);
+            assertEquals(32, unit2.access(0));
+        } catch (MutatingLockedUnitException | AccessingLockedUnitException e) {
+            e.printStackTrace();
+        }
+
+        MemoryUnit unit3 = mmu.getMemoryUnit(0, 2);
+        unit3.lock(0);
+        try {
+            unit3.mutate(0, 799);
+            assertEquals(799, unit3.access(0));
+        } catch (MutatingLockedUnitException | AccessingLockedUnitException e) {
+            e.printStackTrace();
+        }
+
+        MemoryUnit unit4 = mmu.getMemoryUnit(0, 3);
+        unit4.lock(0);
+        try {
+            unit4.mutate(0, 453);
+            assertEquals(453, unit4.access(0));
+        } catch (MutatingLockedUnitException | AccessingLockedUnitException e) {
+            e.printStackTrace();
+        }
+
+        MemoryUnit unit5 = mmu.getMemoryUnit(0, 4);
+        unit5.lock(0);
+        try {
+            unit5.mutate(0, 56465);
+            assertEquals(56465, unit5.access(0));
+        } catch (MutatingLockedUnitException | AccessingLockedUnitException e) {
+            e.printStackTrace();
+        }
+        unit5.unlock();
+
+        unit5 = mmu.getMemoryUnit(0, 4);
+        unit5.lock(0);
+        try {
+            unit5.mutate(0, 56465);
+            assertEquals(56465, unit5.access(0));
+        } catch (MutatingLockedUnitException | AccessingLockedUnitException e) {
+            e.printStackTrace();
+        }
+
+        unit1.unlock();
+        unit2.unlock();
+        unit3.unlock();
+        unit4.unlock();
+        unit5.unlock();
     }
 }
