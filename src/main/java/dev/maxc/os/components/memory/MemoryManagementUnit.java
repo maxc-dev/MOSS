@@ -1,6 +1,6 @@
 package dev.maxc.os.components.memory;
 
-import dev.maxc.os.components.cpu.Cache;
+import dev.maxc.os.components.memory.model.Cache;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandler;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.allocation.Paging;
@@ -12,7 +12,6 @@ import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

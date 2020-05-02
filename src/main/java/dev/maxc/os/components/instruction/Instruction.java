@@ -13,10 +13,16 @@ public class Instruction {
         this.operand = operand;
     }
 
+    /**
+     * Gets the opcode - the type of instruction such as add or sub.
+     */
     public Opcode getOpcode() {
         return opcode;
     }
 
+    /**
+     * Gets the operand which is the value of the instruction.
+     */
     public int getOperand() {
         return operand;
     }

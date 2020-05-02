@@ -1,6 +1,5 @@
-package dev.maxc.os.components.cpu;
+package dev.maxc.os.components.memory.model;
 
-import dev.maxc.os.components.memory.model.CacheMemoryNode;
 import dev.maxc.os.structures.EvictingQueue;
 
 /**
