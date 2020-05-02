@@ -14,4 +14,8 @@ public class Queue<T> extends ArrayList<T> {
             return remove(0);
         }
     }
+
+    public boolean hasNext() {
+        return size() > 0;
+    }
 }
