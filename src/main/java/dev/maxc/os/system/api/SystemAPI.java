@@ -7,16 +7,13 @@
 package dev.maxc.os.system.api;
 
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
-import dev.maxc.os.components.memory.allocation.Paging;
-import dev.maxc.os.components.memory.allocation.Segmentation;
-import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
 import dev.maxc.os.components.memory.*;
 import dev.maxc.os.components.memory.indexer.FirstFit;
-import dev.maxc.os.components.virtual.process.ProcessAPI;
-import dev.maxc.os.components.virtual.thread.ThreadAPI;
+import dev.maxc.os.components.process.ProcessAPI;
+import dev.maxc.os.components.process.thread.ThreadAPI;
 import dev.maxc.ui.api.UserInterfaceAPI;
 
 /**
@@ -113,7 +110,7 @@ public class SystemAPI implements LoadProgressUpdater {
         }
 
         threadAPI = new ThreadAPI();
-        processAPI = new ProcessAPI(threadAPI);
+        processAPI = new ProcessAPI(threadAPI, memoryAPI);
         Logger.log(this, "Created memory, thread and process APIs.");
     }
 }

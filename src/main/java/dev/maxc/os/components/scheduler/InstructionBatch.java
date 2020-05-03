@@ -1,5 +1,7 @@
 package dev.maxc.os.components.scheduler;
 
+import dev.maxc.os.components.instruction.Instruction;
+import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.structures.EmptyQueueException;
 import dev.maxc.os.io.log.Logger;
@@ -11,13 +13,22 @@ import dev.maxc.os.structures.Queue;
  * @since 02/05/2020
  */
 public class InstructionBatch {
-    private final Queue<InstructionSet> instructions = new Queue<>();
+    private final Queue<Instruction> instructions = new Queue<>();
     private boolean locked = false;
+    private final ProcessControlBlock pcb;
+
+    public InstructionBatch(ProcessControlBlock pcb) {
+        this.pcb = pcb;
+    }
+
+    public ProcessControlBlock getProcessControlBlock() {
+        return pcb;
+    }
 
     /**
      * Adds an instruction set to a batch which will be executed together.
      */
-    public boolean addInstructionSet(InstructionSet instructionSet) {
+    public boolean addInstructionSet(Instruction instructionSet) {
         if (locked) {
             Logger.log(Status.WARN, this, "Instruction batch is already locked and cannot have anymore instruction sets added.");
             return false;
@@ -43,7 +54,7 @@ public class InstructionBatch {
     /**
      * Gets the next instruction set to execute, although the batch must be locked.
      */
-    public InstructionSet get() throws AccessingLockedUnitException, EmptyQueueException {
+    public Instruction get() throws AccessingLockedUnitException, EmptyQueueException {
         if (locked) {
             if (instructions.isEmpty()) {
                 Logger.log(Status.WARN, this, "Attempting to retrieve an instruction set from an empty queue.");

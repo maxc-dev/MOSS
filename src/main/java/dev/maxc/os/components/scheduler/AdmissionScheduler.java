@@ -2,6 +2,8 @@ package dev.maxc.os.components.scheduler;
 
 import dev.maxc.os.components.scheduler.disciplines.FirstInFirstOut;
 import dev.maxc.os.components.scheduler.disciplines.SchedulingDiscipline;
+import dev.maxc.os.components.process.ProcessControlBlock;
+import dev.maxc.os.components.process.ProcessState;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 import dev.maxc.os.structures.MutableQueue;
@@ -14,7 +16,7 @@ import java.lang.reflect.InvocationTargetException;
  * @since 02/05/2020
  */
 public class AdmissionScheduler implements ClockTick {
-    private final MutableQueue<InstructionBatch> waitingQueue = new MutableQueue<>();
+    private final MutableQueue<ProcessControlBlock> waitingQueue = new MutableQueue<>();
     private final CPUScheduler cpuScheduler;
     private SchedulingDiscipline scheduler;
 
@@ -29,12 +31,13 @@ public class AdmissionScheduler implements ClockTick {
         }
     }
 
-    public synchronized void scheduleInstructionBatch(InstructionBatch batch) {
-        waitingQueue.add(batch);
+    public synchronized void schedulePCB(ProcessControlBlock pcb) {
+        pcb.setProcessState(ProcessState.WAITING);
+        waitingQueue.add(pcb);
     }
 
     @Override
     public void onSystemClockTick() {
-        scheduler.schedule(waitingQueue);
+        //send the PCB to the STS
     }
 }
