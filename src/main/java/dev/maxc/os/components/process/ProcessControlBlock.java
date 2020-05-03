@@ -1,4 +1,6 @@
-package dev.maxc.os.components.virtual.process;
+package dev.maxc.os.components.process;
+
+import dev.maxc.os.components.cpu.ProgramCounter;
 
 /**
  * @author Max Carter
@@ -8,12 +10,11 @@ public class ProcessControlBlock {
     private ProcessState processState = ProcessState.NEW;
     private final int processIdentifier;
     private final int parentProcessIdentifier;
-   // private final ProgramCounter programCounter;
+    private final ProgramCounter programCounter = new ProgramCounter();
 
-    public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier) { //ProgramCounter programCounter
+    public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier) {
         this.processIdentifier = processIdentifier;
         this.parentProcessIdentifier = parentProcessIdentifier;
-        //this.programCounter = programCounter;
     }
 
     public int getProcessID() {

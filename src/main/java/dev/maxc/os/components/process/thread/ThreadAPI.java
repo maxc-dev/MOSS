@@ -1,8 +1,8 @@
-package dev.maxc.os.components.virtual.thread;
+package dev.maxc.os.components.process.thread;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import dev.maxc.os.components.virtual.process.Process;
+import dev.maxc.os.components.process.Process;
 
 /**
  * @author Max Carter

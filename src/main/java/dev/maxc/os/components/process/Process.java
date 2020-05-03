@@ -1,6 +1,6 @@
-package dev.maxc.os.components.virtual.process;
+package dev.maxc.os.components.process;
 
-import dev.maxc.os.components.virtual.thread.Thread;
+import dev.maxc.os.components.process.thread.Thread;
 
 import java.util.ArrayList;
 

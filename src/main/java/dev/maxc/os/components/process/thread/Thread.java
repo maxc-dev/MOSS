@@ -1,4 +1,4 @@
-package dev.maxc.os.components.virtual.thread;
+package dev.maxc.os.components.process.thread;
 
 /**
  * @author Max Carter

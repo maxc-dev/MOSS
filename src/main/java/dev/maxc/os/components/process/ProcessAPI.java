@@ -1,6 +1,7 @@
-package dev.maxc.os.components.virtual.process;
+package dev.maxc.os.components.process;
 
-import dev.maxc.os.components.virtual.thread.ThreadAPI;
+import dev.maxc.os.components.memory.MemoryManagementUnit;
+import dev.maxc.os.components.process.thread.ThreadAPI;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,9 +14,11 @@ public class ProcessAPI {
 
     private final AtomicInteger processCount = new AtomicInteger();
     private final ThreadAPI threadAPI;
+    private final MemoryManagementUnit mmu;
 
-    public ProcessAPI(ThreadAPI threadAPI) {
+    public ProcessAPI(ThreadAPI threadAPI, MemoryManagementUnit mmu) {
         this.threadAPI = threadAPI;
+        this.mmu = mmu;
     }
 
     /**
@@ -25,6 +28,7 @@ public class ProcessAPI {
     public Process getNewProcess(int parentProcessIdentifier) {
         Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier), this);
         threadAPI.addNewThreadToProcess(process);
+        mmu.allocateMemory(process.getProcessControlBlock().getProcessID());
         return process;
     }
 
@@ -33,5 +37,6 @@ public class ProcessAPI {
      */
     public void exitProcess(Process process) {
         process.getProcessControlBlock().setProcessState(ProcessState.TERMINATED);
+        mmu.clearProcessMemory(process.getProcessControlBlock().getProcessID());
     }
 }
