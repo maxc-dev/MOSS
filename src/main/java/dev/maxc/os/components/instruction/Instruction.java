@@ -6,11 +6,18 @@ package dev.maxc.os.components.instruction;
  */
 public class Instruction {
     private final Opcode opcode;
-    private final int operand;
+    private final int offset;
+    private final int operand1;
+    private final int operand2;
 
-    public Instruction(Opcode opcode, int operand) {
+    /**
+     * Creates an instruction with an opcode and two operands.
+     */
+    public Instruction(Opcode opcode, int offset, int operand1, int operand2) {
         this.opcode = opcode;
-        this.operand = operand;
+        this.offset = offset;
+        this.operand1 = operand1;
+        this.operand2 = operand2;
     }
 
     /**
@@ -21,9 +28,33 @@ public class Instruction {
     }
 
     /**
-     * Gets the operand which is the value of the instruction.
+     * Gets the logical address where to store the result of the instruction
      */
-    public int getOperand() {
-        return operand;
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
+     * Gets the first operand which is the value of the instruction.
+     */
+    public int getOperand1() {
+        return operand1;
+    }
+
+    /**
+     * Gets the second operand which is the value of the instruction.
+     */
+    public int getOperand2() {
+        return operand2;
+    }
+
+    @Override
+    public String toString() {
+        return "Instruction{" +
+                "opcode=" + opcode.name() +
+                ", offset=" + offset +
+                ", operand1=" + operand1 +
+                ", operand2=" + operand2 +
+                '}';
     }
 }

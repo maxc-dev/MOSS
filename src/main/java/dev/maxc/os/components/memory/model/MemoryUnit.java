@@ -1,5 +1,6 @@
 package dev.maxc.os.components.memory.model;
 
+import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
@@ -14,7 +15,7 @@ public class MemoryUnit {
 
     private int lockedToProcess = UNLOCKED;
     private boolean allocated = false;
-    private int content;
+    private Instruction content;
     private final MemoryAddress memoryAddress;
 
     public MemoryUnit(MemoryAddress memoryAddress) {
@@ -27,7 +28,7 @@ public class MemoryUnit {
      *
      * @throws AccessingLockedUnitException Thrown when the unit is accessed whilst it is still locked.
      */
-    public int access(int processIdentifier) throws AccessingLockedUnitException {
+    public Instruction access(int processIdentifier) throws AccessingLockedUnitException {
         if (!isLockedToProcess(processIdentifier)) {
             Logger.log(Status.CRIT, this, "Attempting to access a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new AccessingLockedUnitException(memoryAddress);
@@ -43,7 +44,7 @@ public class MemoryUnit {
      *
      * @throws MutatingLockedUnitException Thrown when the unit is mutated whilst is it still locked.
      */
-    public void mutate(int processIdentifier, int content) throws MutatingLockedUnitException {
+    public void mutate(int processIdentifier, Instruction content) throws MutatingLockedUnitException {
         if (!isLockedToProcess(processIdentifier)) {
             Logger.log(Status.CRIT, this, "Attempting to mutate a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new MutatingLockedUnitException(memoryAddress);
@@ -64,7 +65,7 @@ public class MemoryUnit {
             Logger.log(Status.CRIT, this, "Attempting to clear a locked memory unit at address [" + memoryAddress.toString() + "]");
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
-            this.content = 0;
+            this.content = null;
             this.allocated = false;
         }
     }
@@ -98,7 +99,7 @@ public class MemoryUnit {
         return "MemoryUnit{" +
                 "lockedProcess=" + lockedToProcess +
                 ", allocated=" + allocated +
-                ", content=" + content +
+                ", content=" + content.toString() +
                 ", memoryAddress=" + memoryAddress.toString() +
                 '}';
     }
