@@ -1,7 +1,6 @@
 package dev.maxc.os.components.scheduler.disciplines;
 
-import dev.maxc.os.components.instruction.Instruction;
-import dev.maxc.os.components.scheduler.InstructionBatch;
+import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.structures.MutableQueue;
 import dev.maxc.os.structures.Queue;
 
@@ -10,11 +9,11 @@ import dev.maxc.os.structures.Queue;
  * @since 02/05/2020
  */
 public abstract class SchedulingDiscipline {
-    protected volatile Queue<Instruction> jobQueue = new Queue<>();
+    protected volatile Queue<ProcessControlBlock> jobQueue = new Queue<>();
 
     /**
-     * Uses an algorithm to decide what order the instruction sets
+     * Uses an algorithm to decide what order the pcbs
      * should be in when they enter the job queue.
      */
-    public abstract void schedule(MutableQueue<InstructionBatch> instructionBatches);
+    public abstract void schedule(MutableQueue<ProcessControlBlock> pcbs);
 }
