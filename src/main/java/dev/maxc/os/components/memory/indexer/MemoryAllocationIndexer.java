@@ -21,7 +21,7 @@ public abstract class MemoryAllocationIndexer {
     }
 
     public final void throwOutOfMemory() {
-        Logger.log(Status.ERROR, this, "Unable to allocate memory because the main memory is full [" + ram.getUsedMemory() + "/" + ram.getMemorySize() + "]");
+        Logger.log(Status.ERROR, this, "Unable to allocate memory because the main memory is full [" + ram.getAllocatedMemory() + "/" + ram.getMemorySize() + "]");
         throw new OutOfMemoryError();
     }
 

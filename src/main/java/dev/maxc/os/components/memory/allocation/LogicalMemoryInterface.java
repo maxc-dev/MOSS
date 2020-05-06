@@ -11,18 +11,20 @@ import java.util.ArrayList;
  * @since 26/04/2020
  */
 public abstract class LogicalMemoryInterface {
-    private final ArrayList<MemoryUnit> memoryUnits = new ArrayList<>();
+    protected final ArrayList<MemoryUnit> memoryUnits = new ArrayList<>();
     private final LogicalMemoryHandlerUtils utils;
     private int initialSize;
+    private final int startingLogicalPointer;
 
-    public LogicalMemoryInterface(LogicalMemoryHandlerUtils utils) {
+    public LogicalMemoryInterface(int startingLogicalPointer, LogicalMemoryHandlerUtils utils) {
         this.initialSize = utils.getInitialSize();
         this.utils = utils;
+        this.startingLogicalPointer = startingLogicalPointer;
     }
 
     public final void free() {
         for (MemoryUnit unit : memoryUnits) {
-            unit.setAllocated(false);
+            unit.clear();
         }
         Logger.log(Status.DEBUG, this, "Memory Units cleared [" + memoryUnits.size() + "]");
         memoryUnits.clear();
@@ -37,9 +39,13 @@ public abstract class LogicalMemoryInterface {
             Logger.log(Status.WARN, this, "Attempted to add a Memory Unit to a handler which is full.");
             return false;
         }
-        memoryUnit.setAllocated(true);
         memoryUnits.add(memoryUnit);
+        memoryUnit.allocate(startingLogicalPointer + memoryUnits.indexOf(memoryUnit));
         return true;
+    }
+
+    public int getStartingLogicalPointer() {
+        return startingLogicalPointer;
     }
 
     public final MemoryUnit getMemoryUnit(int index) {

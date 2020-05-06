@@ -6,7 +6,6 @@ import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.allocation.Paging;
 import dev.maxc.os.components.memory.allocation.Segmentation;
 import dev.maxc.os.components.memory.model.CacheMemoryNode;
-import dev.maxc.os.components.memory.model.MemoryAddress;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
@@ -94,6 +93,17 @@ public class MemoryManagementUnit {
         return false;
     }
 
+    public int getNextUnitOffset(int processIdentifier) {
+        //search the logical handlers in the ram
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.getParentProcessID() == processIdentifier) {
+                return handler.getNextUnitOffset();
+            }
+        }
+        allocateAdditionalMemory(processIdentifier);
+        return getNextUnitOffset(processIdentifier);
+    }
+
     /**
      * Gets the memory unit for a process at a specific offset.
      */
@@ -101,7 +111,7 @@ public class MemoryManagementUnit {
         //checks the cache before searching the ram
         for (CacheMemoryNode node : cache) {
             if (node.getParentProcessID() == processIdentifier && node.getOffset() == offset) {
-                Logger.log(this, "Fetched memory unit from cache instead of memory for process [" + processIdentifier + "] at offset [" + offset + "]");
+                //Logger.log(this, "Fetched memory unit from cache instead of memory for process [" + processIdentifier + "] at offset [" + offset + "]");
                 return node.getMemoryUnit();
             }
         }
@@ -132,9 +142,5 @@ public class MemoryManagementUnit {
                 return;
             }
         }
-    }
-
-    private void addToCache(MemoryAddress address) {
-
     }
 }

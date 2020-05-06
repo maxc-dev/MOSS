@@ -43,7 +43,7 @@ public class FirstFitTest {
 
         ram.indexMemory(1);
         assertTrue(ram.isFull());
-        assertEquals(1024, ram.getUsedMemory());
+        assertEquals(1024, ram.getAllocatedMemory());
     }
 
     @Test

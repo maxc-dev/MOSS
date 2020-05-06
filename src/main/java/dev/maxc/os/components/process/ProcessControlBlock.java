@@ -1,6 +1,7 @@
 package dev.maxc.os.components.process;
 
 import dev.maxc.os.components.cpu.ProgramCounter;
+import dev.maxc.os.components.memory.model.MemoryAddress;
 
 /**
  * @author Max Carter
@@ -15,6 +16,10 @@ public class ProcessControlBlock {
     public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier) {
         this.processIdentifier = processIdentifier;
         this.parentProcessIdentifier = parentProcessIdentifier;
+    }
+
+    public void addToProgramCounter(int addressLocation) {
+        programCounter.add(addressLocation);
     }
 
     public int getProcessID() {

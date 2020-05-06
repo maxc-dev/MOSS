@@ -39,9 +39,19 @@ public class Segmentation extends LogicalMemoryHandler {
         Logger.log(this, "The Memory Units for [" + super.toString() + "] have been unallocated.");
     }
 
+    @Override
+    public int getNextUnitOffset() {
+        for (MemoryUnit unit : segment.memoryUnits) {
+            if (!unit.inUse()) {
+                return unit.getLogicalAddress();
+            }
+        }
+        return -1;
+    }
+
     private static final class Segment extends LogicalMemoryInterface {
         public Segment(LogicalMemoryHandlerUtils utils) {
-            super(utils);
+            super(0, utils);
         }
     }
 }

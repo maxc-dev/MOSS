@@ -24,4 +24,9 @@ public class ThreadAPI {
     public void addNewThreadToProcess(Process process) {
         process.getThreads().add(getNewThread(process));
     }
+
+    @Override
+    public String toString() {
+        return "Thread-" + threadCount;
+    }
 }

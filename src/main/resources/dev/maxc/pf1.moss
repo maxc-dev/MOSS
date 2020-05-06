@@ -1,7 +1,9 @@
 #process file 1
 
+print(1)
 three = 3
 yeet = 23
 sixnine = yeet * three + 4 - 2 * 2
 
+print(4)
 print(sixnine)

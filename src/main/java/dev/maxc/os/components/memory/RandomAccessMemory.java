@@ -64,7 +64,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     /**
      * Calculates the amount of locations in memory that are in use.
      */
-    public int getUsedMemory() {
+    public int getAllocatedMemory() {
         int memory = 0;
         for (MemoryAddress memoryAddress : this) {
             if (memoryAddress.getMemoryUnit().isAllocated()) {
@@ -87,10 +87,6 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * units as active.
      */
     public AddressPointerSet indexMemory(int size) {
-        AddressPointerSet addressSet = mallocIndexer.getIndexedAddressSlot(size);
-        for (int i = addressSet.getStartPointer(); i < addressSet.getEndPointer() + 1; i++) {
-            get(i).getMemoryUnit().setAllocated(true);
-        }
-        return addressSet;
+        return mallocIndexer.getIndexedAddressSlot(size);
     }
 }

@@ -7,6 +7,9 @@
 package dev.maxc.os.system.api;
 
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.scheduler.AdmissionScheduler;
+import dev.maxc.os.components.scheduler.CPUScheduler;
+import dev.maxc.os.components.scheduler.disciplines.FirstInFirstOut;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
@@ -90,6 +93,8 @@ public class SystemAPI implements LoadProgressUpdater {
     public boolean PROCESS_FIRST_SCHEDULING;
 
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
+    private volatile static CPUScheduler shortTermScheduler = new CPUScheduler(FirstInFirstOut.class);
+    public volatile static AdmissionScheduler longTermScheduler = new AdmissionScheduler(shortTermScheduler);
 
     public MemoryManagementUnit memoryAPI;
     public ThreadAPI threadAPI;

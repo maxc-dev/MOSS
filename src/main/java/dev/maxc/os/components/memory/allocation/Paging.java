@@ -33,7 +33,8 @@ public class Paging extends LogicalMemoryHandler {
         int count = 0;
         for (int i = point.getStartPointer(); i <= point.getEndPointer(); i++) {
             if (count % utils.getInitialSize() == 0) {
-                page = new Page(utils);
+                int startingLogicalPointer = pages.size()*utils.getInitialSize();
+                page = new Page(startingLogicalPointer, utils);
                 pages.add(page);
             }
             page.addMemoryUnit(ram.get(i).getMemoryUnit());
@@ -63,13 +64,25 @@ public class Paging extends LogicalMemoryHandler {
         Logger.log(this, "The Memory Units for [" + super.toString() + "] have been unallocated.");
     }
 
+    @Override
+    public int getNextUnitOffset() {
+        for (Page page : pages) {
+            for (MemoryUnit unit : page.memoryUnits) {
+                if (!unit.inUse()) {
+                    return unit.getLogicalAddress();
+                }
+            }
+        }
+        return -1;
+    }
+
     /**
      * A fixed size page which stores several Memory Units. The size is equal
      * to every other page and cannot increase in size.
      */
     private static final class Page extends LogicalMemoryInterface {
-        public Page(LogicalMemoryHandlerUtils utils) {
-            super(utils);
+        public Page(int startingLogicalPointer, LogicalMemoryHandlerUtils utils) {
+            super(startingLogicalPointer, utils);
         }
 
         /**

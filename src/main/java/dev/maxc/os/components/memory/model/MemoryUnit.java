@@ -12,11 +12,12 @@ import dev.maxc.os.io.log.Status;
  */
 public class MemoryUnit {
     public static final int UNLOCKED = -1;
+    public static final int UNALLOCATED = -1;
 
-    private int lockedToProcess = UNLOCKED;
-    private boolean allocated = false;
-    private Instruction content;
+    private volatile int lockedToProcess = UNLOCKED;
+    private volatile Instruction content;
     private final MemoryAddress memoryAddress;
+    private volatile int logicalAddress = -1;
 
     public MemoryUnit(MemoryAddress memoryAddress) {
         this.memoryAddress = memoryAddress;
@@ -50,24 +51,16 @@ public class MemoryUnit {
             throw new MutatingLockedUnitException(memoryAddress);
         } else {
             this.content = content;
-            this.allocated = true;
         }
     }
 
     /**
-     * Clears the memory unit of it's data, setting the value to the default (0).
-     * The memory unit state will be changed to
-     *
-     * @throws MutatingLockedUnitException
+     * Clears the memory unit of it's data, setting the instruction to null.
+     * The memory unit state will be changed to unallocated.
      */
-    public void clear(int processIdentifier) throws MutatingLockedUnitException {
-        if (!isLockedToProcess(processIdentifier)) {
-            Logger.log(Status.CRIT, this, "Attempting to clear a locked memory unit at address [" + memoryAddress.toString() + "]");
-            throw new MutatingLockedUnitException(memoryAddress);
-        } else {
-            this.content = null;
-            this.allocated = false;
-        }
+    public void clear() {
+        this.content = null;
+        this.logicalAddress = UNALLOCATED;
     }
 
     public boolean isLockedToProcess(int processIdentifier) {
@@ -86,20 +79,31 @@ public class MemoryUnit {
         lockedToProcess = UNLOCKED;
     }
 
+    /**
+     * If the unit is allocated it means it belongs to a logical handler.
+     */
     public boolean isAllocated() {
-        return allocated;
+        return logicalAddress != UNALLOCATED;
     }
 
-    public void setAllocated(boolean allocated) {
-        this.allocated = allocated;
+    public void allocate(int allocation) {
+        this.logicalAddress = allocation;
+    }
+
+    public int getLogicalAddress() {
+        return logicalAddress;
+    }
+
+    public boolean inUse() {
+        return content != null;
     }
 
     @Override
     public String toString() {
         return "MemoryUnit{" +
                 "lockedProcess=" + lockedToProcess +
-                ", allocated=" + allocated +
-                ", content=" + content.toString() +
+                ", logicalAddress=" + logicalAddress +
+                ", content=" + (inUse() ? content.toString() : "N/A") +
                 ", memoryAddress=" + memoryAddress.toString() +
                 '}';
     }

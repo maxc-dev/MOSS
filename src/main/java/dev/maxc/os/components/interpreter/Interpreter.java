@@ -2,6 +2,7 @@ package dev.maxc.os.components.interpreter;
 
 import dev.maxc.App;
 import dev.maxc.os.components.instruction.Instruction;
+import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.interpreter.model.InterpreterUtils;
 import dev.maxc.os.components.interpreter.model.object.variable.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
@@ -27,7 +28,6 @@ public class Interpreter {
     private static final String FILE_EXTENSION = ".moss";
 
     private final ArrayList<Variable> globalVariables = new ArrayList<>();
-    private final InterpreterUtils utils = new InterpreterUtils(globalVariables);
     private final MemoryManagementUnit mmu;
     private final ProcessAPI processAPI;
 
@@ -53,6 +53,8 @@ public class Interpreter {
         }
 
         Process mainProcess = processAPI.getNewProcess(ProcessAPI.NO_PARENT_PROCESS);
+        InterpreterUtils utils = new InterpreterUtils(globalVariables, mmu, mainProcess.getProcessControlBlock());
+        Logger.log(this, "Created new interpreter process [" + mainProcess.toString() + "]");
 
         Logger.log(this, "Successfully gathered process file [" + fileName + FILE_EXTENSION + "] interpreting...");
         //iterate file
@@ -66,14 +68,14 @@ public class Interpreter {
 
                     //if variable declaration is inbound
                     if (line.contains(InterpreterUtils.DECLARE)) {
-                        Logger.log(this, "Reading variable declaration [" + line + "]");
                         int declareIndex = line.indexOf(InterpreterUtils.DECLARE);
-                        Variable var = new Variable(line.substring(0, declareIndex), utils.getIntReturn(line.substring(declareIndex+1)));
+                        Variable var = new Variable(line.substring(0, declareIndex), utils.getVariable(line.substring(declareIndex+1)));
                         globalVariables.add(var);
-                        Logger.log(this, "New variable initialized: " + var.toString());
+                        Logger.log(this, "New variable initialized [" + var.toString() + "]");
+
                     } else if (line.startsWith("print(") && line.endsWith(")")) {
-                        int output = utils.getIntReturn(line.substring(line.indexOf("(")+1, line.indexOf(")")));
-                        Logger.log(Status.OUT, this, "[" + output + "]");
+                        Operand output = utils.getVariable(line.substring(line.indexOf("(")+1, line.indexOf(")")));
+                        utils.outputOperand(output);
                     }
 
                     lineNumber++;

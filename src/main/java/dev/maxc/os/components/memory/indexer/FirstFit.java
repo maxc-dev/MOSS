@@ -25,7 +25,7 @@ public class FirstFit extends MemoryAllocationIndexer {
         int startPointer = -1;
         int endPointer = -1;
         final int ramSize = getRam().getMemorySize();
-        Logger.log(this, "The current memory is [" + getRam().getUsedMemory() + "/" + ramSize + "]");
+        Logger.log(this, "The current memory is [" + getRam().getAllocatedMemory() + "/" + ramSize + "]");
 
         for (int i = 0; i < ramSize; i++) {
             if (endPointer != -1) {

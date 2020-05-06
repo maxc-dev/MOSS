@@ -6,18 +6,25 @@ package dev.maxc.os.components.instruction;
  */
 public class Instruction {
     private final Opcode opcode;
-    private final int offset;
-    private final int operand1;
-    private final int operand2;
+    private final Operand operand1;
+    private final Operand operand2;
 
     /**
      * Creates an instruction with an opcode and two operands.
      */
-    public Instruction(Opcode opcode, int offset, int operand1, int operand2) {
+    public Instruction(Opcode opcode, Operand operand1, Operand operand2) {
         this.opcode = opcode;
-        this.offset = offset;
         this.operand1 = operand1;
         this.operand2 = operand2;
+    }
+
+    /**
+     * Creates an instruction with an opcode and an operand.
+     */
+    public Instruction(Opcode opcode, Operand operand1) {
+        this.opcode = opcode;
+        this.operand1 = operand1;
+        this.operand2 = null;
     }
 
     /**
@@ -28,33 +35,21 @@ public class Instruction {
     }
 
     /**
-     * Gets the logical address where to store the result of the instruction
-     */
-    public int getOffset() {
-        return offset;
-    }
-
-    /**
      * Gets the first operand which is the value of the instruction.
      */
-    public int getOperand1() {
+    public Operand getOperand1() {
         return operand1;
     }
 
     /**
      * Gets the second operand which is the value of the instruction.
      */
-    public int getOperand2() {
+    public Operand getOperand2() {
         return operand2;
     }
 
     @Override
     public String toString() {
-        return "Instruction{" +
-                "opcode=" + opcode.name() +
-                ", offset=" + offset +
-                ", operand1=" + operand1 +
-                ", operand2=" + operand2 +
-                '}';
+        return opcode.toString() + " " + operand1.toString() + (operand2 == null ? "" : " " + operand2.toString());
     }
 }

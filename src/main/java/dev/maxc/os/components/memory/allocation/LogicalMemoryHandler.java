@@ -39,6 +39,11 @@ public abstract class LogicalMemoryHandler {
      */
     public abstract void free();
 
+    /**
+     * Gets the next unallocated memory unit
+     */
+    public abstract int getNextUnitOffset();
+
     @Override
     public String toString() {
         return Integer.toHexString(getId());
