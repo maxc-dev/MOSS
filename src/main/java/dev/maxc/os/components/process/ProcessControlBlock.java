@@ -18,8 +18,8 @@ public class ProcessControlBlock {
         this.parentProcessIdentifier = parentProcessIdentifier;
     }
 
-    public void addToProgramCounter(int addressLocation) {
-        programCounter.add(addressLocation);
+    public ProgramCounter getProgramCounter() {
+        return programCounter;
     }
 
     public int getProcessID() {
