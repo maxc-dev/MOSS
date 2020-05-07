@@ -1,7 +1,6 @@
-package dev.maxc.os.components.interpreter.model.object.variable;
+package dev.maxc.os.components.interpreter.model;
 
 import dev.maxc.os.components.instruction.Operand;
-import dev.maxc.os.components.interpreter.model.InterpreterUtils;
 import dev.maxc.os.io.exceptions.interpreter.InvalidVariableNameException;
 
 /**

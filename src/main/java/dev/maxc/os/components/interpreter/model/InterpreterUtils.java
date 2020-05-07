@@ -3,7 +3,6 @@ package dev.maxc.os.components.interpreter.model;
 import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.instruction.Opcode;
 import dev.maxc.os.components.instruction.Operand;
-import dev.maxc.os.components.interpreter.model.object.variable.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.process.ProcessControlBlock;
@@ -37,7 +36,7 @@ public class InterpreterUtils {
 
     public void outputOperand(Operand operand) {
         int address = submitInstruction(new Instruction(Opcode.OUT, operand, null));
-        pcb.addToProgramCounter(address);
+        pcb.getProgramCounter().add(address);
         SystemAPI.longTermScheduler.schedulePCB(pcb);
     }
 
@@ -78,6 +77,7 @@ public class InterpreterUtils {
 
     private Operand splitOperandList(String[] list) {
         if (list.length == 1) {
+            Logger.log(Status.DEBUG, this, "PARSING VALUE TO OPERAND (splitoperandlist) " + list[0]);
             return new Operand(false, Integer.parseInt(list[0].replace("#", "") + ""));
         } else {
             int opIndex = getNextBestOperatorIndex(list);
@@ -108,7 +108,7 @@ public class InterpreterUtils {
         }
 
         int address = submitInstruction(new Instruction(code, beforeInt, afterInt));
-        pcb.addToProgramCounter(address);
+        pcb.getProgramCounter().add(address);
         SystemAPI.longTermScheduler.schedulePCB(pcb);
         return new Operand(true, address);
     }

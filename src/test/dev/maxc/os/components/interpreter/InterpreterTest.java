@@ -39,17 +39,6 @@ class InterpreterTest {
         Logger.log(this, mmu.getMemoryUnit(1, 1).toString());
         Logger.log(this, mmu.getMemoryUnit(1, 2).toString());
         Logger.log(this, mmu.getMemoryUnit(1, 3).toString());
-        Logger.log(this, mmu.getMemoryUnit(1, 4).toString());
-        Logger.log(this, mmu.getMemoryUnit(1, 5).toString());
-
-        Interpreter interpreter2 = getTestInterpreter(ram, utils, mmu, processAPI);
-        interpreter2.interpret("pf1");
-        Logger.log(this, mmu.getMemoryUnit(2, 0).toString());
-        Logger.log(this, mmu.getMemoryUnit(2, 1).toString());
-        Logger.log(this, mmu.getMemoryUnit(2, 2).toString());
-        Logger.log(this, mmu.getMemoryUnit(2, 3).toString());
-        Logger.log(this, mmu.getMemoryUnit(2, 4).toString());
-        Logger.log(this, mmu.getMemoryUnit(2, 5).toString());
 
     }
 

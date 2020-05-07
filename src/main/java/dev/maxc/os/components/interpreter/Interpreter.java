@@ -4,7 +4,7 @@ import dev.maxc.App;
 import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.interpreter.model.InterpreterUtils;
-import dev.maxc.os.components.interpreter.model.object.variable.Variable;
+import dev.maxc.os.components.interpreter.model.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;
