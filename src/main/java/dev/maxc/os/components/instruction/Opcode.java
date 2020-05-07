@@ -5,12 +5,22 @@ package dev.maxc.os.components.instruction;
  * @since 01/05/2020
  */
 public enum Opcode {
-    OUT,        //OUT 4 will output 4
-    STR,        //STR 2 will store 2
-    ADD,        //ADD 2 3 will store 2 + 3
-    SUB,        //SUB 2 3 will store 2 - 3
-    MUL,        //MUL 2 3 will store 2 * 3
-    DIV;        //DIV 2 3 will store 2 / 3
+    OUT(false),        //OUT 4 will output 4
+    STR(false),        //STR 2 will store 2
+    ADD(true),         //ADD 2 3 will store 2 + 3
+    SUB(true),         //SUB 2 3 will store 2 - 3
+    MUL(true),         //MUL 2 3 will store 2 * 3
+    DIV(true);         //DIV 2 3 will store 2 / 3
+
+    private boolean secondOperand;
+
+    public boolean needsSecondOperand() {
+        return secondOperand;
+    }
+
+    Opcode(boolean secondOperand) {
+        this.secondOperand = secondOperand;
+    }
 
     @Override
     public String toString() {
