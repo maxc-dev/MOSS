@@ -11,7 +11,7 @@ public class AccessingLockedUnitException extends Exception {
         super();
     }
 
-    public AccessingLockedUnitException(MemoryAddress memoryAddress) {
-        super("Process attempted to access a unit which is locked at address: " + memoryAddress.toString());
+    public AccessingLockedUnitException(MemoryAddress memoryAddress, int processLock) {
+        super("Process attempted to access a unit which is locked to process [" + processLock + "] at address: " + memoryAddress.toString());
     }
 }

@@ -6,6 +6,7 @@ import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.process.ProcessControlBlock;
+import dev.maxc.os.components.process.ProcessState;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.exceptions.instruction.UnknownOpcodeException;
@@ -20,13 +21,24 @@ public class ProcessorCore {
     private final int index;
     private final MemoryManagementUnit mmu;
     private final ControlUnit cu;
-    private Thread coreThread;
+    private final CoreThread coreThread;
 
     public ProcessorCore(int index, ControlUnit cu, MemoryManagementUnit mmu, int frequency) {
+        Logger.log(this, "Processor Core [" + index + "] initialised.");
         this.index = index;
         this.cu = cu;
         this.mmu = mmu;
         coreThread = new CoreThread(this, frequency);
+/*        coreThread = new Thread(() -> {
+            while (true) {
+                requestInstruction();
+                try {
+                    Thread.sleep(1000/frequency);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });*/
         coreThread.start();
     }
 
@@ -34,10 +46,13 @@ public class ProcessorCore {
      * Continuously requests instructions to decode, triggered
      * in the core's thread.
      */
-    protected void requestInstruction() {
+    protected synchronized void requestInstruction() {
         try {
             ProcessControlBlock pcb = cu.getJobQueuePCB();
-            decodeInstruction(pcb);
+            if (pcb != null) {
+                coreThread.setBusy(true);
+                decodeInstruction(pcb);
+            }
         } catch (JobQueueEmpty ignored) {
         }
     }
@@ -46,13 +61,16 @@ public class ProcessorCore {
      * Reads the program counter and fetches & decodes the instructions
      * then passes it to the executor.
      */
-    public void decodeInstruction(ProcessControlBlock pcb) {
-        if (pcb.getProgramCounter().hasNext()) {
-            MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), pcb.getProgramCounter().getNextInstructionLocation());
+    public synchronized void decodeInstruction(ProcessControlBlock pcb) {
+        while (pcb.getProgramCounter().hasNext()) {
+            int nextAddress = pcb.getProgramCounter().getNextInstructionLocation();
+            MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), nextAddress);
             if (unit.isLocked()) {
                 Logger.log(Status.WARN, this, "Process [" + pcb.getProcessID() + "] Unit [" + unit.toString() + "] is locked and cannot be accessed.");
             } else {
                 try {
+                    pcb.setProcessState(ProcessState.RUNNING);
+                    unit.lock(pcb.getProcessID());
                     Instruction instruction = unit.access(pcb.getProcessID());
                     int val1 = getValueFromOperand(pcb, instruction.getOperand1());
                     if (instruction.getOpcode().needsSecondOperand()) {
@@ -65,13 +83,14 @@ public class ProcessorCore {
                             executeInstruction(instruction.getOpcode(), val1);
                         }
                     }
+                    unit.unlock();
+                    coreThread.setBusy(false);
 
                 } catch (AccessingLockedUnitException | UnknownOpcodeException | MutatingLockedUnitException ex) {
                     ex.printStackTrace();
                 }
             }
         }
-        requestInstruction();
     }
 
     private int getValueFromOperand(ProcessControlBlock pcb, Operand operand) throws AccessingLockedUnitException {
@@ -79,6 +98,7 @@ public class ProcessorCore {
             return operand.get();
         }
         MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), operand.get());
+        unit.lock(pcb.getProcessID());
         return unit.access(pcb.getProcessID()).getOperand1().get(); //the ret value should have opcode "STR" implying it is direct
     }
 
@@ -106,7 +126,7 @@ public class ProcessorCore {
 
     private void executeInstruction(Opcode opcode, int val) {
         if (opcode == Opcode.OUT) {
-            Logger.log(Status.OUT, "" + val);
+            Logger.log(toString() + ":OUT", "" + val);
         }
     }
 
@@ -114,7 +134,8 @@ public class ProcessorCore {
         unit.mutate(pcb.getProcessID(), new Instruction(Opcode.STR, new Operand(false, val)));
     }
 
-    public int getIndex() {
-        return index;
+    @Override
+    public String toString() {
+        return "Core-" + index;
     }
 }

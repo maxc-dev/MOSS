@@ -37,4 +37,14 @@ public class ProcessControlBlock {
     public void setProcessState(ProcessState processState) {
         this.processState = processState;
     }
+
+    @Override
+    public String toString() {
+        return "ProcessControlBlock{" +
+                "PID=" + processIdentifier +
+                ", PPID=" + parentProcessIdentifier +
+                ", State=" + processState +
+                ", PC=" + programCounter.toString() +
+                '}';
+    }
 }

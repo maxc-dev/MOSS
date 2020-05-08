@@ -15,7 +15,7 @@ public class MemoryUnit {
     public static final int UNALLOCATED = -1;
 
     private volatile int lockedToProcess = UNLOCKED;
-    private volatile Instruction content;
+    private volatile Instruction content = null;
     private final MemoryAddress memoryAddress;
     private volatile int logicalAddress = -1;
 
@@ -32,7 +32,7 @@ public class MemoryUnit {
     public Instruction access(int processIdentifier) throws AccessingLockedUnitException {
         if (!isLockedToProcess(processIdentifier)) {
             Logger.log(Status.CRIT, this, "Attempting to access a locked memory unit at address [" + memoryAddress.toString() + "]");
-            throw new AccessingLockedUnitException(memoryAddress);
+            throw new AccessingLockedUnitException(memoryAddress, lockedToProcess);
         } else {
             lock(processIdentifier);
             return content;

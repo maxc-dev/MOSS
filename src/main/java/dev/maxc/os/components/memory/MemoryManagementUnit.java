@@ -100,7 +100,7 @@ public class MemoryManagementUnit {
                 return handler.getNextUnitOffset();
             }
         }
-        allocateAdditionalMemory(processIdentifier);
+        allocateMemory(processIdentifier);
         return getNextUnitOffset(processIdentifier);
     }
 
