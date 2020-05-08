@@ -6,6 +6,7 @@ import dev.maxc.os.components.scheduler.disciplines.SchedulingDiscipline;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 import dev.maxc.os.structures.MutableQueue;
+import dev.maxc.os.structures.Queue;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -16,12 +17,12 @@ import java.lang.reflect.InvocationTargetException;
 public class CPUScheduler {
     private SchedulingDiscipline scheduler;
 
-    public <T extends SchedulingDiscipline> CPUScheduler(Class<T> schedulerClass) {
+    public <T extends SchedulingDiscipline> CPUScheduler(Class<T> schedulerClass, Queue<ProcessControlBlock> jobQueue) {
         try {
-            this.scheduler = schedulerClass.getConstructor().newInstance();
+            this.scheduler = schedulerClass.getConstructor(Queue.class).newInstance(jobQueue);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
             Logger.log(Status.ERROR, this, "Failed to initialise a new scheduling discipline, defaulting to FIFO.");
-            this.scheduler = new FirstInFirstOut();
+            this.scheduler = new FirstInFirstOut(jobQueue);
             ex.printStackTrace();
         }
     }

@@ -18,8 +18,8 @@ public class AdmissionScheduler implements ClockTick {
     }
 
     public synchronized void schedulePCB(ProcessControlBlock pcb) {
-        pcb.setProcessState(ProcessState.WAITING);
-        if (!waitingQueue.contains(pcb)) {
+        if (pcb.getProcessState() != ProcessState.WAITING) {
+            pcb.setProcessState(ProcessState.WAITING);
             waitingQueue.add(pcb);
         }
     }
@@ -27,5 +27,6 @@ public class AdmissionScheduler implements ClockTick {
     @Override
     public synchronized void onSystemClockTick() {
         cpuScheduler.addToJobQueue(waitingQueue);
+        waitingQueue.clear();
     }
 }

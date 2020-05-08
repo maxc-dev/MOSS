@@ -1,17 +1,16 @@
 package dev.maxc.os.components.interpreter;
 
 import dev.maxc.App;
-import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.interpreter.model.InterpreterUtils;
 import dev.maxc.os.components.interpreter.model.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;
+import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.io.exceptions.interpreter.InvalidVariableNameException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
-import dev.maxc.os.structures.Stack;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,12 +26,14 @@ public class Interpreter {
     private static final String COMMENT_CHARACTER = "#";
     private static final String FILE_EXTENSION = ".moss";
 
+    private final AdmissionScheduler admissionScheduler;
     private final ArrayList<Variable> globalVariables = new ArrayList<>();
     private final MemoryManagementUnit mmu;
     private final ProcessAPI processAPI;
 
 
-    public Interpreter(MemoryManagementUnit mmu, ProcessAPI processAPI) {
+    public Interpreter(AdmissionScheduler admissionScheduler, MemoryManagementUnit mmu, ProcessAPI processAPI) {
+        this.admissionScheduler = admissionScheduler;
         this.mmu = mmu;
         this.processAPI = processAPI;
     }
@@ -64,7 +65,6 @@ public class Interpreter {
             while ((line = Objects.requireNonNull(re).readLine()) != null) {
                 line = line.replaceAll(" ", "");
                 if (!line.startsWith(COMMENT_CHARACTER) && !line.isBlank()) {
-                    Stack<Instruction> instructionStack = new Stack<>();
 
                     //if variable declaration is inbound
                     if (line.contains(InterpreterUtils.DECLARE)) {
@@ -81,6 +81,8 @@ public class Interpreter {
                     lineNumber++;
                 }
             }
+
+            admissionScheduler.schedulePCB(mainProcess.getProcessControlBlock());
         } catch (IOException | InvalidVariableNameException ex) {
             ex.printStackTrace();
         }

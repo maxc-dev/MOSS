@@ -6,10 +6,10 @@ import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.process.ProcessControlBlock;
+import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
-import dev.maxc.os.system.api.SystemAPI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +37,6 @@ public class InterpreterUtils {
     public void outputOperand(Operand operand) {
         int address = submitInstruction(new Instruction(Opcode.OUT, operand, null));
         pcb.getProgramCounter().add(address);
-        SystemAPI.longTermScheduler.schedulePCB(pcb);
     }
 
     public Operand getVariable(String text) {
@@ -77,7 +76,6 @@ public class InterpreterUtils {
 
     private Operand splitOperandList(String[] list) {
         if (list.length == 1) {
-            Logger.log(Status.DEBUG, this, "PARSING VALUE TO OPERAND (splitoperandlist) " + list[0]);
             return new Operand(false, Integer.parseInt(list[0].replace("#", "") + ""));
         } else {
             int opIndex = getNextBestOperatorIndex(list);
@@ -109,7 +107,6 @@ public class InterpreterUtils {
 
         int address = submitInstruction(new Instruction(code, beforeInt, afterInt));
         pcb.getProgramCounter().add(address);
-        SystemAPI.longTermScheduler.schedulePCB(pcb);
         return new Operand(true, address);
     }
 

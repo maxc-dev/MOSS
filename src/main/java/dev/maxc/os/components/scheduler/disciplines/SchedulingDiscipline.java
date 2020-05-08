@@ -9,7 +9,11 @@ import dev.maxc.os.structures.Queue;
  * @since 02/05/2020
  */
 public abstract class SchedulingDiscipline {
-    protected volatile Queue<ProcessControlBlock> jobQueue = new Queue<>();
+    protected volatile Queue<ProcessControlBlock> jobQueue;
+
+    public SchedulingDiscipline(Queue<ProcessControlBlock> jobQueue) {
+        this.jobQueue = jobQueue;
+    }
 
     /**
      * Uses an algorithm to decide what order the pcbs

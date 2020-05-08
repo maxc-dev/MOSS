@@ -1,6 +1,8 @@
 #process file 1
 
 three = 3
+print(69)
+print(three)
 yeet = 23
 sixnine = yeet * three + 4 - 2 * 2
 
