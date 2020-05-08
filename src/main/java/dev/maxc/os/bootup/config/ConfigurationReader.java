@@ -43,7 +43,11 @@ public class ConfigurationReader {
 
         for (Map.Entry<String, String> config : configurationFileReader.getConfigFileMap().entrySet()) {
             for (Field field : fields) {
-                if (config.getKey().equalsIgnoreCase(field.getName())) {
+                String fieldName = field.getAnnotation(Configurable.class).value().toLowerCase();
+                if (fieldName.equalsIgnoreCase(Configurable.FIELD_MATCHES_CONFIG_VAR)) {
+                    fieldName = field.getName();
+                }
+                if (config.getKey().equalsIgnoreCase(fieldName)) {
                     componentLoader.componentLoaded("Parsing " + field.getName().toLowerCase().replace("_", " ") + " config option.");
                     try {
                         field.set(system, getDeducedType(config.getValue()));

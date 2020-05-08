@@ -1,6 +1,7 @@
 package dev.maxc.ui.api;
 
 import dev.maxc.os.io.log.Logger;
+import dev.maxc.os.io.log.Status;
 import dev.maxc.os.system.api.SystemAPI;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -21,9 +22,8 @@ public class UserInterfaceAPI {
             Platform.runLater(() -> {
                 stage.setTitle(completeTitle);
             });
-            Logger.log("UiAPI", "Title changed to [" + completeTitle + "]");
         } else {
-            Logger.log("UiAPI", "The `stage` has not been set, hence the title cannot be changed.");
+            Logger.log(Status.WARN, this, "The `stage` has not been set, hence the title cannot be changed.");
         }
     }
 

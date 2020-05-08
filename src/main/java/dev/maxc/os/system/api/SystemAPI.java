@@ -6,7 +6,10 @@
 
 package dev.maxc.os.system.api;
 
+import dev.maxc.os.components.cpu.ControlUnit;
+import dev.maxc.os.components.interpreter.Interpreter;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.components.scheduler.CPUScheduler;
 import dev.maxc.os.components.scheduler.disciplines.FirstInFirstOut;
@@ -17,6 +20,8 @@ import dev.maxc.os.components.memory.*;
 import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.thread.ThreadAPI;
+import dev.maxc.os.structures.Queue;
+import dev.maxc.os.system.sync.ClockTickEmitter;
 import dev.maxc.ui.api.UserInterfaceAPI;
 
 /**
@@ -66,7 +71,7 @@ public class SystemAPI implements LoadProgressUpdater {
     //segmentation config
 
     @Configurable(docs = "The power by which the segments will increase by (Base^x).")
-    public int SEGMENTATION_INCREASE_POWER;
+    public int SEGMENT_INCREASE_POWER;
 
     //memory allocation config
 
@@ -93,12 +98,15 @@ public class SystemAPI implements LoadProgressUpdater {
     public boolean PROCESS_FIRST_SCHEDULING;
 
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
-    private volatile static CPUScheduler shortTermScheduler = new CPUScheduler(FirstInFirstOut.class);
-    public volatile static AdmissionScheduler longTermScheduler = new AdmissionScheduler(shortTermScheduler);
+
+    private volatile Queue<ProcessControlBlock> jobQueue = new Queue<>();
+    private volatile CPUScheduler shortTermScheduler = new CPUScheduler(FirstInFirstOut.class, jobQueue);
+    public volatile AdmissionScheduler longTermScheduler;
 
     public MemoryManagementUnit memoryAPI;
     public ThreadAPI threadAPI;
     public ProcessAPI processAPI;
+    public ClockTickEmitter clockTickEmitter;
 
     @Override
     public void onUpdateProgression(String message, double percent) {
@@ -106,16 +114,34 @@ public class SystemAPI implements LoadProgressUpdater {
 
     @Override
     public void onLoadComplete() {
-        //todo change malloc indexer to configured version
         RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class, VIRTUAL_MEMORY);
-        LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENTATION_INCREASE_POWER);
-        memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils, CACHE_SIZE);
+        final LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENT_INCREASE_POWER);
+
         if (USE_SEGMENTATION && USE_PAGING) {
             USE_PAGING = false;
+        } else if (!USE_SEGMENTATION && !USE_PAGING) {
+            USE_SEGMENTATION = true;
         }
+        memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils, CACHE_SIZE);
+
+        final ControlUnit controlUnit = new ControlUnit(CPU_CORES, jobQueue, memoryAPI);
+        longTermScheduler = new AdmissionScheduler(shortTermScheduler);
+        clockTickEmitter = new ClockTickEmitter(1000/CLOCK_TICK_FREQUENCY);
+        clockTickEmitter.addClockTickListener(longTermScheduler);
 
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI, memoryAPI);
         Logger.log(this, "Created memory, thread and process APIs.");
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Interpreter interpreter = new Interpreter(longTermScheduler, memoryAPI, processAPI);
+                interpreter.interpret("pf1");
+            }
+        }).start();
     }
 }

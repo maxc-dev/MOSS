@@ -1,8 +1,8 @@
 #system config
-    clock_tick_frequency=100
+    clock_tick_frequency=1000
 
 #cpu config
-    cpu_cores=4
+    cpu_cores=1
     cpu_cores_async=false
 
 #memory config
