@@ -11,12 +11,12 @@ public class ClockTickEmitter {
     private final Thread clockTickThread;
     private boolean emit = true;
 
-    public ClockTickEmitter(int msDelay) {
+    public ClockTickEmitter(int frequency) {
         clockTickThread = new Thread(() -> {
             while (emit) {
                 emit();
                 try {
-                    Thread.sleep(msDelay);
+                    Thread.sleep(1000/frequency);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
