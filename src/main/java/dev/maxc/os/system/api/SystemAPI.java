@@ -43,6 +43,9 @@ public class SystemAPI implements LoadProgressUpdater {
     @Configurable(docs = "The amount of cores in the CPU.")
     public int CPU_CORES;
 
+    @Configurable(value = "cpu_core_frequency", docs = "The maximum amount of processes a CPU core can handle per second.")
+    public int CORE_FREQUENCY;
+
     @Configurable(docs = "If set to true, the CPU cores will run in async which means they will handle instructions independently from other cores. When set to false, the CPU cores will run in sync with one another and share resources and instructions.")
     public boolean CPU_CORES_ASYNC;
 
@@ -125,23 +128,25 @@ public class SystemAPI implements LoadProgressUpdater {
         memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils, CACHE_SIZE);
 
         final ControlUnit controlUnit = new ControlUnit(CPU_CORES, jobQueue, memoryAPI);
+        controlUnit.initProcessorCoreThreads(CLOCK_TICK_FREQUENCY);
         longTermScheduler = new AdmissionScheduler(shortTermScheduler);
-        clockTickEmitter = new ClockTickEmitter(1000/CLOCK_TICK_FREQUENCY);
+        clockTickEmitter = new ClockTickEmitter(CLOCK_TICK_FREQUENCY);
         clockTickEmitter.addClockTickListener(longTermScheduler);
+        clockTickEmitter.addClockTickListener(controlUnit);
 
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI, memoryAPI);
         Logger.log(this, "Created memory, thread and process APIs.");
         new Thread(() -> {
-            while (true) {
+            do {
+                Interpreter interpreter = new Interpreter(longTermScheduler, memoryAPI, processAPI);
+                interpreter.interpret("pf1");
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Interpreter interpreter = new Interpreter(longTermScheduler, memoryAPI, processAPI);
-                interpreter.interpret("pf1");
-            }
+            } while (true);
         }).start();
     }
 }
