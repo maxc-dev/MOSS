@@ -3,6 +3,8 @@ package dev.maxc.os.components.memory.allocation;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
+import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
+import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.log.Logger;
 
 /**
@@ -12,11 +14,13 @@ import dev.maxc.os.io.log.Logger;
 public class Segmentation extends LogicalMemoryHandler {
     private final RandomAccessMemory ram;
     private final Segment segment;
+    private final LogicalMemoryHandlerUtils utils;
 
     public Segmentation(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, int id, int parentProcessID) {
         super(id, parentProcessID);
         this.ram = ram;
         this.segment = new Segment(utils);
+        this.utils = utils;
     }
 
     @Override
@@ -29,7 +33,7 @@ public class Segmentation extends LogicalMemoryHandler {
     }
 
     @Override
-    public MemoryUnit getMemoryUnit(int offset) {
+    public MemoryUnit getMemoryUnit(int offset) throws MemoryUnitNotFoundException {
         return segment.getMemoryUnit(offset);
     }
 
@@ -40,13 +44,13 @@ public class Segmentation extends LogicalMemoryHandler {
     }
 
     @Override
-    public int getNextUnitOffset() {
+    public int getNextUnitOffset() throws MemoryLogicalHandlerFullException {
         for (MemoryUnit unit : segment.memoryUnits) {
             if (!unit.inUse()) {
                 return unit.getLogicalAddress();
             }
         }
-        return -1;
+        throw new MemoryLogicalHandlerFullException();
     }
 
     private static final class Segment extends LogicalMemoryInterface {

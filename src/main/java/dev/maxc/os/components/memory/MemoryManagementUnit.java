@@ -7,6 +7,8 @@ import dev.maxc.os.components.memory.allocation.Paging;
 import dev.maxc.os.components.memory.allocation.Segmentation;
 import dev.maxc.os.components.memory.model.CacheMemoryNode;
 import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
+import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -23,7 +25,7 @@ public class MemoryManagementUnit {
     private final ArrayList<LogicalMemoryHandler> logicalHandlers = new ArrayList<>();
     private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
     private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
-    private final Cache cache;
+    private volatile Cache cache;
 
     /**
      * Creates a Memory Management Unit which is responsible for managing
@@ -50,7 +52,7 @@ public class MemoryManagementUnit {
      * memory with Segmentation or Paging, this can all be modified
      * in the config file.
      */
-    public boolean allocateMemory(int processIdentifier) {
+    public synchronized boolean allocateMemory(int processIdentifier) {
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
                 Logger.log(Status.ERROR, this, "Attempted to allocate new memory to a process [" + processIdentifier + "] which already has memory. Processes which already have memory must allocate additional memory instead since it saves memory space.");
@@ -78,7 +80,7 @@ public class MemoryManagementUnit {
      * allocates memory with Segmentation or Paging, this can all be
      * modified in the config file.
      */
-    public boolean allocateAdditionalMemory(int processIdentifier) {
+    public synchronized boolean allocateAdditionalMemory(int processIdentifier) {
         if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
             for (LogicalMemoryHandler handler : logicalHandlers) {
                 if (handler.getParentProcessID() == processIdentifier) {
@@ -93,38 +95,47 @@ public class MemoryManagementUnit {
         return false;
     }
 
-    public int getNextUnitOffset(int processIdentifier) {
+    public synchronized int getNextUnitOffset(int processIdentifier) {
         //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
-                return handler.getNextUnitOffset();
+                try {
+                    return handler.getNextUnitOffset();
+                } catch (MemoryLogicalHandlerFullException e) {
+                    allocateAdditionalMemory(processIdentifier);
+                    return getNextUnitOffset(processIdentifier);
+                }
             }
         }
-        allocateMemory(processIdentifier);
-        return getNextUnitOffset(processIdentifier);
+        throw new OutOfMemoryError();
     }
 
     /**
      * Gets the memory unit for a process at a specific offset.
      */
-    public MemoryUnit getMemoryUnit(int processIdentifier, int offset) {
+    public synchronized MemoryUnit getMemoryUnit(int processIdentifier, int offset) {
         //checks the cache before searching the ram
-        for (CacheMemoryNode node : cache) {
-            if (node.getParentProcessID() == processIdentifier && node.getOffset() == offset) {
+        for (CacheMemoryNode cacheMemoryNode : cache) {
+            if (cacheMemoryNode.getParentProcessID() == processIdentifier && cacheMemoryNode.getOffset() == offset) {
                 //Logger.log(this, "Fetched memory unit from cache instead of memory for process [" + processIdentifier + "] at offset [" + offset + "]");
-                return node.getMemoryUnit();
+                return cacheMemoryNode.getMemoryUnit();
             }
         }
 
         //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
-                MemoryUnit unit = handler.getMemoryUnit(offset);
+                MemoryUnit unit = null;
+                try {
+                    unit = handler.getMemoryUnit(offset);
+                } catch (MemoryUnitNotFoundException e) {
+                    e.printStackTrace();
+                }
                 cache.add(new CacheMemoryNode(processIdentifier, offset, unit));
                 return unit;
             }
         }
-        Logger.log(Status.ERROR, this, "Unable to get a Memory Unit for process [" + processIdentifier + "] at offset [" + offset + "]");
+        Logger.log(Status.WARN, this, "Unable to get a Memory Unit for process [" + processIdentifier + "] allocating more memory and trying again...");
         return null;
     }
 
@@ -134,7 +145,7 @@ public class MemoryManagementUnit {
      * removed from the memory's list of handlers. This means that the handler
      * will no longer be able to be accessed.
      */
-    public void clearProcessMemory(int processIdentifier) {
+    public synchronized void clearProcessMemory(int processIdentifier) {
         for (int i = 0; i < logicalHandlers.size(); i++) {
             if (logicalHandlers.get(i).getParentProcessID() == processIdentifier) {
                 logicalHandlers.get(i).free();

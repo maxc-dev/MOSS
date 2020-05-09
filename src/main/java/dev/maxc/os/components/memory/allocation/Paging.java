@@ -3,6 +3,8 @@ package dev.maxc.os.components.memory.allocation;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
+import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
+import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.log.Logger;
 
 import java.util.ArrayList;
@@ -46,7 +48,7 @@ public class Paging extends LogicalMemoryHandler {
      * Gets the Memory Unit which has it's own offset in the page.
      */
     @Override
-    public MemoryUnit getMemoryUnit(int offset) {
+    public MemoryUnit getMemoryUnit(int offset) throws MemoryUnitNotFoundException {
         int pageId = (int) Math.floor((double) offset/utils.getInitialSize());
         int pageOffset = offset % utils.getInitialSize();
         return pages.get(pageId).getMemoryUnit(pageOffset);
@@ -65,7 +67,7 @@ public class Paging extends LogicalMemoryHandler {
     }
 
     @Override
-    public int getNextUnitOffset() {
+    public int getNextUnitOffset() throws MemoryLogicalHandlerFullException {
         for (Page page : pages) {
             for (MemoryUnit unit : page.memoryUnits) {
                 if (!unit.inUse()) {
@@ -73,7 +75,7 @@ public class Paging extends LogicalMemoryHandler {
                 }
             }
         }
-        return -1;
+        throw new MemoryLogicalHandlerFullException();
     }
 
     /**

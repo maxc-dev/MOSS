@@ -1,6 +1,9 @@
 package dev.maxc.os.components.memory.allocation;
 
+import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.io.exceptions.memory.MemoryUnitAddressException;
+import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -26,7 +29,6 @@ public abstract class LogicalMemoryInterface {
         for (MemoryUnit unit : memoryUnits) {
             unit.clear();
         }
-        Logger.log(Status.DEBUG, this, "Memory Units cleared [" + memoryUnits.size() + "]");
         memoryUnits.clear();
     }
 
@@ -36,7 +38,6 @@ public abstract class LogicalMemoryInterface {
 
     protected final boolean addMemoryUnit(MemoryUnit memoryUnit) {
         if (memoryUnits.size() + 1 > initialSize) {
-            Logger.log(Status.WARN, this, "Attempted to add a Memory Unit to a handler which is full.");
             return false;
         }
         memoryUnits.add(memoryUnit);
@@ -48,10 +49,9 @@ public abstract class LogicalMemoryInterface {
         return startingLogicalPointer;
     }
 
-    public final MemoryUnit getMemoryUnit(int index) {
-        if (Math.abs(index) >= memoryUnits.size()) {
-            Logger.log(Status.ERROR, this, "Attempted to get a Memory Unit at a non existent offset.");
-            return null;
+    public final MemoryUnit getMemoryUnit(int index) throws MemoryUnitNotFoundException {
+        if (index >= memoryUnits.size() || index < 0) {
+            throw new MemoryUnitNotFoundException(index);
         }
         return memoryUnits.get(index);
     }

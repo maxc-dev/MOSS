@@ -2,6 +2,8 @@ package dev.maxc.os.components.memory.allocation;
 
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
+import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 
 /**
  * @author Max Carter
@@ -32,7 +34,7 @@ public abstract class LogicalMemoryHandler {
     /**
      * Gets the memory unit at a specific offset in the logical memory
      */
-    public abstract MemoryUnit getMemoryUnit(int offset);
+    public abstract MemoryUnit getMemoryUnit(int offset) throws MemoryUnitNotFoundException;
 
     /**
      * Frees the memory used by the process
@@ -42,7 +44,7 @@ public abstract class LogicalMemoryHandler {
     /**
      * Gets the next unallocated memory unit
      */
-    public abstract int getNextUnitOffset();
+    public abstract int getNextUnitOffset() throws MemoryLogicalHandlerFullException;
 
     @Override
     public String toString() {
