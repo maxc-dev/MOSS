@@ -22,7 +22,7 @@ public class Process {
      * Exits the process.
      */
     public void exit() {
-        processAPI.exitProcess(this);
+        processAPI.exitProcess(processControlBlock.getProcessID());
     }
 
     /**

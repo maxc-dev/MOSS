@@ -1,7 +1,6 @@
 package dev.maxc.os.components.process;
 
 import dev.maxc.os.components.cpu.ProgramCounter;
-import dev.maxc.os.components.memory.model.MemoryAddress;
 
 /**
  * @author Max Carter
@@ -12,10 +11,12 @@ public class ProcessControlBlock {
     private final int processIdentifier;
     private final int parentProcessIdentifier;
     private final ProgramCounter programCounter = new ProgramCounter();
+    private final ProcessAPI processAPI;
 
-    public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier) {
+    public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier, ProcessAPI processAPI) {
         this.processIdentifier = processIdentifier;
         this.parentProcessIdentifier = parentProcessIdentifier;
+        this.processAPI = processAPI;
     }
 
     public ProgramCounter getProgramCounter() {
@@ -36,6 +37,9 @@ public class ProcessControlBlock {
 
     public void setProcessState(ProcessState processState) {
         this.processState = processState;
+        if (processState == ProcessState.TERMINATED) {
+            processAPI.exitProcess(processIdentifier);
+        }
     }
 
     @Override

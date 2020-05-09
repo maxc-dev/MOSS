@@ -26,7 +26,7 @@ public class ProcessAPI {
      * Also creates a new main thread to add with the process.
      */
     public Process getNewProcess(int parentProcessIdentifier) {
-        Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier), this);
+        Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier, this), this);
         threadAPI.addNewThreadToProcess(process);
         mmu.allocateMemory(process.getProcessControlBlock().getProcessID());
         return process;
@@ -35,8 +35,7 @@ public class ProcessAPI {
     /**
      * Exits the process permanently.
      */
-    public void exitProcess(Process process) {
-        process.getProcessControlBlock().setProcessState(ProcessState.TERMINATED);
-        mmu.clearProcessMemory(process.getProcessControlBlock().getProcessID());
+    public void exitProcess(int processIdentifier) {
+        mmu.clearProcessMemory(processIdentifier);
     }
 }
