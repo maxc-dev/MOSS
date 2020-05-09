@@ -21,7 +21,7 @@ public class CoreThread extends Thread {
     public synchronized void run() {
         while (true) {
             if (!busy) {
-                core.requestInstruction();
+                core.readPCBSocket();
             }
             try {
                 sleep(delay);
