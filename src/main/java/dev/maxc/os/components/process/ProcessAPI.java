@@ -2,6 +2,7 @@ package dev.maxc.os.components.process;
 
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.thread.ThreadAPI;
+import dev.maxc.os.io.log.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,6 +30,7 @@ public class ProcessAPI {
         Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier, this), this);
         threadAPI.addNewThreadToProcess(process);
         mmu.allocateMemory(process.getProcessControlBlock().getProcessID());
+        Logger.log(this, "Initialised new process: " + process.toString());
         return process;
     }
 
