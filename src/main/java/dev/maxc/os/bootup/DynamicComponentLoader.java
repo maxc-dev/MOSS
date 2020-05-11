@@ -8,15 +8,11 @@ import java.util.List;
  */
 public class DynamicComponentLoader {
     private final List<LoadProgressUpdater> loadProgressListeners;
-    private int size = 1;
+    private final int size = 40;
     private int pointer;
 
     public DynamicComponentLoader(List<LoadProgressUpdater> loadProgressListeners) {
         this.loadProgressListeners = loadProgressListeners;
-    }
-
-    public void addToSize(int size) {
-        this.size += size;
     }
 
     /**
@@ -29,9 +25,16 @@ public class DynamicComponentLoader {
         pointer++;
         try {
             //ensures that the splash screen is enabled for at least 2 seconds
-            Thread.sleep(2000/size);
+            Thread.sleep(3000/size);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void complete() {
+        for (LoadProgressUpdater loadProgressUpdater : loadProgressListeners) {
+            loadProgressUpdater.onUpdateProgression("Successfully initialised MOSS.", 1);
+            loadProgressUpdater.onLoadComplete();
         }
     }
 }

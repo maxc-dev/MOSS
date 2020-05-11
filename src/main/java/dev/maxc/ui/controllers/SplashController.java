@@ -93,7 +93,7 @@ public class SplashController extends Pane implements LoadProgressUpdater {
         }
 
         //animate fade out of the splash
-        FadeTransition fadeTransition = new FadeTransition(Duration.millis(2000), this);
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(3000), this);
         fadeTransition.setFromValue(1.0);
         fadeTransition.setToValue(0.0);
         fadeTransition.play();

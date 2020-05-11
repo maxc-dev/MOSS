@@ -6,15 +6,14 @@
 
 package dev.maxc.os.system.api;
 
+import dev.maxc.os.bootup.DynamicComponentLoader;
 import dev.maxc.os.components.cpu.ControlUnit;
-import dev.maxc.os.components.interpreter.Interpreter;
+import dev.maxc.os.components.interpreter.Compiler;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.components.scheduler.CPUScheduler;
 import dev.maxc.os.components.scheduler.disciplines.FirstInFirstOut;
-import dev.maxc.os.io.log.Logger;
-import dev.maxc.os.bootup.LoadProgressUpdater;
 import dev.maxc.os.bootup.config.Configurable;
 import dev.maxc.os.components.memory.*;
 import dev.maxc.os.components.memory.indexer.FirstFit;
@@ -28,10 +27,16 @@ import dev.maxc.ui.api.UserInterfaceAPI;
  * @author Max Carter
  * @since 10/04/2020
  */
-public class SystemAPI implements LoadProgressUpdater {
+public class SystemAPI {
     //system constants
     public static final String SYSTEM_NAME = "MOSS";
     public static final String SYSTEM_AUTHOR = "Max Carter";
+
+    private final DynamicComponentLoader componentLoader;
+
+    public SystemAPI(DynamicComponentLoader componentLoader) {
+        this.componentLoader = componentLoader;
+    }
 
     //system config
 
@@ -45,9 +50,6 @@ public class SystemAPI implements LoadProgressUpdater {
 
     @Configurable(value = "cpu_core_frequency", docs = "The maximum amount of processes a CPU core can handle per second.")
     public int CORE_FREQUENCY;
-
-    @Configurable(docs = "If set to true, the CPU cores will run in async which means they will handle instructions independently from other cores. When set to false, the CPU cores will run in sync with one another and share resources and instructions.")
-    public boolean CPU_CORES_ASYNC;
 
     //memory config
 
@@ -65,10 +67,10 @@ public class SystemAPI implements LoadProgressUpdater {
 
     //paging config
 
-    @Configurable(value="malloc_size_base", docs = "The base of the allocation system.")
+    @Configurable(value = "malloc_size_base", docs = "The base of the allocation system.")
     public int ALLOCATION_BASE;
 
-    @Configurable(value="malloc_size_power", docs = "The power of allocation system.")
+    @Configurable(value = "malloc_size_power", docs = "The power of allocation system.")
     public int ALLOCATION_POWER;
 
     //segmentation config
@@ -95,15 +97,10 @@ public class SystemAPI implements LoadProgressUpdater {
     @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
     public boolean VIRTUAL_MEMORY;
 
-    //process config
-
-    @Configurable(docs = "When set to true, threads will be scheduled along with their parent Process. When set to false, threads wil be executed independently from their parent Process.")
-    public boolean PROCESS_FIRST_SCHEDULING;
-
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
 
-    private volatile Queue<ProcessControlBlock> jobQueue = new Queue<>();
-    private volatile CPUScheduler shortTermScheduler = new CPUScheduler(FirstInFirstOut.class, jobQueue);
+    private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
+    private volatile CPUScheduler shortTermScheduler = new CPUScheduler(FirstInFirstOut.class, readyQueue);
     public volatile AdmissionScheduler longTermScheduler;
 
     public MemoryManagementUnit memoryAPI;
@@ -111,14 +108,12 @@ public class SystemAPI implements LoadProgressUpdater {
     public ProcessAPI processAPI;
     public ClockTickEmitter clockTickEmitter;
 
-    @Override
-    public void onUpdateProgression(String message, double percent) {
-    }
-
-    @Override
-    public void onLoadComplete() {
+    public void onLoadingReady() {
+        componentLoader.componentLoaded("Initialising memory subsystem...");
         RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class, VIRTUAL_MEMORY);
+        componentLoader.componentLoaded("Initialised Random Access memory.");
         final LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENT_INCREASE_POWER);
+        componentLoader.componentLoaded("Initialised logical memory handler interface utils.");
 
         if (USE_SEGMENTATION && USE_PAGING) {
             USE_PAGING = false;
@@ -126,27 +121,47 @@ public class SystemAPI implements LoadProgressUpdater {
             USE_SEGMENTATION = true;
         }
         memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils, CACHE_SIZE);
+        componentLoader.componentLoaded("Initialised the Memory Management Unit.");
+        componentLoader.componentLoaded("Successfully initialised the memory subsystem.");
 
-        final ControlUnit controlUnit = new ControlUnit(CPU_CORES, jobQueue, memoryAPI);
-        controlUnit.initProcessorCoreThreads(CLOCK_TICK_FREQUENCY);
+        componentLoader.componentLoaded("Initialising the CPU architecture...");
+        final ControlUnit controlUnit = new ControlUnit(CPU_CORES, readyQueue, memoryAPI);
+        componentLoader.componentLoaded("Initialised the CPU Control Unit.");
+        controlUnit.initProcessorCoreThreads(CORE_FREQUENCY);
+        componentLoader.componentLoaded("Initialised processor core threads.");
         longTermScheduler = new AdmissionScheduler(shortTermScheduler);
+        componentLoader.componentLoaded("Initialised the long term scheduler.");
+
         clockTickEmitter = new ClockTickEmitter(CLOCK_TICK_FREQUENCY);
+        componentLoader.componentLoaded("Initialised the system clock.");
         clockTickEmitter.addClockTickListener(longTermScheduler);
         clockTickEmitter.addClockTickListener(controlUnit);
+        componentLoader.componentLoaded("Successfully initialised the processing & scheduling subsystem.");
 
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI, memoryAPI);
-        Logger.log(this, "Created memory, thread and process APIs.");
-        new Thread(() -> {
-            do {
-                Interpreter interpreter = new Interpreter(longTermScheduler, memoryAPI, processAPI);
-                interpreter.interpret("pf1");
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } while (true);
-        }).start();
+        componentLoader.componentLoaded("Initialised the process & thread APIs.");
+        componentLoader.complete();
+
+        Thread compile1 = new Thread(() -> {
+            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
+            compiler.compile("pf1");
+        });
+        Thread compile2 = new Thread(() -> {
+            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
+            compiler.compile("pf1");
+        });
+        Thread compile3 = new Thread(() -> {
+            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
+            compiler.compile("pf1");
+        });
+        Thread compile4 = new Thread(() -> {
+            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
+            compiler.compile("pf1");
+        });
+        compile1.start();
+        compile2.start();
+        compile3.start();
+        compile4.start();
     }
 }
