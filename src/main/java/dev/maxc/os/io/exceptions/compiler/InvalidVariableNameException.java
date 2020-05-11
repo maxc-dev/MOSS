@@ -1,4 +1,4 @@
-package dev.maxc.os.io.exceptions.interpreter;
+package dev.maxc.os.io.exceptions.compiler;
 
 /**
  * @author Max Carter

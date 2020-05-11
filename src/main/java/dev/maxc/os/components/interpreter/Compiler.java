@@ -2,13 +2,14 @@ package dev.maxc.os.components.interpreter;
 
 import dev.maxc.App;
 import dev.maxc.os.components.instruction.Operand;
-import dev.maxc.os.components.interpreter.model.InterpreterUtils;
+import dev.maxc.os.components.interpreter.model.CompilerTranslator;
 import dev.maxc.os.components.interpreter.model.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
-import dev.maxc.os.io.exceptions.interpreter.InvalidVariableNameException;
+import dev.maxc.os.io.exceptions.compiler.InvalidVariableNameException;
+import dev.maxc.os.io.exceptions.compiler.UnparsableDataException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -22,7 +23,7 @@ import java.util.Objects;
  * @author Max Carter
  * @since 03/05/2020
  */
-public class Interpreter {
+public class Compiler {
     private static final String COMMENT_CHARACTER = "#";
     private static final String FILE_EXTENSION = ".moss";
 
@@ -32,7 +33,7 @@ public class Interpreter {
     private final ProcessAPI processAPI;
 
 
-    public Interpreter(AdmissionScheduler admissionScheduler, MemoryManagementUnit mmu, ProcessAPI processAPI) {
+    public Compiler(AdmissionScheduler admissionScheduler, MemoryManagementUnit mmu, ProcessAPI processAPI) {
         this.admissionScheduler = admissionScheduler;
         this.mmu = mmu;
         this.processAPI = processAPI;
@@ -41,7 +42,7 @@ public class Interpreter {
     /**
      * Runs the interpreter on a file.
      */
-    public void interpret(String fileName) {
+    public void compile(String fileName) {
         //read file
         Logger.log(this, "Gathering process file [" + fileName + "]");
         BufferedReader re = null;
@@ -54,11 +55,9 @@ public class Interpreter {
         }
 
         Process mainProcess = processAPI.getNewProcess(ProcessAPI.NO_PARENT_PROCESS);
-        InterpreterUtils utils = new InterpreterUtils(globalVariables, mmu, mainProcess.getProcessControlBlock());
-        Logger.log(this, "Created new interpreter process [" + mainProcess.toString() + "]");
-
+        CompilerTranslator utils = new CompilerTranslator(globalVariables, mmu, mainProcess.getProcessControlBlock());
         Logger.log(this, "Successfully gathered process file [" + fileName + FILE_EXTENSION + "] interpreting...");
-        //iterate file
+        //compile file
         try {
             int lineNumber = 1;
             String line;
@@ -67,23 +66,23 @@ public class Interpreter {
                 if (!line.startsWith(COMMENT_CHARACTER) && !line.isBlank()) {
 
                     //if variable declaration is inbound
-                    if (line.contains(InterpreterUtils.DECLARE)) {
-                        int declareIndex = line.indexOf(InterpreterUtils.DECLARE);
-                        Variable var = new Variable(line.substring(0, declareIndex), utils.getVariable(line.substring(declareIndex+1)));
+                    if (line.contains(CompilerTranslator.DECLARE)) {
+                        int declareIndex = line.indexOf(CompilerTranslator.DECLARE);
+                        Variable var = new Variable(line.substring(0, declareIndex), utils.getOperand(line.substring(declareIndex+1)));
                         globalVariables.add(var);
                         Logger.log(this, "New variable initialized [" + var.toString() + "]");
 
                     } else if (line.startsWith("print(") && line.endsWith(")")) {
-                        Operand output = utils.getVariable(line.substring(line.indexOf("(")+1, line.indexOf(")")));
+                        Operand output = utils.getOperand(line.substring(line.indexOf("(")+1, line.indexOf(")")));
                         utils.outputOperand(output);
+                    } else {
+                        throw new UnparsableDataException(lineNumber, line);
                     }
-
                     lineNumber++;
                 }
             }
-
             admissionScheduler.schedulePCB(mainProcess.getProcessControlBlock());
-        } catch (IOException | InvalidVariableNameException ex) {
+        } catch (IOException | InvalidVariableNameException | UnparsableDataException ex) {
             ex.printStackTrace();
         }
     }

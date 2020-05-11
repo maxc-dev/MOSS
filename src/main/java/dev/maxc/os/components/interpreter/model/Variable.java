@@ -1,7 +1,7 @@
 package dev.maxc.os.components.interpreter.model;
 
 import dev.maxc.os.components.instruction.Operand;
-import dev.maxc.os.io.exceptions.interpreter.InvalidVariableNameException;
+import dev.maxc.os.io.exceptions.compiler.InvalidVariableNameException;
 
 /**
  * @author Max Carter
@@ -12,7 +12,7 @@ public class Variable {
     private Operand operand;
 
     public Variable(String identifier, Operand operand) throws InvalidVariableNameException {
-        if (!identifier.matches(InterpreterUtils.VARIABLE_NAME)) {
+        if (!identifier.matches(CompilerTranslator.VARIABLE_NAME)) {
             throw new InvalidVariableNameException(identifier);
         }
         this.identifier = identifier;
