@@ -15,10 +15,10 @@ import dev.maxc.os.system.sync.ClockTick;
 public class ControlUnit implements ClockTick {
     private final ProcessorCore[] cores;
 
-    private volatile Queue<ProcessControlBlock> jobQueue;
+    private volatile Queue<ProcessControlBlock> readyQueue;
 
-    public ControlUnit(int coreCount, Queue<ProcessControlBlock> jobQueue, MemoryManagementUnit mmu) {
-        this.jobQueue = jobQueue;
+    public ControlUnit(int coreCount, Queue<ProcessControlBlock> readyQueue, MemoryManagementUnit mmu) {
+        this.readyQueue = readyQueue;
         cores = new ProcessorCore[coreCount];
         for (int i = 0; i < coreCount; i++) {
             cores[i] = new ProcessorCore(i, mmu);
@@ -50,12 +50,23 @@ public class ControlUnit implements ClockTick {
 
     @Override
     public void onSystemClockTick() {
-        while (jobQueue.hasNext()) {
-            ProcessControlBlock pcb = jobQueue.get();
+        //if the ready queue is not empty, it will find a core to execute the next job.
+        while (readyQueue.hasNext()) {
+            ProcessControlBlock pcb = readyQueue.get();
             if (!writeCoreSocket(pcb)) {
-                Logger.log(Status.CRIT, this, "Unable to write process to core socket, to prevent the process from being lost it has been appended back to the job queue.");
+                /*
+                    When the control unit is unable to write to the socket, it is usually due to
+                    an issue of concurrency. What normally happens is the core socket might be empty,
+                    and just as the control unit goes to write the PCB to the socket, the core is written
+                    to in another thread. Since it cannot be overwritten, the PCB is rejected and has
+                    to be appended back into the queue. However due to concurrency and the structure of
+                    a queue, it cannot be added back to the start, it must be written to from the back
+                    which means the PCB has to be reprocessed. Whilst this is inconvenient, the delay
+                    is insignificant and the affect it has on the rest of the system is negligible.
+                 */
+                Logger.log(Status.WARN, this, "Unable to write process to core socket due to concurrency, to prevent the process from being lost it has been appended to the back of the job queue.");
                 pcb.setProcessState(ProcessState.WAITING);
-                jobQueue.add(pcb);
+                readyQueue.add(pcb);
             }
         }
     }

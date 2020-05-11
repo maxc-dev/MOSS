@@ -3,8 +3,7 @@
 
 #cpu config
     cpu_cores=8
-    cpu_core_frequency=1
-    cpu_cores_async=false
+    cpu_core_frequency=1000
 
 #memory config
     main_memory_base=2
@@ -34,6 +33,3 @@
 
     #virtual memory
         virtual_memory=false
-
-#process config
-    process_first_scheduling=true

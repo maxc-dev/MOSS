@@ -12,7 +12,7 @@ public class CoreThread extends Thread {
     protected volatile boolean busy = false;
 
     public CoreThread(ProcessorCore core, int frequency) {
-        Logger.log(this, "Processor Core Thread initialised, operating @" + frequency + "mhz, awaiting instructions.");
+        Logger.log(this, "Processor Core Thread initialised, operating @" + frequency + "hz, awaiting instructions.");
         this.core = core;
         this.delay = 1000/frequency;
     }

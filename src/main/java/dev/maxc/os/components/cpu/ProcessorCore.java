@@ -90,7 +90,7 @@ public class ProcessorCore {
                         if (instruction.getOpcode() == Opcode.STR) {
                             saveExecution(pcb, unit, instruction.getOperand1().get());
                         } else {
-                            executeInstruction(instruction.getOpcode(), val1);
+                            executeInstruction(pcb, instruction.getOpcode(), val1);
                         }
                     }
                     //finishes by unlocking the unit, opens the socket and continues the thread
@@ -154,9 +154,9 @@ public class ProcessorCore {
     /**
      * Executes an instruction with only one operand
      */
-    private void executeInstruction(Opcode opcode, int val) {
+    private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val) {
         if (opcode == Opcode.OUT) {
-            Logger.log(toString() + ":OUT", "" + val);
+            Logger.log(toString(), "[Process-" + pcb.getProcessID() + "] " + val);
         }
     }
 
