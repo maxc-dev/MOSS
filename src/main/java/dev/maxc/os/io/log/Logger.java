@@ -12,11 +12,23 @@ public class Logger {
     private static final String LOG_FORMAT = "[%s] %s";
     private static final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 
+    private static volatile String latestLog = "";
+    private static volatile int logRepeatCount = 0;
+
     /**
      * Prints the log to the console.
      */
-    private static void printLog(String message) {
-        System.out.println(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), message));
+    private static synchronized void printLog(String message) {
+        if (message.equals(latestLog)) {
+            logRepeatCount++;
+        } else {
+            if (logRepeatCount > 0) {
+                System.out.println(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), "\t\t\t^ (Repeated line x" + logRepeatCount + ")"));
+                logRepeatCount = 0;
+            }
+            System.out.println(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), message));
+            latestLog = message;
+        }
     }
 
     /**
