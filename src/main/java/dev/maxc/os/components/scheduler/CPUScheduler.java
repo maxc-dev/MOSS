@@ -27,7 +27,7 @@ public class CPUScheduler {
         }
     }
 
-    public void addToJobQueue(MutableQueue<ProcessControlBlock> pcbs) {
+    public void addToReadyQueue(MutableQueue<ProcessControlBlock> pcbs) {
         scheduler.schedule(pcbs);
     }
 }

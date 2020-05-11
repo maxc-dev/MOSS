@@ -9,10 +9,10 @@ import dev.maxc.os.structures.Queue;
  * @since 02/05/2020
  */
 public abstract class SchedulingDiscipline {
-    protected volatile Queue<ProcessControlBlock> jobQueue;
+    protected volatile Queue<ProcessControlBlock> readyQueue;
 
-    public SchedulingDiscipline(Queue<ProcessControlBlock> jobQueue) {
-        this.jobQueue = jobQueue;
+    public SchedulingDiscipline(Queue<ProcessControlBlock> readyQueue) {
+        this.readyQueue = readyQueue;
     }
 
     /**

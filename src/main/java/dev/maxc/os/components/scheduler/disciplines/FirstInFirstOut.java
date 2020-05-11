@@ -20,7 +20,7 @@ public class FirstInFirstOut extends SchedulingDiscipline {
         while (pcbs.hasNext()) {
             ProcessControlBlock pcb = pcbs.get();
             pcb.setProcessState(ProcessState.READY);
-            jobQueue.add(pcb);
+            readyQueue.add(pcb);
         }
     }
 }
