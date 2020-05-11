@@ -14,7 +14,7 @@ import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.structures.Queue;
 import org.junit.jupiter.api.Test;
 
-class InterpreterTest {
+class CompilerTest {
     public LogicalMemoryHandlerUtils getTestUtils() {
         return new LogicalMemoryHandlerUtils(2, 4, 2);
     }
@@ -27,9 +27,9 @@ class InterpreterTest {
         return new MemoryManagementUnit(ram, useSegmentation, utils, 5);
     }
 
-    public Interpreter getTestInterpreter(MemoryManagementUnit mmu, ProcessAPI processAPI) {
+    public Compiler getTestInterpreter(MemoryManagementUnit mmu, ProcessAPI processAPI) {
         Queue<ProcessControlBlock> jobQueue = new Queue<>();
-        return new Interpreter(new AdmissionScheduler(new CPUScheduler(FirstInFirstOut.class, jobQueue)), mmu, processAPI);
+        return new Compiler(new AdmissionScheduler(new CPUScheduler(FirstInFirstOut.class, jobQueue)), mmu, processAPI);
     }
 
     @Test
@@ -39,8 +39,8 @@ class InterpreterTest {
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
         ThreadAPI threadAPI = new ThreadAPI();
         ProcessAPI processAPI = new ProcessAPI(threadAPI, mmu);
-        Interpreter interpreter = getTestInterpreter(mmu, processAPI);
-        interpreter.interpret("pf1");
+        Compiler compiler = getTestInterpreter(mmu, processAPI);
+        compiler.compile("pf1");
         Logger.log(this, mmu.getMemoryUnit(1, 0).toString());
         Logger.log(this, mmu.getMemoryUnit(1, 1).toString());
         Logger.log(this, mmu.getMemoryUnit(1, 2).toString());
