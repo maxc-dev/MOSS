@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane id="default" fx:id="selectorPane" prefHeight="70.0" prefWidth="480.0" stylesheets="@pane.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.maxc.ui.anchors.FileSelector">
+   <cursor>
+      <Cursor fx:constant="DEFAULT" />
+   </cursor>
+   <effect>
+      <DropShadow />
+   </effect>
+   <Button id="default" fx:id="run" layoutX="403.0" layoutY="14.0" mnemonicParsing="false" stylesheets="@button.css" text="Run" />
+   <Button id="default" fx:id="next" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="75.0" stylesheets="@button.css" text="Next" />
+   <Label id="default" fx:id="processLabel" alignment="CENTER" layoutX="94.0" layoutY="11.0" prefHeight="49.0" prefWidth="293.0" stylesheets="@text.css" text="pf1" textAlignment="CENTER" textFill="#43aeb7" />
+</Pane>
