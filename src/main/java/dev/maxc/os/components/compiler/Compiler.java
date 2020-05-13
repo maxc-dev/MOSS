@@ -1,9 +1,9 @@
-package dev.maxc.os.components.interpreter;
+package dev.maxc.os.components.compiler;
 
 import dev.maxc.App;
+import dev.maxc.os.components.compiler.model.CompilerTranslator;
 import dev.maxc.os.components.instruction.Operand;
-import dev.maxc.os.components.interpreter.model.CompilerTranslator;
-import dev.maxc.os.components.interpreter.model.Variable;
+import dev.maxc.os.components.compiler.model.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;
@@ -32,7 +32,6 @@ public class Compiler {
     private final MemoryManagementUnit mmu;
     private final ProcessAPI processAPI;
 
-
     public Compiler(AdmissionScheduler admissionScheduler, MemoryManagementUnit mmu, ProcessAPI processAPI) {
         this.admissionScheduler = admissionScheduler;
         this.mmu = mmu;
@@ -40,11 +39,9 @@ public class Compiler {
     }
 
     /**
-     * Runs the interpreter on a file.
+     * Runs the compiler on a file.
      */
     public void compile(String fileName) {
-        //read file
-        Logger.log(this, "Gathering process file [" + fileName + "]");
         BufferedReader re = null;
         try {
             String file = App.class.getResource(fileName + FILE_EXTENSION).getFile();
@@ -56,7 +53,6 @@ public class Compiler {
 
         Process mainProcess = processAPI.getNewProcess(ProcessAPI.NO_PARENT_PROCESS);
         CompilerTranslator utils = new CompilerTranslator(globalVariables, mmu, mainProcess.getProcessControlBlock());
-        Logger.log(this, "Successfully gathered process file [" + fileName + FILE_EXTENSION + "] interpreting...");
         //compile file
         try {
             int lineNumber = 1;
@@ -68,12 +64,11 @@ public class Compiler {
                     //if variable declaration is inbound
                     if (line.contains(CompilerTranslator.DECLARE)) {
                         int declareIndex = line.indexOf(CompilerTranslator.DECLARE);
-                        Variable var = new Variable(line.substring(0, declareIndex), utils.getOperand(line.substring(declareIndex+1)));
+                        Variable var = new Variable(line.substring(0, declareIndex), utils.getOperand(line.substring(declareIndex + 1)));
                         globalVariables.add(var);
-                        Logger.log(this, "New variable initialized [" + var.toString() + "]");
 
                     } else if (line.startsWith("print(") && line.endsWith(")")) {
-                        Operand output = utils.getOperand(line.substring(line.indexOf("(")+1, line.indexOf(")")));
+                        Operand output = utils.getOperand(line.substring(line.indexOf("(") + 1, line.indexOf(")")));
                         utils.outputOperand(output);
                     } else {
                         throw new UnparsableDataException(lineNumber, line);
@@ -81,7 +76,7 @@ public class Compiler {
                     lineNumber++;
                 }
             }
-            admissionScheduler.schedulePCB(mainProcess.getProcessControlBlock());
+            new Thread(() -> admissionScheduler.schedulePCB(mainProcess.getProcessControlBlock())).start();
         } catch (IOException | InvalidVariableNameException | UnparsableDataException ex) {
             ex.printStackTrace();
         }

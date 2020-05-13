@@ -1,4 +1,4 @@
-package dev.maxc.os.components.interpreter.model;
+package dev.maxc.os.components.compiler.model;
 
 import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.io.exceptions.compiler.InvalidVariableNameException;

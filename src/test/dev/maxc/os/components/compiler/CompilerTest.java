@@ -1,4 +1,4 @@
-package dev.maxc.os.components.interpreter;
+package dev.maxc.os.components.compiler;
 
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;

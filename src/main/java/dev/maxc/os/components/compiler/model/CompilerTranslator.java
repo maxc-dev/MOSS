@@ -1,4 +1,4 @@
-package dev.maxc.os.components.interpreter.model;
+package dev.maxc.os.components.compiler.model;
 
 import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.instruction.Opcode;
@@ -7,7 +7,6 @@ import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
-import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.log.Logger;
 
 import java.util.ArrayList;
