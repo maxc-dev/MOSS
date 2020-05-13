@@ -7,12 +7,14 @@ import dev.maxc.ui.models.panes.SubModule;
 import dev.maxc.ui.util.ColorUtils;
 import javafx.scene.transform.Rotate;
 
+import java.time.Instant;
+
 /**
  * @author Max Carter
  * @since  11/04/2020
  */
 public class ModuleController {
-    public static final String[] MODULE_TITLES = new String[]{ "Shell", "Config", "Files" };
+    public static final String[] MODULE_TITLES = new String[]{ "Files", "Config", "Time" };
 
     private RotatablePane[] rotatablePanes;
 

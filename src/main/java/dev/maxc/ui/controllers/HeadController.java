@@ -1,8 +1,10 @@
 package dev.maxc.ui.controllers;
 
+import dev.maxc.App;
 import dev.maxc.os.bootup.SimulationBootup;
 import dev.maxc.os.system.api.SystemAPI;
 import dev.maxc.ui.anchors.BackgroundController;
+import dev.maxc.ui.anchors.FileSelector;
 import dev.maxc.ui.models.CoreRing;
 import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.models.RingLines;
@@ -14,6 +16,8 @@ import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -21,6 +25,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
+
+import java.io.IOException;
 
 /**
  * @author Max Carter
@@ -38,6 +44,7 @@ public class HeadController implements SplashController.OnSplashComplete {
     private SparkLineController sparkLineController;
 
     private volatile State state = State.UNLOADED;
+    private SimulationBootup bootup;
 
     /**
      * Creates a new head controller
@@ -62,7 +69,7 @@ public class HeadController implements SplashController.OnSplashComplete {
         anchorPane.getChildren().add(pane);
         pane.getChildren().add(splashController);
 
-        SimulationBootup bootup = new SimulationBootup();
+        bootup = new SimulationBootup();
         bootup.addProgressUpdaterListener(splashController);
         Thread loadingThread = new Thread(bootup::bootup);
         loadingThread.start();
@@ -123,6 +130,21 @@ public class HeadController implements SplashController.OnSplashComplete {
         pane.getChildren().add(coreRingLines);
         pane.getChildren().add(floatingTextTitle);
         pane.getChildren().add(floatingTextAuthor);
+        try {
+            //loads the process file selector/loader
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("selector.fxml"));
+            Pane selectorPane = loader.load();
+            //attaches system api to the loader (for the compiler)
+            FileSelector selector = loader.getController();
+            selector.initCompilerAPI(bootup.getSystemAPI().compilerAPI);
+            //adds to pane
+            pane.getChildren().add(selectorPane);
+            Node child = pane.getChildren().get(pane.getChildren().size()-1);
+            child.setLayoutX(-selectorPane.getPrefWidth()/2);
+            child.setLayoutY(headRadius*1.6);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         open();
     }
 
@@ -169,9 +191,7 @@ public class HeadController implements SplashController.OnSplashComplete {
         UNLOADED,
         LOADING,
         LOADED,
-        CLOSED,
         OPENING,
-        OPEN,
-        CLOSING
+        OPEN
     }
 }

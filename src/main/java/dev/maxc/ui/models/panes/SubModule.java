@@ -25,8 +25,9 @@ public class SubModule extends SemiRing {
         this.outerRadius = headRadius + (layer * LAYER_THICKNESS) + LAYER_OVERLAP + LAYER_THICKNESS;
         this.innerRadius = headRadius + (layer * LAYER_THICKNESS);
 
-        setOnMouseEntered(t -> pane.hovered = true);
-        setOnMouseExited(t -> pane.hovered = false);
+        super.setOnMouseEntered(t -> pane.hovered = true);
+        super.setOnMouseExited(t -> pane.hovered = false);
+        super.setOnMouseClicked(t -> System.out.println("MOUSE CLICK YEET"));
     }
 
     public double getOuterRadius() {

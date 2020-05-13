@@ -2,7 +2,6 @@ package dev.maxc.ui.models;
 
 import dev.maxc.ui.util.ColorUtils;
 import dev.maxc.ui.util.UiUtils;
-import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
@@ -20,10 +19,10 @@ public class FloatingText extends Pane {
     /**
      * Creates a new text box in a pane hat floats in an offset.
      */
-    public FloatingText(String textContent, double yOffset, int size) {
+    public FloatingText(String textContent, double yOffset, int fontSize) {
         text = new Text(textContent);
         text.setFill(ColorUtils.SURFACE_COLOUR);
-        text.setFont(UiUtils.getFont(size));
+        text.setFont(UiUtils.getFont(fontSize));
         DropShadow textShadow = new DropShadow(3, ColorUtils.SURFACE_COLOUR);
         text.setEffect(textShadow);
         getChildren().add(text);

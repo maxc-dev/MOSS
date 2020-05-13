@@ -4,7 +4,6 @@ import dev.maxc.ui.util.UiUtils;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -14,6 +13,10 @@ import javafx.scene.text.TextAlignment;
  */
 public class CurvedTextController {
     private Text[] chars;
+    private final Pane pane;
+    private final double radius;
+    private final int startingAngle;
+    private final Color fill;
 
     /**
      * RingLines with starting angle and degree
@@ -21,7 +24,20 @@ public class CurvedTextController {
      * @param startingAngle The initial angle of the rings
      */
     public CurvedTextController(String text, Pane pane, double radius, int startingAngle, Color fill) {
-        text = text.toUpperCase();
+        this.pane = pane;
+        this.radius = radius;
+        this.startingAngle = startingAngle;
+        this.fill = fill;
+        updateText(text);
+    }
+
+    public void sendToFront() {
+        for (Text text : chars) {
+            text.toFront();
+        }
+    }
+
+    public void updateText(String text) {text = text.toUpperCase();
         chars = new Text[text.length()];
         for (int i = 0; i < chars.length; i++) {
             chars[i] = new Text(text.charAt(i) + "");
@@ -40,31 +56,5 @@ public class CurvedTextController {
             pane.getChildren().add(chars[i]);
             chars[i].toFront();
         }
-    }
-
-    public void sendToFront() {
-        for (Text text : chars) {
-            text.toFront();
-        }
-    }
-
-    /**
-     * Gets the tangent at t
-     *
-     * K, R, V all constants
-     * t is the index of the char in the string
-     *
-     * formula:
-     * x = K * cos(R + (t * V))
-     * y = K * sin(R + (t * V))
-     *
-     * dx/dt = -sin(R + (t * V)) * t
-     * dy/dt = cos(R + (t * V)) * t
-     *
-     * result = t*cos(R + (t * V)) / -t*sin(R + (t * V)) = -cot(R + (t * V))
-     */
-    @Deprecated
-    private double getTangent(double R, double t, double V) {
-        return Math.cos(R + (t * V))/-Math.sin(R + (t * V));
     }
 }
