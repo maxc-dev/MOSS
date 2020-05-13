@@ -40,7 +40,6 @@ public class Segmentation extends LogicalMemoryHandler {
     @Override
     public void free() {
         segment.free();
-        Logger.log(this, "The Memory Units for [" + super.toString() + "] have been unallocated.");
     }
 
     @Override

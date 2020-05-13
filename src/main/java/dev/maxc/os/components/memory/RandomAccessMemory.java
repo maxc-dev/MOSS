@@ -9,6 +9,7 @@ import dev.maxc.os.io.log.Status;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Max Carter
@@ -21,6 +22,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     private final boolean usingVirtualMemory;
 
     public <T extends MemoryAllocationIndexer> RandomAccessMemory(int memoryBaseSize, int memoryPowerSize, Class<T> mallocIndexerClass, boolean usingVirtualMemory) {
+        super((int) Math.pow(memoryBaseSize, memoryPowerSize));
         this.memoryBaseSize = memoryBaseSize;
         this.memoryPowerSize = memoryPowerSize;
         Logger.log(this, "Main memory created of size [" + getMemorySize() + "]");

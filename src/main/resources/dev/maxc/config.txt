@@ -2,12 +2,12 @@
     clock_tick_frequency=1000
 
 #cpu config
-    cpu_cores=8
+    cpu_cores=4
     cpu_core_frequency=1000
 
 #memory config
     main_memory_base=2
-    main_memory_power=24
+    main_memory_power=12
 
     #memory allocation algorithm which is used by the mmu
     #if both algorithms have the same value, segmentation is prioritised
@@ -19,7 +19,7 @@
 
     #segmentation config
         #the segment will increase in size by base^x
-        segment_increase_power=4
+        segment_increase_power=5
 
     #allocation algorithm used by the mmu to determine where to allocate a new page/segment
     #if both algorithms have the same value, the order of prioritisation is: best, first then worst
@@ -29,7 +29,7 @@
 
     #cache memory config
     #set the values to any negative number if you don't want that level of cache.
-    cache_size_level_1=10
+    cache_size_level_1=100
 
     #virtual memory
         virtual_memory=false

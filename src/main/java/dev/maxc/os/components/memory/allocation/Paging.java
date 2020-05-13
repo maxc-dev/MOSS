@@ -63,7 +63,6 @@ public class Paging extends LogicalMemoryHandler {
             page.free();
         }
         pages.clear();
-        Logger.log(this, "The Memory Units for [" + super.toString() + "] have been unallocated.");
     }
 
     @Override
