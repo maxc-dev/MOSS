@@ -1,6 +1,11 @@
 package dev.maxc.os.components.process;
 
 import dev.maxc.os.components.cpu.ProgramCounter;
+import dev.maxc.os.io.log.Logger;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Max Carter
@@ -12,11 +17,14 @@ public class ProcessControlBlock {
     private final int parentProcessIdentifier;
     private final ProgramCounter programCounter = new ProgramCounter();
     private final ProcessAPI processAPI;
+    private final Date processStartTime;
+    private Date processEndTime;
 
     public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier, ProcessAPI processAPI) {
         this.processIdentifier = processIdentifier;
         this.parentProcessIdentifier = parentProcessIdentifier;
         this.processAPI = processAPI;
+        processStartTime = Calendar.getInstance().getTime();
     }
 
     public ProgramCounter getProgramCounter() {
@@ -38,6 +46,9 @@ public class ProcessControlBlock {
     public void setProcessState(ProcessState processState) {
         this.processState = processState;
         if (processState == ProcessState.TERMINATED) {
+            processEndTime = Calendar.getInstance().getTime();
+            long diffInMillies = processEndTime.getTime() - processStartTime.getTime();
+            Logger.log(this, "Process [" + processIdentifier + "] terminated. Alive time: [" + TimeUnit.MILLISECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS) + "ms]");
             processAPI.exitProcess(processIdentifier);
         }
     }
