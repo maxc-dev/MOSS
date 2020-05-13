@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class DynamicComponentLoader {
     private final List<LoadProgressUpdater> loadProgressListeners;
-    private final int size = 40;
+    private final int size = 41;
     private int pointer;
 
     public DynamicComponentLoader(List<LoadProgressUpdater> loadProgressListeners) {
@@ -25,7 +25,7 @@ public class DynamicComponentLoader {
         pointer++;
         try {
             //ensures that the splash screen is enabled for at least 2 seconds
-            Thread.sleep(3000/size);
+            Thread.sleep(2000/size);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

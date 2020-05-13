@@ -7,8 +7,9 @@
 package dev.maxc.os.system.api;
 
 import dev.maxc.os.bootup.DynamicComponentLoader;
+import dev.maxc.os.components.compiler.CompilerAPI;
 import dev.maxc.os.components.cpu.ControlUnit;
-import dev.maxc.os.components.interpreter.Compiler;
+import dev.maxc.os.components.compiler.Compiler;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
@@ -21,7 +22,9 @@ import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.thread.ThreadAPI;
 import dev.maxc.os.structures.Queue;
 import dev.maxc.os.system.sync.ClockTickEmitter;
+import dev.maxc.ui.anchors.FileSelector;
 import dev.maxc.ui.api.UserInterfaceAPI;
+import javafx.fxml.FXMLLoader;
 
 /**
  * @author Max Carter
@@ -107,6 +110,7 @@ public class SystemAPI {
     public ThreadAPI threadAPI;
     public ProcessAPI processAPI;
     public ClockTickEmitter clockTickEmitter;
+    public CompilerAPI compilerAPI;
 
     public void onLoadingReady() {
         componentLoader.componentLoaded("Initialising memory subsystem...");
@@ -141,9 +145,12 @@ public class SystemAPI {
         threadAPI = new ThreadAPI();
         processAPI = new ProcessAPI(threadAPI, memoryAPI);
         componentLoader.componentLoaded("Initialised the process & thread APIs.");
+
+        compilerAPI = new CompilerAPI(longTermScheduler, memoryAPI, processAPI);
+        componentLoader.componentLoaded("Initialised the Compiler API.");
         componentLoader.complete();
 
-        Thread compile1 = new Thread(() -> {
+/*        Thread compile1 = new Thread(() -> {
             Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
             compiler.compile("pf1");
         });
@@ -162,6 +169,6 @@ public class SystemAPI {
         compile1.start();
         compile2.start();
         compile3.start();
-        compile4.start();
+        compile4.start();*/
     }
 }

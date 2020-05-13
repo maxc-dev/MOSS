@@ -6,17 +6,13 @@ import java.util.List;
 import dev.maxc.os.bootup.config.ConfigurationReader;
 import dev.maxc.os.system.api.SystemAPI;
 import dev.maxc.os.io.log.Logger;
-
 /**
  * @author Max Carter
  * @since 10/04/2020
  */
 public class SimulationBootup {
-    private final List<LoadProgressUpdater> loadProgressListeners;
-
-    public SimulationBootup() {
-        loadProgressListeners = new ArrayList<>();
-    }
+    private final List<LoadProgressUpdater> loadProgressListeners = new ArrayList<>();
+    private SystemAPI systemAPI;
 
     public void addProgressUpdaterListener(LoadProgressUpdater loadProgressUpdater) {
         loadProgressListeners.add(loadProgressUpdater);
@@ -32,7 +28,7 @@ public class SimulationBootup {
 
         //creating system api
         componentLoader.componentLoaded("Creating System API...");
-        SystemAPI systemAPI = new SystemAPI(componentLoader);
+        systemAPI = new SystemAPI(componentLoader);
         componentLoader.componentLoaded("System API created.");
 
         //initializing system api
@@ -43,5 +39,9 @@ public class SimulationBootup {
 
         Logger.log(this, "Configuration initialization successful.");
         systemAPI.onLoadingReady();
+    }
+
+    public SystemAPI getSystemAPI() {
+        return systemAPI;
     }
 }

@@ -3,7 +3,6 @@ package dev.maxc;
 import dev.maxc.os.system.api.SystemAPI;
 import dev.maxc.os.system.api.SystemUtils;
 import dev.maxc.os.io.log.Logger;
-import dev.maxc.ui.util.Display;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author Max Carter
@@ -25,7 +25,7 @@ public class App extends Application {
         SystemAPI.uiAPI.setStage(stage);
         SystemAPI.uiAPI.setTitle("Booting up...");
 
-        scene = new Scene(loadFXML(Display.PRIMARY));
+        scene = new Scene(loadFXML("primary"));
         scene.getStylesheets().add(getClass().getResource("fontstyle.css").toExternalForm());
 
         stage.setScene(scene);
@@ -40,13 +40,18 @@ public class App extends Application {
         stage.show();
     }
 
-    static void setRoot(Display display) throws IOException {
-        scene.setRoot(loadFXML(display));
+    static void setRoot(String name) throws IOException {
+        scene.setRoot(loadFXML(name));
     }
 
-    private static Parent loadFXML(Display display) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(display + ".fxml"));
+    public static Parent loadFXML(String name) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(name + ".fxml"));
         return fxmlLoader.load();
+    }
+
+    public static boolean isValidProcessFile(String name) {
+        URL file = App.class.getResource(name + ".moss");
+        return file != null;
     }
 
     public static void main(String[] args) {
