@@ -14,7 +14,7 @@ import dev.maxc.os.system.sync.ClockTick;
  */
 public class ControlUnit implements ClockTick {
     private final ProcessorCore[] cores;
-
+    private int lastCoreIndexed = 0;
     private volatile Queue<ProcessControlBlock> readyQueue;
 
     public ControlUnit(int coreCount, Queue<ProcessControlBlock> readyQueue, MemoryManagementUnit mmu) {
@@ -38,12 +38,15 @@ public class ControlUnit implements ClockTick {
      * Writes a PCB to an available core's PCB socket.
      */
     public boolean writeCoreSocket(ProcessControlBlock pcb) {
-        for (ProcessorCore core : cores) {
-            if (core.isAvailable()) {
-                if (core.writePCBSocket(pcb)) {
-                    return true;
-                }
+        for (int i = 0; i < cores.length; i++) {
+            if (lastCoreIndexed >= cores.length) {
+                lastCoreIndexed = 0;
             }
+            if (cores[lastCoreIndexed].isAvailable()) {
+                cores[lastCoreIndexed].writePCBSocket(pcb);
+                return true;
+            }
+            lastCoreIndexed++;
         }
         return false;
     }
