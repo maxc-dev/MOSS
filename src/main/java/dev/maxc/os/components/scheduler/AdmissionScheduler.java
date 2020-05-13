@@ -27,6 +27,5 @@ public class AdmissionScheduler implements ClockTick {
     @Override
     public synchronized void onSystemClockTick() {
         cpuScheduler.addToReadyQueue(waitingQueue);
-        waitingQueue.clear();
     }
 }

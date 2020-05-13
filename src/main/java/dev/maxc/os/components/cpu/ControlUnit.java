@@ -44,6 +44,7 @@ public class ControlUnit implements ClockTick {
             }
             if (cores[lastCoreIndexed].isAvailable()) {
                 cores[lastCoreIndexed].writePCBSocket(pcb);
+                lastCoreIndexed++;
                 return true;
             }
             lastCoreIndexed++;

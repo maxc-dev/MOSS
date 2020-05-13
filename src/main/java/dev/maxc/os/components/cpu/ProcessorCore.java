@@ -156,7 +156,7 @@ public class ProcessorCore {
      */
     private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val) {
         if (opcode == Opcode.OUT) {
-            Logger.log(toString(), "[Process-" + pcb.getProcessID() + "] " + val);
+            Logger.log(Status.OUT, toString(), "[Process-" + pcb.getProcessID() + "] " + val);
         }
     }
 
