@@ -21,6 +21,7 @@ import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.thread.ThreadAPI;
 import dev.maxc.os.structures.Queue;
 import dev.maxc.os.system.sync.ClockTickEmitter;
+import dev.maxc.ui.anchors.TaskManagerController;
 import dev.maxc.ui.api.UserInterfaceAPI;
 
 /**
@@ -108,6 +109,7 @@ public class SystemAPI {
     public ProcessAPI processAPI;
     public ClockTickEmitter clockTickEmitter;
     public CompilerAPI compilerAPI;
+    private ControlUnit controlUnit;
 
     public void onLoadingReady() {
         componentLoader.componentLoaded("Initialising memory subsystem...");
@@ -126,7 +128,7 @@ public class SystemAPI {
         componentLoader.componentLoaded("Successfully initialised the memory subsystem.");
 
         componentLoader.componentLoaded("Initialising the CPU architecture...");
-        final ControlUnit controlUnit = new ControlUnit(CPU_CORES, readyQueue, memoryAPI);
+        controlUnit = new ControlUnit(CPU_CORES, readyQueue, memoryAPI);
         componentLoader.componentLoaded("Initialised the CPU Control Unit.");
         controlUnit.initProcessorCoreThreads(CORE_FREQUENCY);
         componentLoader.componentLoaded("Initialised processor core threads.");
@@ -167,5 +169,9 @@ public class SystemAPI {
         compile2.start();
         compile3.start();
         compile4.start();*/
+    }
+
+    public void setTaskManagerController(TaskManagerController taskManagerController) {
+        controlUnit.setTaskManagerOutput(taskManagerController);
     }
 }

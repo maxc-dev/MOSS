@@ -1,5 +1,8 @@
 package dev.maxc.os.io.log;
 
+import dev.maxc.ui.anchors.TaskManagerController;
+import javafx.application.Platform;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -14,6 +17,11 @@ public class Logger {
 
     private static volatile String latestLog = "";
     private static volatile int logRepeatCount = 0;
+    private static TaskManagerController taskManagerController;
+
+    public static void setTaskManagerController(TaskManagerController taskManagerController) {
+        Logger.taskManagerController = taskManagerController;
+    }
 
     /**
      * Prints the log to the console.
@@ -23,12 +31,19 @@ public class Logger {
             logRepeatCount++;
         } else {
             if (logRepeatCount > 0) {
-                System.out.println(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), "\t\t\t^ (Repeated line x" + logRepeatCount + ")"));
+                print(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), "\t\t\t^ (Repeated line x" + logRepeatCount + ")"));
                 logRepeatCount = 0;
             }
-            System.out.println(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), message));
+            print(String.format(LOG_FORMAT, dateFormat.format(Calendar.getInstance().getTimeInMillis()), message));
             latestLog = message;
         }
+    }
+
+    private static void print(String message) {
+        if (taskManagerController != null) {
+            Platform.runLater(() -> taskManagerController.console(message));
+        }
+        System.out.println(message);
     }
 
     /**
