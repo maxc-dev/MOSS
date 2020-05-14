@@ -19,16 +19,10 @@ public class UserInterfaceAPI {
     public void setTitle(String title) {
         if (stage != null) {
             String completeTitle = title + " | " + SystemAPI.SYSTEM_NAME + " by " + SystemAPI.SYSTEM_AUTHOR;
-            Platform.runLater(() -> {
-                stage.setTitle(completeTitle);
-            });
+            Platform.runLater(() -> stage.setTitle(completeTitle));
         } else {
             Logger.log(Status.WARN, this, "The `stage` has not been set, hence the title cannot be changed.");
         }
-    }
-
-    public Stage getStage() {
-        return stage;
     }
 
     public void setStage(Stage stage) {

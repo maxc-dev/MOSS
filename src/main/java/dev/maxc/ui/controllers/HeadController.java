@@ -2,9 +2,10 @@ package dev.maxc.ui.controllers;
 
 import dev.maxc.App;
 import dev.maxc.os.bootup.SimulationBootup;
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.system.api.SystemAPI;
 import dev.maxc.ui.anchors.BackgroundController;
-import dev.maxc.ui.anchors.FileSelector;
+import dev.maxc.ui.anchors.FileSelectorController;
 import dev.maxc.ui.models.CoreRing;
 import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.models.RingLines;
@@ -18,6 +19,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -132,16 +134,28 @@ public class HeadController implements SplashController.OnSplashComplete {
         pane.getChildren().add(floatingTextAuthor);
         try {
             //loads the process file selector/loader
-            FXMLLoader loader = new FXMLLoader(App.class.getResource("selector.fxml"));
-            Pane selectorPane = loader.load();
+            FXMLLoader processSelectorLoader = new FXMLLoader(App.class.getResource("selector.fxml"));
+            Pane selectorPane = processSelectorLoader.load();
+
             //attaches system api to the loader (for the compiler)
-            FileSelector selector = loader.getController();
+            FileSelectorController selector = processSelectorLoader.getController();
             selector.initCompilerAPI(bootup.getSystemAPI().compilerAPI);
+
             //adds to pane
             pane.getChildren().add(selectorPane);
-            Node child = pane.getChildren().get(pane.getChildren().size()-1);
-            child.setLayoutX(-selectorPane.getPrefWidth()/2);
-            child.setLayoutY(headRadius*1.6);
+            //child.setLayoutX(-selectorPane.getPrefWidth()/2); //use for centering pane
+            selectorPane.setLayoutX(UiUtils.WIDTH / 2 - selectorPane.getPrefWidth() - 20);
+            selectorPane.setLayoutY(headRadius * 1.6);
+
+            //load task manager
+            FXMLLoader taskManagerLoader = new FXMLLoader(App.class.getResource("shell.fxml"));
+            Pane taskManagerPane = taskManagerLoader.load();
+            selector.initTaskManager(taskManagerLoader.getController());
+            pane.getChildren().add(taskManagerPane);
+            bootup.getSystemAPI().setTaskManagerController(taskManagerLoader.getController());
+            Logger.setTaskManagerController(taskManagerLoader.getController());
+            taskManagerPane.setLayoutX(-UiUtils.WIDTH / 2 + 20);
+            taskManagerPane.setOpacity(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

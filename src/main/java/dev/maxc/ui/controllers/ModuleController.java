@@ -14,7 +14,14 @@ import java.time.Instant;
  * @since  11/04/2020
  */
 public class ModuleController {
-    public static final String[] MODULE_TITLES = new String[]{ "Files", "Config", "Time" };
+    /*
+        Each "" can be replaced with a string that represents a title.
+        The idea being that each module has a title that can be clicked
+        and can open a menu, however in the end it was never needed.
+        It now acts purely as a cosmetic flex of the hours I spent using
+        trigonometry to get those things to spins...
+     */
+    public static final String[] MODULE_TITLES = new String[]{ "","","","" };
 
     private RotatablePane[] rotatablePanes;
 
