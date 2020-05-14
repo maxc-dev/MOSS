@@ -14,6 +14,7 @@ import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.bootup.DynamicComponentLoader;
 import dev.maxc.os.io.log.Status;
 import dev.maxc.os.system.api.SystemAPI;
+import dev.maxc.os.system.api.SystemUtils;
 
 /**
  * @author Max Carter
@@ -49,10 +50,20 @@ public class ConfigurationReader {
                 }
                 if (config.getKey().equalsIgnoreCase(fieldName)) {
                     componentLoader.componentLoaded("Parsing " + field.getName().toLowerCase().replace("_", " ") + " config option.");
+                    if (field.getType() == int.class) {
+                        int value = (int) getDeducedType(config.getValue());
+                        if (!isWithinBound(value, field.getAnnotation(Configurable.class))) {
+                            Logger.log(Status.ERROR, this, "Unable to configure value for [" + config.getKey().toUpperCase() + "] since it is not within the defined bounds, using default.");
+                            setDefault(field, field.getAnnotation(Configurable.class));
+                            Logger.log(this, "Configured [" + config.getKey().toUpperCase() + "] with the recommend settings.");
+                            componentLoader.componentLoaded("Parsed " + field.getName().toLowerCase().replace("_", " ") + " with the default value.");
+                            continue;
+                        }
+                    }
                     try {
                         field.set(system, getDeducedType(config.getValue()));
                     } catch (IllegalAccessException | NullPointerException ex) {
-                        Logger.log(Status.WARN, this, "Unable to configure value for: " + config.getKey().toUpperCase());
+                        Logger.log(Status.ERROR, this, "Unable to configure value for: " + config.getKey().toUpperCase());
                         ex.printStackTrace();
                     }
                     componentLoader.componentLoaded("Parsed " + field.getName().toLowerCase().replace("_", " ") + ".");
@@ -72,6 +83,29 @@ public class ConfigurationReader {
             Logger.log(Status.WARN, this, "There are missing attributes in the config file.");
         }
         Logger.log(this, "Successfully configured the SystemAPI.");
+    }
+
+    /**
+     * Ensures that a config option is within it's specified bounds.
+     */
+    private boolean isWithinBound(int value, Configurable configurable) {
+        return (value >= configurable.min() && configurable.min() != Configurable.NO_NUMBER_CONSTRAINT) && (value <= configurable.max() && configurable.max() != Configurable.NO_NUMBER_CONSTRAINT);
+    }
+
+    /**
+     * Applies the default value to a field.
+     */
+    private void setDefault(Field field, Configurable configurable) {
+        //if no default can be found the system can't load the config so has to abort
+        if (configurable.recommended() == Configurable.NO_NUMBER_CONSTRAINT) {
+            Logger.log(Status.CRIT, this, "Unable to parse a default value so the config cannot be loaded.");
+            SystemUtils.shutdown();
+        }
+        try {
+            field.set(system, configurable.recommended());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
