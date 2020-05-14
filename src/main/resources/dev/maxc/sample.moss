@@ -1,0 +1,9 @@
+#sample.moss
+#showcases some of the basic functionality of the moss compiler
+
+three = 3
+four = 4
+twelve = three * four
+twenty = twelve + 8
+
+print(twenty)

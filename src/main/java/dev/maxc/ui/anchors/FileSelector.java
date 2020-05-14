@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
  * @since 13/05/2020
  */
 public class FileSelector implements Initializable {
-    private static final String[] files = new String[]{"pf1", "ree"};
+    private static final String[] files = new String[]{"sample", "one_to_ten"};
 
     private CompilerAPI compilerAPI = null;
     private int fileIndex = 0;

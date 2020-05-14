@@ -26,7 +26,7 @@ public class App extends Application {
         SystemAPI.uiAPI.setTitle("Booting up...");
 
         scene = new Scene(loadFXML("primary"));
-        scene.getStylesheets().add(getClass().getResource("fontstyle.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("style/fontstyle.css").toExternalForm());
 
         stage.setScene(scene);
         stage.setAlwaysOnTop(true);
