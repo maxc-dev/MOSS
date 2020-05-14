@@ -7,6 +7,7 @@ import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 import dev.maxc.os.structures.Queue;
 import dev.maxc.os.system.sync.ClockTick;
+import dev.maxc.ui.anchors.TaskManagerController;
 
 /**
  * @author Max Carter
@@ -72,6 +73,12 @@ public class ControlUnit implements ClockTick {
                 pcb.setProcessState(ProcessState.WAITING);
                 readyQueue.add(pcb);
             }
+        }
+    }
+
+    public void setTaskManagerOutput(TaskManagerController taskManagerOutput) {
+        for (ProcessorCore core : cores) {
+            core.setTaskManager(taskManagerOutput);
         }
     }
 }

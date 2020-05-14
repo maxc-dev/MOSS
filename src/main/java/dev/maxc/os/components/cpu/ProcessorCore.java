@@ -13,6 +13,8 @@ import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.exceptions.instruction.UnknownOpcodeException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
+import dev.maxc.ui.anchors.TaskManagerController;
+import javafx.application.Platform;
 
 /**
  * @author Max Carter
@@ -22,7 +24,7 @@ public class ProcessorCore {
     private final int index;
     private final MemoryManagementUnit mmu;
     private volatile CoreThread coreThread;
-
+    private TaskManagerController taskManager;
     private volatile ProcessControlBlock socketPCB = null;
 
     public ProcessorCore(int index, MemoryManagementUnit mmu) {
@@ -156,6 +158,9 @@ public class ProcessorCore {
     private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val) {
         if (opcode == Opcode.OUT) {
             Logger.log(Status.OUT, toString(), "[Process-" + pcb.getProcessID() + "] " + val);
+            if (taskManager != null) {
+                Platform.runLater(() -> taskManager.output("[" + toString() + "][Process-" + pcb.getProcessID() + "] " + val));
+            }
         }
     }
 
@@ -172,6 +177,10 @@ public class ProcessorCore {
      */
     public synchronized boolean isAvailable() {
         return socketPCB == null;
+    }
+
+    protected void setTaskManager(TaskManagerController taskManager) {
+        this.taskManager = taskManager;
     }
 
     @Override
