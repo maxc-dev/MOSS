@@ -18,14 +18,12 @@ import java.net.URL;
  * @since 01/04/2020
  */
 public class App extends Application {
-    private static Scene scene;
-
     @Override
     public void start(Stage stage) throws IOException {
         SystemAPI.uiAPI.setStage(stage);
         SystemAPI.uiAPI.setTitle("Booting up...");
 
-        scene = new Scene(loadFXML("primary"));
+        Scene scene = new Scene(loadFXML("primary"));
         scene.getStylesheets().add(getClass().getResource("style/fontstyle.css").toExternalForm());
 
         stage.setScene(scene);
@@ -38,10 +36,6 @@ public class App extends Application {
         stage.setY(0);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
-    }
-
-    static void setRoot(String name) throws IOException {
-        scene.setRoot(loadFXML(name));
     }
 
     public static Parent loadFXML(String name) throws IOException {

@@ -16,16 +16,19 @@ import java.util.ResourceBundle;
  * @author Max Carter
  * @since 13/05/2020
  */
-public class FileSelector implements Initializable {
+public class FileSelectorController implements Initializable {
     private static final String[] files = new String[]{"sample", "one_to_ten"};
 
     private CompilerAPI compilerAPI = null;
+    private TaskManagerController taskManagerController = null;
     private int fileIndex = 0;
 
     @FXML
     private Button run;
     @FXML
     private Button next;
+    @FXML
+    private Button taskManagerButton;
     @FXML
     private Label processLabel;
 
@@ -47,9 +50,18 @@ public class FileSelector implements Initializable {
             }
             processLabel.setText(files[fileIndex]);
         });
+        taskManagerButton.setOnAction(actionEvent -> {
+            if (taskManagerController != null) {
+                taskManagerController.toggle();
+            }
+        });
     }
 
     public void initCompilerAPI(CompilerAPI compilerAPI) {
         this.compilerAPI = compilerAPI;
+    }
+
+    public void initTaskManager(TaskManagerController taskManagerController) {
+        this.taskManagerController = taskManagerController;
     }
 }

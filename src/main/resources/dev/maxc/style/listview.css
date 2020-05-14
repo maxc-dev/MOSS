@@ -1,0 +1,21 @@
+.list-cell {
+    -fx-background-color: black;
+    -fx-box-border: black;
+    -fx-control-inner-background: black;
+    -fx-text-fill: white;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-font-size: 12px;
+    -fx-font-family: Consolas;
+    -fx-padding: 1;
+    -fx-background-insets: 0, 1;
+    -fx-border-width: 0px;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #151515;
+}
+
+.list-view .scroll-bar:vertical {
+    -fx-scale-x: 0;
+}
