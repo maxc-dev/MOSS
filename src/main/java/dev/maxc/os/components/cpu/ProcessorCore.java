@@ -7,6 +7,7 @@ import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.components.process.ProcessState;
+import dev.maxc.os.io.exceptions.cpu.DirectAddressingException;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.exceptions.instruction.UnknownOpcodeException;
@@ -70,42 +71,35 @@ public class ProcessorCore {
      */
     public synchronized void decodeInstruction(ProcessControlBlock pcb) {
         while (pcb.getProgramCounter().hasNext()) {
-            int nextAddress = pcb.getProgramCounter().getNextInstructionLocation();
-            MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), nextAddress);
-            if (unit.isLocked()) {
-                Logger.log(Status.WARN, this, "Process [" + pcb.getProcessID() + "] Unit [" + unit.toString() + "] is locked and cannot be accessed.");
-            } else {
-                try {
-                    //locks the memory unit to the process and requests access
-                    pcb.setProcessState(ProcessState.RUNNING);
-                    unit.lock(pcb.getProcessID());
-                    Instruction instruction = unit.access(pcb.getProcessID());
+            try {
+                MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), pcb.getProgramCounter().getNextInstructionLocation());
+                pcb.setProcessState(ProcessState.RUNNING);
+                unit.lock(pcb.getProcessID());
+                Instruction instruction = unit.access(pcb.getProcessID());
 
-                    //extracts the values of the operand1 (and operand2 if it's needed)
-                    int val1 = getValueFromOperand(pcb, instruction.getOperand1());
-                    if (instruction.getOpcode().needsSecondOperand()) {
-                        int val2 = getValueFromOperand(pcb, instruction.getOperand2());
-                        executeInstruction(pcb, instruction.getOpcode(), val1, val2, unit);
+                //extracts the values of the operand1 (and operand2 if it's needed)
+                int val1 = getValueFromOperand(pcb, instruction.getOperand1());
+                if (instruction.getOpcode().needsSecondOperand()) {
+                    int val2 = getValueFromOperand(pcb, instruction.getOperand2());
+                    executeInstruction(pcb, instruction.getOpcode(), val1, val2, unit);
+                } else {
+                    if (instruction.getOpcode() == Opcode.STR) {
+                        saveExecution(pcb, unit, instruction.getOperand1().get());
                     } else {
-                        if (instruction.getOpcode() == Opcode.STR) {
-                            saveExecution(pcb, unit, instruction.getOperand1().get());
-                        } else {
-                            executeInstruction(pcb, instruction.getOpcode(), val1);
-                        }
+                        executeInstruction(pcb, instruction.getOpcode(), val1);
                     }
-                    //finishes by unlocking the unit, opens the socket and continues the thread
-                    unit.unlock();
-                    coreThread.setBusy(false);
-
-                } catch (AccessingLockedUnitException | UnknownOpcodeException | MutatingLockedUnitException ex) {
-                    ex.printStackTrace();
-                    //^ critical error if the cpu cannot decode an instruction successfully
                 }
+                //finishes by unlocking the unit
+                unit.unlock();
+            } catch (AccessingLockedUnitException | UnknownOpcodeException | MutatingLockedUnitException | DirectAddressingException ex) {
+                Logger.log(Status.ERROR, toString(), "Unable to decode & execute instruction so the process has been terminated, see stack trace for more details.");
+                ex.printStackTrace();
+                //^ critical error if the cpu cannot decode an instruction successfully
             }
         }
         pcb.setProcessState(ProcessState.TERMINATED);
-
         socketPCB = null;
+        coreThread.setBusy(false);
     }
 
     /**
@@ -115,15 +109,20 @@ public class ProcessorCore {
      * If this isn't the case there has been an undetectable error with the
      * program counter where it has incorrectly queued the instructions.
      */
-    private int getValueFromOperand(ProcessControlBlock pcb, Operand operand) throws AccessingLockedUnitException {
+    private int getValueFromOperand(ProcessControlBlock pcb, Operand operand) throws AccessingLockedUnitException, DirectAddressingException {
         if (operand.isDirect()) {
             return operand.get();
         }
         MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), operand.get());
         unit.lock(pcb.getProcessID());
-        int val = unit.access(pcb.getProcessID()).getOperand1().get();
+        Instruction requiredInstruction = unit.access(pcb.getProcessID());
         unit.unlock();
-        return val; //the ret value should have opcode "STR" implying it is direct
+        //the ret value should have opcode "STR" implying it is direct
+        if (requiredInstruction.getOpcode() == Opcode.STR) {
+            return requiredInstruction.getOperand1().get();
+        }
+        Logger.log(Status.ERROR, toString(), "Tried to get a direct value which is incorrectly stored.");
+        throw new DirectAddressingException(requiredInstruction.getOperand1().get());
     }
 
     /**

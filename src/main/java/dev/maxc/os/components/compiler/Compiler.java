@@ -1,12 +1,12 @@
 package dev.maxc.os.components.compiler;
 
 import dev.maxc.App;
-import dev.maxc.os.components.compiler.model.CompilerTranslator;
 import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.compiler.model.Variable;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;
+import dev.maxc.os.components.process.ProcessState;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.io.exceptions.compiler.InvalidVariableNameException;
 import dev.maxc.os.io.exceptions.compiler.UnparsableDataException;
@@ -79,6 +79,8 @@ public class Compiler {
             new Thread(() -> admissionScheduler.schedulePCB(mainProcess.getProcessControlBlock())).start();
         } catch (IOException | InvalidVariableNameException | UnparsableDataException ex) {
             ex.printStackTrace();
+            Logger.log(Status.ERROR, this, "Cannot parse process file, terminating process.");
+            mainProcess.getProcessControlBlock().setProcessState(ProcessState.TERMINATED);
         }
     }
 }

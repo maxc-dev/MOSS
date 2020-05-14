@@ -1,5 +1,6 @@
-package dev.maxc.os.components.compiler.model;
+package dev.maxc.os.components.compiler;
 
+import dev.maxc.os.components.compiler.model.Variable;
 import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.instruction.Opcode;
 import dev.maxc.os.components.instruction.Operand;
@@ -110,7 +111,7 @@ public class CompilerTranslator {
      */
     private Operand splitOperandList(String[] list) {
         if (list.length == 1) {
-            return new Operand(false, Integer.parseInt(list[0].replace("#", "") + ""));
+            return new Operand(!list[0].contains("#"), Integer.parseInt(list[0].replace("#", "") + ""));
         } else {
             int opIndex = getNextBestOperatorIndex(list);
             String[] beforeNew = Arrays.copyOfRange(list, 0, opIndex);
