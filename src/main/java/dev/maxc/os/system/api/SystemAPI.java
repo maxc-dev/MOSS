@@ -41,70 +41,53 @@ public class SystemAPI {
     }
 
     //system config
-
     @Configurable(docs = "The amount of time between each CPU execution in ms.", min = 1, max = 1000, recommended = 1000)
     public int CLOCK_TICK_FREQUENCY;
 
     //cpu config
-
     @Configurable(docs = "The amount of cores in the CPU.", min = 1, max = 256, recommended = 4)
     public int CPU_CORES;
-
     @Configurable(value = "cpu_core_frequency", docs = "The maximum amount of processes a CPU core can handle per second.", min = 1, max = 1000, recommended = 1000)
     public int CORE_FREQUENCY;
 
-    //memory config
+    //scheduling config
+    @Configurable(value = "use_first_in_first_out", docs = "The scheduler will schedule processes on a first come first serve basis.")
+    public boolean USE_FIFO;
+    @Configurable(value = "use_shortest_job_first", docs = "The scheduler will schedule processes first if they have the shortest CPU time.")
+    public boolean USE_SJF;
 
+    //memory config
     @Configurable(docs = "The amount of memory locations available.", min = 2, max = 3, recommended = 2)
     public int MAIN_MEMORY_BASE;
-
     @Configurable(docs = "The amount of memory locations available.", min = 2, max = 24, recommended = 12)
     public int MAIN_MEMORY_POWER;
-
     @Configurable(value = "malloc_algorithm_use_segmentation", docs = "If the MMU uses segmentation to allocate memory.")
     public boolean USE_SEGMENTATION;
-
     @Configurable(value = "malloc_algorithm_use_paging", docs = "If the MMU uses paging to allocate memory.")
     public boolean USE_PAGING;
 
     //paging config
-
     @Configurable(value = "malloc_size_base", docs = "The base of the allocation system.", min = 2, max = 3, recommended = 2)
     public int ALLOCATION_BASE;
-
     @Configurable(value = "malloc_size_power", docs = "The power of allocation system.", min = 2, max = 12, recommended = 4)
     public int ALLOCATION_POWER;
 
     //segmentation config
-
     @Configurable(docs = "The power by which the segments will increase by (Base^x).", min = 1, max = 8, recommended = 4)
     public int SEGMENT_INCREASE_POWER;
 
-    //memory allocation config
-
-    @Configurable(value = "malloc_best_fit", docs = "The memory given to a new allocation is the smallest possible, but just big enough.")
-    public boolean ALLOCATION_BEST_FIT;
-
-    @Configurable(value = "malloc_first_fit", docs = "The memory given to a new allocation is the first occurrence available which is big enough.")
-    public boolean ALLOCATION_FIRST_FIT;
-
-    @Configurable(value = "malloc_worst_fit", docs = "The memory given to a new allocation is the largest space available.")
-    public boolean ALLOCATION_WORST_FIT;
-
+    //cache config
     @Configurable(value = "cache_size_level_1", docs = "The amount of memory that the cache can store.", min = 0, max = 1024, recommended = 24)
     public int CACHE_SIZE;
 
     //virtual memory config
-
     @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
     public boolean VIRTUAL_MEMORY;
 
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
 
     private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
-    private volatile CPUScheduler shortTermScheduler = new CPUScheduler(ShortestJobFirst.class, readyQueue);
     public volatile AdmissionScheduler longTermScheduler;
-
     public MemoryManagementUnit memoryAPI;
     public ThreadAPI threadAPI;
     public ProcessAPI processAPI;
@@ -133,6 +116,15 @@ public class SystemAPI {
         componentLoader.componentLoaded("Initialised the CPU Control Unit.");
         controlUnit.initProcessorCoreThreads(CORE_FREQUENCY);
         componentLoader.componentLoaded("Initialised processor core threads.");
+        CPUScheduler shortTermScheduler;
+        if (USE_FIFO) {
+            USE_SJF = false;
+            shortTermScheduler = new CPUScheduler(FirstInFirstOut.class, readyQueue);
+        } else {
+            USE_SJF = true;
+            shortTermScheduler = new CPUScheduler(ShortestJobFirst.class, readyQueue);
+        }
+        componentLoader.componentLoaded("Initialised the short term scheduler.");
         longTermScheduler = new AdmissionScheduler(shortTermScheduler);
         componentLoader.componentLoaded("Initialised the long term scheduler.");
 

@@ -5,6 +5,11 @@
     cpu_cores=4
     cpu_core_frequency=1000
 
+#scheduler config
+    #the scheduling algorithm to use, defaults to fifo
+    use_first_in_first_out=true
+    use_shortest_job_first=false
+
 #memory config
     main_memory_base=2
     main_memory_power=12
@@ -20,12 +25,6 @@
     #segmentation config
         #the segment will increase in size by base^x
         segment_increase_power=5
-
-    #allocation algorithm used by the mmu to determine where to allocate a new page/segment
-    #if both algorithms have the same value, the order of prioritisation is: best, first then worst
-        alloc_best_fit=false
-        alloc_first_fit=true
-        alloc_worst_fit=false
 
     #cache memory config
     #set the values to any negative number if you don't want that level of cache.
