@@ -8,6 +8,7 @@ import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.ProcessState;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
+import dev.maxc.os.io.exceptions.compiler.InUseVariableNameException;
 import dev.maxc.os.io.exceptions.compiler.InvalidVariableNameException;
 import dev.maxc.os.io.exceptions.compiler.UnparsableDataException;
 import dev.maxc.os.io.log.Logger;
@@ -64,8 +65,13 @@ public class Compiler {
                     //if variable declaration is inbound
                     if (line.contains(CompilerTranslator.DECLARE)) {
                         int declareIndex = line.indexOf(CompilerTranslator.DECLARE);
-                        Variable var = new Variable(line.substring(0, declareIndex), utils.getOperand(line.substring(declareIndex + 1)));
-                        globalVariables.add(var);
+                        String identifier = line.substring(0, declareIndex);
+                        if (Variable.isValidIdentifier(identifier, globalVariables)) {
+                            Variable var = new Variable(identifier, utils.getOperand(line.substring(declareIndex + 1)));
+                            globalVariables.add(var);
+                        } else {
+                            throw new InUseVariableNameException(identifier);
+                        }
 
                     } else if (line.startsWith("print(") && line.endsWith(")")) {
                         Operand output = utils.getOperand(line.substring(line.indexOf("(") + 1, line.indexOf(")")));
@@ -77,7 +83,7 @@ public class Compiler {
                 }
             }
             new Thread(() -> admissionScheduler.schedulePCB(mainProcess.getProcessControlBlock())).start();
-        } catch (IOException | InvalidVariableNameException | UnparsableDataException ex) {
+        } catch (IOException | InvalidVariableNameException | UnparsableDataException | InUseVariableNameException ex) {
             ex.printStackTrace();
             Logger.log(Status.ERROR, this, "Cannot parse process file, terminating process.");
             mainProcess.getProcessControlBlock().setProcessState(ProcessState.TERMINATED);

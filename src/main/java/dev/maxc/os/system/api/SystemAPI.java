@@ -19,6 +19,7 @@ import dev.maxc.os.components.memory.*;
 import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.thread.ThreadAPI;
+import dev.maxc.os.components.scheduler.disciplines.ShortestJobFirst;
 import dev.maxc.os.structures.Queue;
 import dev.maxc.os.system.sync.ClockTickEmitter;
 import dev.maxc.ui.anchors.TaskManagerController;
@@ -101,7 +102,7 @@ public class SystemAPI {
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
 
     private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
-    private volatile CPUScheduler shortTermScheduler = new CPUScheduler(FirstInFirstOut.class, readyQueue);
+    private volatile CPUScheduler shortTermScheduler = new CPUScheduler(ShortestJobFirst.class, readyQueue);
     public volatile AdmissionScheduler longTermScheduler;
 
     public MemoryManagementUnit memoryAPI;
@@ -149,26 +150,22 @@ public class SystemAPI {
         componentLoader.componentLoaded("Initialised the Compiler API.");
         componentLoader.complete();
 
-/*        Thread compile1 = new Thread(() -> {
-            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
-            compiler.compile("pf1");
+        Thread compile1 = new Thread(() -> {
+            compilerAPI.compile("sample");
         });
         Thread compile2 = new Thread(() -> {
-            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
-            compiler.compile("pf1");
+            compilerAPI.compile("one_to_ten");
         });
         Thread compile3 = new Thread(() -> {
-            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
-            compiler.compile("pf1");
+            compilerAPI.compile("advanced");
         });
         Thread compile4 = new Thread(() -> {
-            Compiler compiler = new Compiler(longTermScheduler, memoryAPI, processAPI);
-            compiler.compile("pf1");
+            compilerAPI.compile("sample");
         });
-        compile1.start();
-        compile2.start();
+       // compile1.start();
+        //compile2.start();
         compile3.start();
-        compile4.start();*/
+        //compile4.start();
     }
 
     public void setTaskManagerController(TaskManagerController taskManagerController) {

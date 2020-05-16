@@ -68,7 +68,8 @@ public class CompilerTranslator {
         } else if (text.matches(WILDCARD + OPERATOR + WILDCARD)) {
             String[] vars = text.split(OPERATOR);
             for (String var : vars) {
-                text = text.replace(var, translateVariable(var) + "");
+                String replacement = translateVariable(var).toString();
+                text = text.replace(var, replacement);
             }
         }
 
@@ -77,7 +78,7 @@ public class CompilerTranslator {
             can be directly returned since it has already been compiled.
          */
         for (Variable variable : globalVariables) {
-            if (text.matches(variable.getIdentifier())) {
+            if (text.equals(variable.getIdentifier())) {
                 return variable.getOperand();
             }
         }
