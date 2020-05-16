@@ -31,6 +31,10 @@ public class ProcessControlBlock {
         return programCounter;
     }
 
+    public int getCPUBursts() {
+        return programCounter.size();
+    }
+
     public int getProcessID() {
         return processIdentifier;
     }
@@ -44,12 +48,14 @@ public class ProcessControlBlock {
     }
 
     public void setProcessState(ProcessState processState) {
-        this.processState = processState;
-        if (processState == ProcessState.TERMINATED) {
-            processEndTime = Calendar.getInstance().getTime();
-            long diffInMillies = processEndTime.getTime() - processStartTime.getTime();
-            Logger.log(this, "Process [" + processIdentifier + "] terminated. Alive time: [" + TimeUnit.MILLISECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS) + "ms]");
-            processAPI.exitProcess(processIdentifier);
+        if (this.processState != processState) {
+            this.processState = processState;
+            if (processState == ProcessState.TERMINATED) {
+                processEndTime = Calendar.getInstance().getTime();
+                long diffInMillies = processEndTime.getTime() - processStartTime.getTime();
+                Logger.log(this, "Process [" + processIdentifier + "] terminated. Alive time: [" + TimeUnit.MILLISECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS) + "ms]");
+                processAPI.exitProcess(processIdentifier);
+            }
         }
     }
 
