@@ -20,6 +20,7 @@ public class CPUScheduler {
     public <T extends SchedulingDiscipline> CPUScheduler(Class<T> schedulerClass, Queue<ProcessControlBlock> jobQueue) {
         try {
             this.scheduler = schedulerClass.getConstructor(Queue.class).newInstance(jobQueue);
+            Logger.log(this, "Initialised " + schedulerClass.getSimpleName() + " scheduling discipline.");
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
             Logger.log(Status.ERROR, this, "Failed to initialise a new scheduling discipline, defaulting to FIFO.");
             this.scheduler = new FirstInFirstOut(jobQueue);
