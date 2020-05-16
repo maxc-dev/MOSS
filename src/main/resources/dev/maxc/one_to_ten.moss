@@ -1,0 +1,18 @@
+#one_to_ten.moss
+#prints numbers 1 to 10 with progressively more complicated arithmetic
+
+one = 1
+two = 2
+print(one)
+print(two)
+
+three = 3
+four = 4
+print(three)
+print(four)
+print(5)
+print(5 + 1)
+print(14/2)
+print(2*2*2)
+print(3*3)
+print(2*3+4)

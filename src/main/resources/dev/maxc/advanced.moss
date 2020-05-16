@@ -1,0 +1,15 @@
+#advanced.moss
+#shows longer more complicated arithmetic which has a large compile time
+
+one=54375*10484-54354/20*54-543543+43243
+two=543687-109658*one-one/12
+three=one*two/45
+four=453543*4323*4309*6
+five=four/2020
+
+print(one)
+print(two)
+print(three)
+print(four)
+print(five)
+print(four - five)
