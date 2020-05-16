@@ -45,7 +45,7 @@ public class Compiler {
     public void compile(String fileName) {
         BufferedReader re = null;
         try {
-            String file = App.class.getResource(fileName + FILE_EXTENSION).getFile();
+            String file = App.class.getResource("processes/" + fileName + FILE_EXTENSION).getFile();
             re = new BufferedReader(new FileReader(file));
         } catch (IOException ex) {
             Logger.log(Status.ERROR, this, "Could not recognise file: [" + fileName + FILE_EXTENSION + "].");

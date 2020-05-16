@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
  * @since 13/05/2020
  */
 public class FileSelectorController implements Initializable {
-    private static final String[] files = new String[]{"sample", "one_to_ten"};
+    private static final String[] files = new String[]{"sample", "one_to_ten", "advanced"};
 
     private CompilerAPI compilerAPI = null;
     private TaskManagerController taskManagerController = null;

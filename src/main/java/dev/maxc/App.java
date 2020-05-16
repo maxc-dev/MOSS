@@ -44,7 +44,7 @@ public class App extends Application {
     }
 
     public static boolean isValidProcessFile(String name) {
-        URL file = App.class.getResource(name + ".moss");
+        URL file = App.class.getResource("processes/" + name + ".moss");
         return file != null;
     }
 
