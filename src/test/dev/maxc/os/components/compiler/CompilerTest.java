@@ -20,7 +20,7 @@ class CompilerTest {
     }
 
     public RandomAccessMemory getTestRAM() {
-        return new RandomAccessMemory(2, 16, FirstFit.class, true);
+        return new RandomAccessMemory(2, 16, FirstFit.class);
     }
 
     public MemoryManagementUnit getTestMMU(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, boolean useSegmentation) {

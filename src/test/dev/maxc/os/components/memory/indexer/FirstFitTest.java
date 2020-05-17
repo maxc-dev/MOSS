@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class FirstFitTest {
     public RandomAccessMemory getTestRam() {
-        return new RandomAccessMemory(2, 10, FirstFit.class, false);
+        return new RandomAccessMemory(2, 10, FirstFit.class);
     }
 
     @Test

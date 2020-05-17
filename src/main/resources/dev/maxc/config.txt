@@ -12,7 +12,7 @@
 
 #memory config
     main_memory_base=2
-    main_memory_power=12
+    main_memory_power=8
 
     #memory allocation algorithm which is used by the mmu
     #if both algorithms have the same value, segmentation is prioritised
@@ -29,6 +29,3 @@
     #cache memory config
     #set the values to any negative number if you don't want that level of cache.
     cache_size_level_1=100
-
-    #virtual memory
-        virtual_memory=false

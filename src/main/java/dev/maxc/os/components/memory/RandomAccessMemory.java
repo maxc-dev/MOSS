@@ -9,22 +9,18 @@ import dev.maxc.os.io.log.Status;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Max Carter
  * @since 14/04/2020
  */
 public class RandomAccessMemory extends ArrayList<MemoryAddress> {
-    private final int memoryBaseSize;
-    private final int memoryPowerSize;
+    private final int memorySize;
     private MemoryAllocationIndexer mallocIndexer;
-    private final boolean usingVirtualMemory;
 
-    public <T extends MemoryAllocationIndexer> RandomAccessMemory(int memoryBaseSize, int memoryPowerSize, Class<T> mallocIndexerClass, boolean usingVirtualMemory) {
-        super((int) Math.pow(memoryBaseSize, memoryPowerSize));
-        this.memoryBaseSize = memoryBaseSize;
-        this.memoryPowerSize = memoryPowerSize;
+    public <T extends MemoryAllocationIndexer> RandomAccessMemory(int memorySize, int memoryPowerSize, Class<T> mallocIndexerClass) {
+        super((int) Math.pow(memorySize, memoryPowerSize));
+        this.memorySize = (int) Math.pow(memorySize, memoryPowerSize);
         Logger.log(this, "Main memory created of size [" + getMemorySize() + "]");
         try {
             this.mallocIndexer = mallocIndexerClass.getConstructor(RandomAccessMemory.class).newInstance(this);
@@ -33,7 +29,6 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
             e.printStackTrace();
             this.mallocIndexer = new FirstFit(this);
         }
-        this.usingVirtualMemory = usingVirtualMemory;
 
         /*
             Populates the main memory with individual memory addresses.
@@ -46,7 +41,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     }
 
     public int getMemorySize() {
-        return (int) Math.pow(memoryBaseSize, memoryPowerSize);
+        return memorySize;
     }
 
     /**
@@ -59,7 +54,6 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
                 memory--;
             }
         }
-        //TODO if virtual memory is being used, find out how much can be allocated
         return memory;
     }
 
