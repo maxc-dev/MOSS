@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -16,7 +17,8 @@
                                     <styleClass>
                                         <String fx:value="list-view" />
                                         <String fx:value="list-cell" />
-                                    </styleClass></ListView>
+                                    </styleClass>
+                                </ListView>
                             </children>
                         </AnchorPane>
                     </content>
@@ -29,7 +31,8 @@
                                     <styleClass>
                                         <String fx:value="list-view" />
                                         <String fx:value="list-cell" />
-                                    </styleClass></ListView>
+                                    </styleClass>
+                                </ListView>
                             </children>
                         </AnchorPane>
                     </content>
@@ -37,6 +40,16 @@
                 <Tab id="tab" text="Memory">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <LineChart id="default" fx:id="memoryUsageChart" createSymbols="false" horizontalGridLinesVisible="false" prefHeight="344.0" prefWidth="600.0" stylesheets="@style/linechart.css" title="Memory Usage" verticalGridLinesVisible="false">
+                                    <xAxis>
+                                        <NumberAxis animated="false" forceZeroInRange="false" label="Seconds (S)" side="BOTTOM" tickLabelFill="#387c79" fx:id="xAxisMemory" />
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis fx:id="yAxisMemory" animated="false" label="Requests" side="LEFT" tickLabelFill="#387c79" />
+                                    </yAxis>
+                                </LineChart>
+                            </children>
                         </AnchorPane>
                     </content>
                 </Tab>
