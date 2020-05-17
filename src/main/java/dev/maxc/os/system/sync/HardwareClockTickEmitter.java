@@ -6,12 +6,12 @@ import java.util.ArrayList;
  * @author Max Carter
  * @since 08/05/2020
  */
-public class ClockTickEmitter {
-    private final ArrayList<ClockTick> clockTickListeners = new ArrayList<>();
+public class HardwareClockTickEmitter {
+    private final ArrayList<HardwareClockTick> hardwareClockTickListeners = new ArrayList<>();
     private final Thread clockTickThread;
     private boolean emit = true;
 
-    public ClockTickEmitter(int frequency) {
+    public HardwareClockTickEmitter(int frequency) {
         clockTickThread = new Thread(() -> {
             while (emit) {
                 emit();
@@ -25,13 +25,13 @@ public class ClockTickEmitter {
         clockTickThread.start();
     }
 
-    public void addClockTickListener(ClockTick listener) {
-        clockTickListeners.add(listener);
+    public void addClockTickListener(HardwareClockTick listener) {
+        hardwareClockTickListeners.add(listener);
     }
 
     private void emit() {
-        for (ClockTick listener : clockTickListeners) {
-            listener.onSystemClockTick();
+        for (HardwareClockTick listener : hardwareClockTickListeners) {
+            listener.onClockTick();
         }
     }
 

@@ -153,6 +153,7 @@ public class HeadController implements SplashController.OnSplashComplete {
             selector.initTaskManager(taskManagerLoader.getController());
             pane.getChildren().add(taskManagerPane);
             bootup.getSystemAPI().setTaskManagerController(taskManagerLoader.getController());
+            bootup.getSystemAPI().initSystemClockPulse(taskManagerLoader.getController());
             Logger.setTaskManagerController(taskManagerLoader.getController());
             taskManagerPane.setLayoutX(-UiUtils.WIDTH / 2 + 20);
             taskManagerPane.setOpacity(0);

@@ -6,14 +6,14 @@ import dev.maxc.os.components.process.ProcessState;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 import dev.maxc.os.structures.Queue;
-import dev.maxc.os.system.sync.ClockTick;
+import dev.maxc.os.system.sync.HardwareClockTick;
 import dev.maxc.ui.anchors.TaskManagerController;
 
 /**
  * @author Max Carter
  * @since 14/04/2020
  */
-public class ControlUnit implements ClockTick {
+public class ControlUnit implements HardwareClockTick {
     private final ProcessorCore[] cores;
     private int lastCoreIndexed = 0;
     private volatile Queue<ProcessControlBlock> readyQueue;
@@ -54,7 +54,7 @@ public class ControlUnit implements ClockTick {
     }
 
     @Override
-    public void onSystemClockTick() {
+    public void onClockTick() {
         //if the ready queue is not empty, it will find a core to execute the next job.
         while (readyQueue.hasNext()) {
             ProcessControlBlock pcb = readyQueue.get();

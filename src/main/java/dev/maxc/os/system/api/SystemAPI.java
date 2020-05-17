@@ -21,7 +21,8 @@ import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.thread.ThreadAPI;
 import dev.maxc.os.components.scheduler.disciplines.ShortestJobFirst;
 import dev.maxc.os.structures.Queue;
-import dev.maxc.os.system.sync.ClockTickEmitter;
+import dev.maxc.os.system.sync.HardwareClockTickEmitter;
+import dev.maxc.os.system.sync.SystemClockPulse;
 import dev.maxc.ui.anchors.TaskManagerController;
 import dev.maxc.ui.api.UserInterfaceAPI;
 
@@ -80,10 +81,6 @@ public class SystemAPI {
     @Configurable(value = "cache_size_level_1", docs = "The amount of memory that the cache can store.", min = 0, max = 1024, recommended = 24)
     public int CACHE_SIZE;
 
-    //virtual memory config
-    @Configurable(docs = "When set to true, virtual memory will be enabled so memory is stored in pages in the main storage.")
-    public boolean VIRTUAL_MEMORY;
-
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
 
     private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
@@ -91,13 +88,13 @@ public class SystemAPI {
     public MemoryManagementUnit memoryAPI;
     public ThreadAPI threadAPI;
     public ProcessAPI processAPI;
-    public ClockTickEmitter clockTickEmitter;
+    public HardwareClockTickEmitter hardwareClockTickEmitter;
     public CompilerAPI compilerAPI;
     private ControlUnit controlUnit;
 
     public void onLoadingReady() {
         componentLoader.componentLoaded("Initialising memory subsystem...");
-        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class, VIRTUAL_MEMORY);
+        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class);
         componentLoader.componentLoaded("Initialised Random Access memory.");
         final LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENT_INCREASE_POWER);
         componentLoader.componentLoaded("Initialised logical memory handler interface utils.");
@@ -128,10 +125,10 @@ public class SystemAPI {
         longTermScheduler = new AdmissionScheduler(shortTermScheduler);
         componentLoader.componentLoaded("Initialised the long term scheduler.");
 
-        clockTickEmitter = new ClockTickEmitter(CLOCK_TICK_FREQUENCY);
+        hardwareClockTickEmitter = new HardwareClockTickEmitter(CLOCK_TICK_FREQUENCY);
         componentLoader.componentLoaded("Initialised the system clock.");
-        clockTickEmitter.addClockTickListener(longTermScheduler);
-        clockTickEmitter.addClockTickListener(controlUnit);
+        hardwareClockTickEmitter.addClockTickListener(longTermScheduler);
+        hardwareClockTickEmitter.addClockTickListener(controlUnit);
         componentLoader.componentLoaded("Successfully initialised the processing & scheduling subsystem.");
 
         threadAPI = new ThreadAPI();
@@ -162,5 +159,12 @@ public class SystemAPI {
 
     public void setTaskManagerController(TaskManagerController taskManagerController) {
         controlUnit.setTaskManagerOutput(taskManagerController);
+    }
+
+    public void initSystemClockPulse(TaskManagerController taskManagerController) {
+        new Thread(() -> {
+            SystemClockPulse systemClockPulse = new SystemClockPulse(taskManagerController);
+            systemClockPulse.addSystemPulseListener(memoryAPI);
+        }).start();
     }
 }

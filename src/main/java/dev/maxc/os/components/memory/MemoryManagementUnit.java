@@ -11,6 +11,8 @@ import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
+import dev.maxc.os.system.sync.SystemClock;
+import dev.maxc.ui.anchors.TaskManagerController;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,13 +21,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Max Carter
  * @since 21/04/2020
  */
-public class MemoryManagementUnit {
+public class MemoryManagementUnit implements SystemClock {
     private final RandomAccessMemory ram;
     private final boolean useSegmentation;
     private final ArrayList<LogicalMemoryHandler> logicalHandlers = new ArrayList<>();
     private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
     private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
     private volatile Cache cache;
+    private volatile int readRequests = 0;
+    private volatile int writeRequests = 0;
 
     /**
      * Creates a Memory Management Unit which is responsible for managing
@@ -53,6 +57,7 @@ public class MemoryManagementUnit {
      * in the config file.
      */
     public synchronized boolean allocateMemory(int processIdentifier) {
+        writeRequests++;
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
                 Logger.log(Status.ERROR, this, "Attempted to allocate new memory to a process [" + processIdentifier + "] which already has memory. Processes which already have memory must allocate additional memory instead since it saves memory space.");
@@ -81,6 +86,7 @@ public class MemoryManagementUnit {
      * modified in the config file.
      */
     public synchronized boolean allocateAdditionalMemory(int processIdentifier) {
+        writeRequests++;
         if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
             for (LogicalMemoryHandler handler : logicalHandlers) {
                 if (handler.getParentProcessID() == processIdentifier) {
@@ -96,6 +102,7 @@ public class MemoryManagementUnit {
     }
 
     public synchronized int getNextUnitOffset(int processIdentifier) {
+        readRequests++;
         //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
@@ -114,6 +121,7 @@ public class MemoryManagementUnit {
      * Gets the memory unit for a process at a specific offset.
      */
     public synchronized MemoryUnit getMemoryUnit(int processIdentifier, int offset) {
+        readRequests++;
         //checks the cache before searching the ram
         for (CacheMemoryNode cacheMemoryNode : cache) {
             if (cacheMemoryNode.getParentProcessID() == processIdentifier && cacheMemoryNode.getOffset() == offset) {
@@ -146,6 +154,7 @@ public class MemoryManagementUnit {
      * will no longer be able to be accessed.
      */
     public synchronized void clearProcessMemory(int processIdentifier) {
+        writeRequests++;
         for (int i = 0; i < logicalHandlers.size(); i++) {
             if (logicalHandlers.get(i).getParentProcessID() == processIdentifier) {
                 logicalHandlers.get(i).free();
@@ -153,5 +162,12 @@ public class MemoryManagementUnit {
                 return;
             }
         }
+    }
+
+    @Override
+    public void onSecondTick(TaskManagerController taskManagerController) {
+        taskManagerController.addMemoryWrite(readRequests, writeRequests);
+        writeRequests = 0;
+        readRequests = 0;
     }
 }
