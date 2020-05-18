@@ -166,7 +166,7 @@ public class MemoryManagementUnit implements SystemClock {
 
     @Override
     public void onSecondTick(TaskManagerController taskManagerController) {
-        taskManagerController.addMemoryWrite(readRequests, writeRequests);
+        taskManagerController.addMemoryUsageData(readRequests, writeRequests);
         writeRequests = 0;
         readRequests = 0;
     }
