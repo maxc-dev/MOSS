@@ -9,6 +9,7 @@ package dev.maxc.os.system.api;
 import dev.maxc.os.bootup.DynamicComponentLoader;
 import dev.maxc.os.components.compiler.CompilerAPI;
 import dev.maxc.os.components.cpu.ControlUnit;
+import dev.maxc.os.components.cpu.ProcessorCore;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
@@ -153,7 +154,7 @@ public class SystemAPI {
         });
        // compile1.start();
         //compile2.start();
-        compile3.start();
+        //compile3.start();
         //compile4.start();
     }
 
@@ -162,9 +163,13 @@ public class SystemAPI {
     }
 
     public void initSystemClockPulse(TaskManagerController taskManagerController) {
+        taskManagerController.initCoreUsageChart(CPU_CORES);
         new Thread(() -> {
             SystemClockPulse systemClockPulse = new SystemClockPulse(taskManagerController);
             systemClockPulse.addSystemPulseListener(memoryAPI);
+            for (ProcessorCore core : controlUnit.getCores()) {
+                systemClockPulse.addSystemPulseListener(core);
+            }
         }).start();
     }
 }
