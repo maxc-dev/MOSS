@@ -72,7 +72,7 @@ public class ProcessorCore {
      * then passes it to the executor.
      */
     public synchronized void decodeInstruction(ProcessControlBlock pcb) {
-        while (pcb.getProgramCounter().hasNext()) {
+        if (pcb.getProgramCounter().hasNext()) {
             try {
                 MemoryUnit unit = mmu.getMemoryUnit(pcb.getProcessID(), pcb.getProgramCounter().getNextInstructionLocation());
                 pcb.setProcessState(ProcessState.RUNNING);
@@ -93,15 +93,17 @@ public class ProcessorCore {
                 }
                 //finishes by unlocking the unit
                 unit.unlock();
+                coreThread.setBusy(false);
             } catch (AccessingLockedUnitException | UnknownOpcodeException | MutatingLockedUnitException | DirectAddressingException ex) {
                 Logger.log(Status.ERROR, toString(), "Unable to decode & execute instruction so the process has been terminated, see stack trace for more details.");
                 ex.printStackTrace();
                 //^ critical error if the cpu cannot decode an instruction successfully
             }
+        } else {
+            pcb.setProcessState(ProcessState.TERMINATED);
+            socketPCB = null;
+            coreThread.setBusy(false);
         }
-        pcb.setProcessState(ProcessState.TERMINATED);
-        socketPCB = null;
-        coreThread.setBusy(false);
     }
 
     /**
