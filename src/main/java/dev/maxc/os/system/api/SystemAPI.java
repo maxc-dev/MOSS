@@ -140,7 +140,7 @@ public class SystemAPI {
         componentLoader.componentLoaded("Initialised the Compiler API.");
         componentLoader.complete();
 
-        Thread compile1 = new Thread(() -> {
+/*        Thread compile1 = new Thread(() -> {
             compilerAPI.compile("sample");
         });
         Thread compile2 = new Thread(() -> {
@@ -152,10 +152,10 @@ public class SystemAPI {
         Thread compile4 = new Thread(() -> {
             compilerAPI.compile("sample");
         });
-       // compile1.start();
-        //compile2.start();
-        //compile3.start();
-        //compile4.start();
+        compile1.start();
+        compile2.start();
+        compile3.start();
+        compile4.start();*/
     }
 
     public void setTaskManagerController(TaskManagerController taskManagerController) {
