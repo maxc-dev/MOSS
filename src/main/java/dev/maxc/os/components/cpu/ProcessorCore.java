@@ -13,6 +13,7 @@ import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.exceptions.instruction.UnknownOpcodeException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
+import dev.maxc.os.system.sync.SystemClock;
 import dev.maxc.ui.anchors.TaskManagerController;
 import javafx.application.Platform;
 
@@ -20,8 +21,9 @@ import javafx.application.Platform;
  * @author Max Carter
  * @since 14/04/2020
  */
-public class ProcessorCore {
+public class ProcessorCore implements SystemClock {
     private final int index;
+    private volatile int ticks = 0;
     private final MemoryManagementUnit mmu;
     private volatile CoreThread coreThread;
     private TaskManagerController taskManager;
@@ -133,6 +135,7 @@ public class ProcessorCore {
      * Performs the execution of the instruction with two operands
      */
     private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val1, int val2, MemoryUnit unit) throws UnknownOpcodeException, MutatingLockedUnitException {
+        ticks++;
         int val3;
         switch (opcode) {
             case MUL:
@@ -158,6 +161,7 @@ public class ProcessorCore {
      * Executes an instruction with only one operand
      */
     private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val) {
+        ticks++;
         if (opcode == Opcode.OUT) {
             Logger.log(Status.OUT, toString(), "[Process-" + pcb.getProcessID() + "] " + val);
             if (taskManager != null) {
@@ -188,5 +192,11 @@ public class ProcessorCore {
     @Override
     public String toString() {
         return "Core-" + index;
+    }
+
+    @Override
+    public void onSecondTick(TaskManagerController taskManagerController) {
+        taskManagerController.addCoreUsageData(index, ticks);
+        ticks = 0;
     }
 }

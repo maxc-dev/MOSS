@@ -76,6 +76,10 @@ public class ControlUnit implements HardwareClockTick {
         }
     }
 
+    public ProcessorCore[] getCores() {
+        return cores;
+    }
+
     public void setTaskManagerOutput(TaskManagerController taskManagerOutput) {
         for (ProcessorCore core : cores) {
             core.setTaskManager(taskManagerOutput);

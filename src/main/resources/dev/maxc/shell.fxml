@@ -5,61 +5,66 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="default" fx:id="pane" prefHeight="400.0" prefWidth="600.0" stylesheets="@style/pane.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.maxc.ui.anchors.TaskManagerController">
-    <children>
-        <TabPane id="tab-pane" prefHeight="404.0" prefWidth="600.0" stylesheets="@style/tabpane.css" tabClosingPolicy="UNAVAILABLE">
-            <tabs>
-                <Tab id="tab" text="Console">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <ListView id="list-cell" fx:id="consoleListView" prefHeight="344.0" prefWidth="600.0" stylesheets="@style/listview.css">
-                                    <styleClass>
-                                        <String fx:value="list-view" />
-                                        <String fx:value="list-cell" />
-                                    </styleClass>
-                                </ListView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab id="tab" text="Output">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <ListView id="list-cell" fx:id="outputListView" prefHeight="344.0" prefWidth="600.0" stylesheets="@style/listview.css">
-                                    <styleClass>
-                                        <String fx:value="list-view" />
-                                        <String fx:value="list-cell" />
-                                    </styleClass>
-                                </ListView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab id="tab" text="Memory">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <LineChart id="default" fx:id="memoryUsageChart" createSymbols="false" horizontalGridLinesVisible="false" prefHeight="344.0" prefWidth="600.0" stylesheets="@style/linechart.css" title="Memory Usage" verticalGridLinesVisible="false">
-                                    <xAxis>
-                                        <NumberAxis animated="false" forceZeroInRange="false" label="Seconds (S)" side="BOTTOM" tickLabelFill="#387c79" fx:id="xAxisMemory" />
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis fx:id="yAxisMemory" animated="false" label="Requests" side="LEFT" tickLabelFill="#387c79" />
-                                    </yAxis>
-                                </LineChart>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab id="tab" text="CPU">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                        </AnchorPane>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
-    </children>
+<AnchorPane id="default" fx:id="pane" prefHeight="400.0" prefWidth="600.0" stylesheets="@style/pane.css"
+            xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.maxc.ui.anchors.TaskManagerController">
+    <TabPane id="tab-pane" prefHeight="404.0" prefWidth="600.0" stylesheets="@style/tabpane.css"
+             tabClosingPolicy="UNAVAILABLE">
+        <Tab id="tab" text="Console">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <ListView id="list-cell" fx:id="consoleListView" prefHeight="344.0" prefWidth="600.0"
+                          stylesheets="@style/listview.css">
+                    <styleClass>
+                        <String fx:value="list-view"/>
+                        <String fx:value="list-cell"/>
+                    </styleClass>
+                </ListView>
+            </AnchorPane>
+        </Tab>
+        <Tab id="tab" text="Output">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <ListView id="list-cell" fx:id="outputListView" prefHeight="344.0" prefWidth="600.0"
+                          stylesheets="@style/listview.css">
+                    <styleClass>
+                        <String fx:value="list-view"/>
+                        <String fx:value="list-cell"/>
+                    </styleClass>
+                </ListView>
+            </AnchorPane>
+        </Tab>
+        <Tab id="tab" text="Memory">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <LineChart id="default" fx:id="memoryUsageChart" createSymbols="false"
+                           horizontalGridLinesVisible="false" prefHeight="344.0" prefWidth="600.0"
+                           stylesheets="@style/linechart.css" title="Memory Usage"
+                           verticalGridLinesVisible="false">
+                    <xAxis>
+                        <NumberAxis animated="false" forceZeroInRange="false" label="Seconds (S)"
+                                    side="BOTTOM" tickLabelFill="#387c79"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis animated="false" label="Requests" side="LEFT"
+                                    tickLabelFill="#387c79"/>
+                    </yAxis>
+                </LineChart>
+            </AnchorPane>
+        </Tab>
+        <Tab id="tab" text="CPU">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <LineChart id="default" fx:id="coreUsageChart" createSymbols="false"
+                           horizontalGridLinesVisible="false" prefHeight="344.0" prefWidth="600.0"
+                           stylesheets="@style/linechart.css" title="CPU Usage"
+                           verticalGridLinesVisible="false">
+                    <xAxis>
+                        <NumberAxis animated="false" forceZeroInRange="false" label="Seconds (S)"
+                                    side="BOTTOM" tickLabelFill="#387c79"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis animated="false" label="Executions" side="LEFT"
+                                    tickLabelFill="#387c79"/>
+                    </yAxis>
+                </LineChart>
+            </AnchorPane>
+        </Tab>
+    </TabPane>
 </AnchorPane>
