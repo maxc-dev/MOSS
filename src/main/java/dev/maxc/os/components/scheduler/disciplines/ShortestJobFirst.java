@@ -12,8 +12,8 @@ import java.util.ArrayList;
  * @since 02/05/2020
  */
 public class ShortestJobFirst extends SchedulingDiscipline {
-    public ShortestJobFirst(Queue<ProcessControlBlock> jobQueue) {
-        super(jobQueue);
+    public ShortestJobFirst(Queue<ProcessControlBlock> readyQueue) {
+        super(readyQueue);
     }
 
     @Override

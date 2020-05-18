@@ -10,8 +10,8 @@ import dev.maxc.os.structures.Queue;
  * @since 02/05/2020
  */
 public class FirstInFirstOut extends SchedulingDiscipline {
-    public FirstInFirstOut(Queue<ProcessControlBlock> jobQueue) {
-        super(jobQueue);
+    public FirstInFirstOut(Queue<ProcessControlBlock> readyQueue) {
+        super(readyQueue);
     }
 
     @Override
