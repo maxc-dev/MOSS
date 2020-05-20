@@ -11,21 +11,28 @@
     use_shortest_job_first=false
 
 #memory config
-    main_memory_base=2
-    main_memory_power=8
+    main_memory_power=6
 
     #memory allocation algorithm which is used by the mmu
     #if both algorithms have the same value, segmentation is prioritised
         malloc_algorithm_use_segmentation=true
         malloc_algorithm_use_paging=false
 
-    malloc_size_base=2
-    malloc_size_power=4
+    #virtual memory config
+    virtual_memory=true
+    clear_terminated_process_memory=true
+
+    #paging config
+        malloc_size_power=4
 
     #segmentation config
         #the segment will increase in size by base^x
-        segment_increase_power=5
+        segment_increase_power=4
 
     #cache memory config
     #set the values to any negative number if you don't want that level of cache.
     cache_size_level_1=100
+
+#io config
+    disk_size_power=12
+    disk_cleaner=false

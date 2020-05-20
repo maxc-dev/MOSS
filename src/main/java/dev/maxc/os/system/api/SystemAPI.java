@@ -10,7 +10,9 @@ import dev.maxc.os.bootup.DynamicComponentLoader;
 import dev.maxc.os.components.compiler.CompilerAPI;
 import dev.maxc.os.components.cpu.ControlUnit;
 import dev.maxc.os.components.cpu.ProcessorCore;
+import dev.maxc.os.components.disk.DiskDrive;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
 import dev.maxc.os.components.process.ProcessControlBlock;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.components.scheduler.CPUScheduler;
@@ -59,8 +61,6 @@ public class SystemAPI {
     public boolean USE_SJF;
 
     //memory config
-    @Configurable(docs = "The amount of memory locations available.", min = 2, max = 3, recommended = 2)
-    public int MAIN_MEMORY_BASE;
     @Configurable(docs = "The amount of memory locations available.", min = 2, max = 24, recommended = 12)
     public int MAIN_MEMORY_POWER;
     @Configurable(value = "malloc_algorithm_use_segmentation", docs = "If the MMU uses segmentation to allocate memory.")
@@ -68,9 +68,13 @@ public class SystemAPI {
     @Configurable(value = "malloc_algorithm_use_paging", docs = "If the MMU uses paging to allocate memory.")
     public boolean USE_PAGING;
 
+    //virtual memory config
+    @Configurable(docs = "Allows memory to be swapped into the disk drive temporarily to give space to other processes in main memory.")
+    public boolean VIRTUAL_MEMORY;
+    @Configurable(docs = "Processes which are terminated will have their memory automatically cleared. Recommend as true although if virtual memory & disk cleaner is enabled it is safe as false.")
+    public boolean CLEAR_TERMINATED_PROCESS_MEMORY;
+
     //paging config
-    @Configurable(value = "malloc_size_base", docs = "The base of the allocation system.", min = 2, max = 3, recommended = 2)
-    public int ALLOCATION_BASE;
     @Configurable(value = "malloc_size_power", docs = "The power of allocation system.", min = 2, max = 12, recommended = 4)
     public int ALLOCATION_POWER;
 
@@ -82,6 +86,12 @@ public class SystemAPI {
     @Configurable(value = "cache_size_level_1", docs = "The amount of memory that the cache can store.", min = 0, max = 1024, recommended = 24)
     public int CACHE_SIZE;
 
+    //io config
+    @Configurable(docs = "The power of the size of the disk.", min = 4, max = 24, recommended = 12)
+    public int DISK_SIZE_POWER;
+    @Configurable(docs = "Performs checks on the disk drive to ensure that any terminated processes are cleared.")
+    public boolean DISK_CLEANER;
+
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
 
     private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
@@ -91,13 +101,19 @@ public class SystemAPI {
     public ProcessAPI processAPI;
     public HardwareClockTickEmitter hardwareClockTickEmitter;
     public CompilerAPI compilerAPI;
+    public DiskDrive diskDrive;
     private ControlUnit controlUnit;
 
     public void onLoadingReady() {
+        componentLoader.componentLoaded("Initialising I/O subsystem...");
+        diskDrive = new DiskDrive('C', (int) Math.pow(2, DISK_SIZE_POWER));
+        componentLoader.componentLoaded("Successfully initialised the I/O subsystem.");
+
         componentLoader.componentLoaded("Initialising memory subsystem...");
-        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_BASE, MAIN_MEMORY_POWER, FirstFit.class);
+        //NOTE: mmu and vmi are not yet initialised although they are not used until after they're initialised
+        RandomAccessMemory ram = new RandomAccessMemory(MAIN_MEMORY_POWER, FirstFit.class);
         componentLoader.componentLoaded("Initialised Random Access memory.");
-        final LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_BASE, ALLOCATION_POWER, SEGMENT_INCREASE_POWER);
+        final LogicalMemoryHandlerUtils handlerUtils = new LogicalMemoryHandlerUtils(ALLOCATION_POWER, SEGMENT_INCREASE_POWER);
         componentLoader.componentLoaded("Initialised logical memory handler interface utils.");
 
         if (USE_SEGMENTATION && USE_PAGING) {
@@ -107,6 +123,14 @@ public class SystemAPI {
         }
         memoryAPI = new MemoryManagementUnit(ram, USE_SEGMENTATION, handlerUtils, CACHE_SIZE);
         componentLoader.componentLoaded("Initialised the Memory Management Unit.");
+
+        if (VIRTUAL_MEMORY) {
+            VirtualMemoryInterface virtualMemoryAPI = new VirtualMemoryInterface(memoryAPI, diskDrive);
+            memoryAPI.initVirtualMemoryInterface(virtualMemoryAPI);
+            ram.initVirtualMemoryInterface(virtualMemoryAPI);
+            ram.initMemoryManagementUnit(memoryAPI);
+        }
+        componentLoader.componentLoaded("Initialised the Virtual Memory API.");
         componentLoader.componentLoaded("Successfully initialised the memory subsystem.");
 
         componentLoader.componentLoaded("Initialising the CPU architecture...");
@@ -133,7 +157,7 @@ public class SystemAPI {
         componentLoader.componentLoaded("Successfully initialised the processing & scheduling subsystem.");
 
         threadAPI = new ThreadAPI();
-        processAPI = new ProcessAPI(threadAPI, memoryAPI);
+        processAPI = new ProcessAPI(threadAPI, memoryAPI, CLEAR_TERMINATED_PROCESS_MEMORY);
         componentLoader.componentLoaded("Initialised the process & thread APIs.");
 
         compilerAPI = new CompilerAPI(longTermScheduler, memoryAPI, processAPI);
