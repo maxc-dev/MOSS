@@ -102,7 +102,8 @@ public class ProcessorCore implements SystemClock {
                 //^ critical error if the cpu cannot decode an instruction successfully
             }
         } else {
-            pcb.setProcessState(ProcessState.TERMINATED);
+            //todo wrap this in a config option
+            //pcb.setProcessState(ProcessState.TERMINATED);
             socketPCB = null;
             coreThread.setBusy(false);
         }
@@ -134,7 +135,7 @@ public class ProcessorCore implements SystemClock {
     /**
      * Performs the execution of the instruction with two operands
      */
-    private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val1, int val2, MemoryUnit unit) throws UnknownOpcodeException, MutatingLockedUnitException {
+    private synchronized void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val1, int val2, MemoryUnit unit) throws UnknownOpcodeException, MutatingLockedUnitException {
         ticks++;
         int val3;
         switch (opcode) {
@@ -160,7 +161,7 @@ public class ProcessorCore implements SystemClock {
     /**
      * Executes an instruction with only one operand
      */
-    private void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val) {
+    private synchronized void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val) {
         ticks++;
         if (opcode == Opcode.OUT) {
             Logger.log(Status.OUT, toString(), "[Process-" + pcb.getProcessID() + "] " + val);
