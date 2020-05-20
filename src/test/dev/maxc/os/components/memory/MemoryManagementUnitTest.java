@@ -1,11 +1,13 @@
 package dev.maxc.os.components.memory;
 
+import dev.maxc.os.components.disk.DiskDrive;
 import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.instruction.Opcode;
 import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryManagementUnitTest {
     public LogicalMemoryHandlerUtils getTestUtils() {
-        return new LogicalMemoryHandlerUtils(2, 4, 2);
+        return new LogicalMemoryHandlerUtils(4, 2);
     }
 
     public RandomAccessMemory getTestRAM() {
-        return new RandomAccessMemory(2, 16, FirstFit.class);
+        return new RandomAccessMemory(16, FirstFit.class);
     }
 
     public MemoryManagementUnit getTestMMU(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, boolean useSegmentation) {
@@ -30,6 +32,11 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, false);
+        DiskDrive diskDrive = new DiskDrive('T', 12);
+        VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
+        ram.initMemoryManagementUnit(mmu);
+        ram.initVirtualMemoryInterface(vmi);
+        mmu.initVirtualMemoryInterface(vmi);
 
         assertTrue(mmu.allocateMemory(0));
         assertEquals(utils.getInitialSize(), ram.getAllocatedMemory());
@@ -56,6 +63,11 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
+        DiskDrive diskDrive = new DiskDrive('T', 12);
+        VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
+        ram.initMemoryManagementUnit(mmu);
+        ram.initVirtualMemoryInterface(vmi);
+        mmu.initVirtualMemoryInterface(vmi);
 
         //allocating to a new process
         assertTrue(mmu.allocateMemory(0));
@@ -81,6 +93,11 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, false);
+        DiskDrive diskDrive = new DiskDrive('T', 12);
+        VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
+        ram.initMemoryManagementUnit(mmu);
+        ram.initVirtualMemoryInterface(vmi);
+        mmu.initVirtualMemoryInterface(vmi);
 
         mmu.allocateMemory(0);
         MemoryUnit unit = mmu.getMemoryUnit(0, 0);
@@ -117,6 +134,11 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
+        DiskDrive diskDrive = new DiskDrive('T', 12);
+        VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
+        ram.initMemoryManagementUnit(mmu);
+        ram.initVirtualMemoryInterface(vmi);
+        mmu.initVirtualMemoryInterface(vmi);
 
         mmu.allocateMemory(0);
         MemoryUnit unit = mmu.getMemoryUnit(0, 0);
@@ -152,6 +174,11 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
+        DiskDrive diskDrive = new DiskDrive('T', 12);
+        VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
+        ram.initMemoryManagementUnit(mmu);
+        ram.initVirtualMemoryInterface(vmi);
+        mmu.initVirtualMemoryInterface(vmi);
 
         mmu.allocateMemory(0);
         MemoryUnit unit1 = mmu.getMemoryUnit(0, 0);

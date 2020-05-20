@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 
 class CompilerTest {
     public LogicalMemoryHandlerUtils getTestUtils() {
-        return new LogicalMemoryHandlerUtils(2, 4, 2);
+        return new LogicalMemoryHandlerUtils(4, 2);
     }
 
     public RandomAccessMemory getTestRAM() {
-        return new RandomAccessMemory(2, 16, FirstFit.class);
+        return new RandomAccessMemory(16, FirstFit.class);
     }
 
     public MemoryManagementUnit getTestMMU(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, boolean useSegmentation) {
@@ -38,7 +38,7 @@ class CompilerTest {
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
         ThreadAPI threadAPI = new ThreadAPI();
-        ProcessAPI processAPI = new ProcessAPI(threadAPI, mmu);
+        ProcessAPI processAPI = new ProcessAPI(threadAPI, mmu, true);
         Compiler compiler = getTestInterpreter(mmu, processAPI);
         compiler.compile("pf1");
         Logger.log(this, mmu.getMemoryUnit(1, 0).toString());
