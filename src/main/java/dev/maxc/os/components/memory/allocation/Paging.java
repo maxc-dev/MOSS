@@ -5,7 +5,6 @@ import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
-import dev.maxc.os.io.log.Logger;
 
 import java.util.ArrayList;
 
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 public class Paging extends LogicalMemoryHandler {
     private final RandomAccessMemory ram;
     private final LogicalMemoryHandlerUtils utils;
-    private final ArrayList<Page> pages = new ArrayList<>();
+    private final ArrayList<Frame> frames = new ArrayList<>();
 
     public Paging(RandomAccessMemory ram, LogicalMemoryHandlerUtils utils, int id, int parentProcessID) {
         super(id, parentProcessID);
@@ -26,49 +25,49 @@ public class Paging extends LogicalMemoryHandler {
 
     /**
      * The page logical memory handler handles allocations by creating
-     * additional pages of a fixed size and appending them to a paging
+     * additional frames of a fixed size and appending them to a paging
      * list.
      */
     @Override
     public void allocate(AddressPointerSet point) {
-        Page page = null;
+        Frame frame = null;
         int count = 0;
         for (int i = point.getStartPointer(); i <= point.getEndPointer(); i++) {
             if (count % utils.getInitialSize() == 0) {
-                int startingLogicalPointer = pages.size()*utils.getInitialSize();
-                page = new Page(startingLogicalPointer, utils);
-                pages.add(page);
+                int startingLogicalPointer = frames.size()*utils.getInitialSize();
+                frame = new Frame(startingLogicalPointer, utils);
+                frames.add(frame);
             }
-            page.addMemoryUnit(ram.get(i).getMemoryUnit());
+            frame.addMemoryUnit(ram.get(i).getMemoryUnit());
             count++;
         }
     }
 
     /**
-     * Gets the Memory Unit which has it's own offset in the page.
+     * Gets the Memory Unit which has it's own offset in the frame.
      */
     @Override
     public MemoryUnit getMemoryUnit(int offset) throws MemoryUnitNotFoundException {
         int pageId = (int) Math.floor((double) offset/utils.getInitialSize());
         int pageOffset = offset % utils.getInitialSize();
-        return pages.get(pageId).getMemoryUnit(pageOffset);
+        return frames.get(pageId).getMemoryUnit(pageOffset);
     }
 
     /**
-     * Clears up all the memory used by all the different pages.
+     * Clears up all the memory used by all the different frames.
      */
     @Override
     public void free() {
-        for (Page page : pages) {
-            page.free();
+        for (Frame frame : frames) {
+            frame.free();
         }
-        pages.clear();
+        frames.clear();
     }
 
     @Override
     public int getNextUnitOffset() throws MemoryLogicalHandlerFullException {
-        for (Page page : pages) {
-            for (MemoryUnit unit : page.memoryUnits) {
+        for (Frame frame : frames) {
+            for (MemoryUnit unit : frame.memoryUnits) {
                 if (!unit.inUse()) {
                     return unit.getLogicalAddress();
                 }
@@ -78,17 +77,17 @@ public class Paging extends LogicalMemoryHandler {
     }
 
     /**
-     * A fixed size page which stores several Memory Units. The size is equal
-     * to every other page and cannot increase in size.
+     * A fixed size frame which stores several Memory Units. The size is equal
+     * to every other frame and cannot increase in size.
      */
-    private static final class Page extends LogicalMemoryInterface {
-        public Page(int startingLogicalPointer, LogicalMemoryHandlerUtils utils) {
+    private static final class Frame extends LogicalMemoryInterface {
+        public Frame(int startingLogicalPointer, LogicalMemoryHandlerUtils utils) {
             super(startingLogicalPointer, utils);
         }
 
         /**
-         * Overrides the increase method on a page since pages are static
-         * and they cannot override.
+         * Overrides the increase method on a frame since frames are static
+         * and they cannot increase in size.
          */
         @Override
         public final void increase() {
