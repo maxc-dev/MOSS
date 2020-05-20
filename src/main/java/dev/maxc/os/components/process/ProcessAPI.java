@@ -16,10 +16,12 @@ public class ProcessAPI {
     private final AtomicInteger processCount = new AtomicInteger();
     private final ThreadAPI threadAPI;
     private final MemoryManagementUnit mmu;
+    private final boolean clearTerminatedMemory;
 
-    public ProcessAPI(ThreadAPI threadAPI, MemoryManagementUnit mmu) {
+    public ProcessAPI(ThreadAPI threadAPI, MemoryManagementUnit mmu, boolean clearTerminatedMemory) {
         this.threadAPI = threadAPI;
         this.mmu = mmu;
+        this.clearTerminatedMemory = clearTerminatedMemory;
     }
 
     /**
@@ -28,9 +30,9 @@ public class ProcessAPI {
      */
     public Process getNewProcess(int parentProcessIdentifier) {
         Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier, this), this);
-        threadAPI.addNewThreadToProcess(process);
-        mmu.allocateMemory(process.getProcessControlBlock().getProcessID());
+        //threadAPI.addNewThreadToProcess(process);
         Logger.log(this, "Initialised new process: " + process.toString());
+        mmu.allocateMemory(process.getProcessControlBlock().getProcessID());
         return process;
     }
 
@@ -38,6 +40,8 @@ public class ProcessAPI {
      * Exits the process permanently.
      */
     public void exitProcess(int processIdentifier) {
-        mmu.clearProcessMemory(processIdentifier);
+        if (clearTerminatedMemory) {
+            mmu.clearProcessMemory(processIdentifier);
+        }
     }
 }
