@@ -2,6 +2,7 @@
   <dictionary name="merca">
     <words>
       <w>initializable</w>
+      <w>lookaside</w>
       <w>maxc</w>
     </words>
   </dictionary>
