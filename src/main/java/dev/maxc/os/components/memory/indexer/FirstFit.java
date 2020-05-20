@@ -3,7 +3,6 @@ package dev.maxc.os.components.memory.indexer;
 import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.io.log.Logger;
-import dev.maxc.os.io.log.Status;
 
 /**
  * @author Max Carter
@@ -16,10 +15,10 @@ public class FirstFit extends MemoryAllocationIndexer {
 
     @Override
     public AddressPointerSet getIndexedAddressSlot(int size) {
-        Logger.log(this, "Finding an allocation of size [" + size + "] in the main memory...");
-        if (size > getRam().getMemorySize() || getRam().isFull()) {
-            super.throwOutOfMemory();
-            return null;
+        Logger.log(this, "Finding an allocation of size [" + size + "] in the main memory [" + getRam().getAllocatedMemory() + "/" + getRam().getMemorySize() + "]...");
+        if (size > getRam().getMemorySize() || getRam().isFull() || size + getRam().getAllocatedMemory() > getRam().getMemorySize()) {
+            //resorts to virtual memory
+            return handlerOutOfMemory(size);
         }
 
         int startPointer = -1;
@@ -45,7 +44,6 @@ public class FirstFit extends MemoryAllocationIndexer {
             }
         }
 
-        super.throwOutOfMemory();
-        return null;
+        throw new OutOfMemoryError();
     }
 }
