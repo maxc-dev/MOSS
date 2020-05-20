@@ -8,9 +8,9 @@ public class LogicalMemoryHandlerUtils {
     private final int initialSize;
     private final int increase;
 
-    public LogicalMemoryHandlerUtils(int base, int power, int segmentPowerIncrease) {
-        this.initialSize = (int) Math.pow(base, power);
-        this.increase = (int) Math.pow(base, segmentPowerIncrease);
+    public LogicalMemoryHandlerUtils(int power, int segmentPowerIncrease) {
+        this.initialSize = (int) Math.pow(2, power);
+        this.increase = (int) Math.pow(2, segmentPowerIncrease);
     }
 
     public int getInitialSize() {

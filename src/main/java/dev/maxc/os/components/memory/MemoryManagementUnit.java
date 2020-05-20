@@ -7,6 +7,9 @@ import dev.maxc.os.components.memory.allocation.Paging;
 import dev.maxc.os.components.memory.allocation.Segmentation;
 import dev.maxc.os.components.memory.model.CacheMemoryNode;
 import dev.maxc.os.components.memory.model.MemoryUnit;
+import dev.maxc.os.components.memory.virtual.VirtualMemoryDiskNode;
+import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
+import dev.maxc.os.io.exceptions.disk.MemoryHandlerNotFoundException;
 import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.log.Logger;
@@ -26,8 +29,9 @@ public class MemoryManagementUnit implements SystemClock {
     private final boolean useSegmentation;
     private final ArrayList<LogicalMemoryHandler> logicalHandlers = new ArrayList<>();
     private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
+    private VirtualMemoryInterface vmi = null;
     private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
-    private volatile Cache cache;
+    private volatile Cache translationLookasideBuffer;
     private volatile int readRequests = 0;
     private volatile int writeRequests = 0;
 
@@ -45,9 +49,11 @@ public class MemoryManagementUnit implements SystemClock {
         this.ram = ram;
         this.useSegmentation = useSegmentation;
         this.logicalMemoryHandlerUtils = logicalMemoryHandlerUtils;
+        translationLookasideBuffer = new Cache(cacheSize);
+    }
 
-        //dummy values for cache declaration.
-        cache = new Cache(cacheSize);
+    public void initVirtualMemoryInterface(VirtualMemoryInterface vmi) {
+        this.vmi = vmi;
     }
 
     /**
@@ -64,14 +70,19 @@ public class MemoryManagementUnit implements SystemClock {
                 return false;
             }
         }
-        if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getInitialSize()) {
+        if (ram.getAvailableMemory() >= logicalMemoryHandlerUtils.getInitialSize() || vmi != null) {
             LogicalMemoryHandler allocator;
             if (useSegmentation) {
                 allocator = new Segmentation(ram, logicalMemoryHandlerUtils, logicalHandlerCount.addAndGet(1), processIdentifier);
             } else {
                 allocator = new Paging(ram, logicalMemoryHandlerUtils, logicalHandlerCount.addAndGet(1), processIdentifier);
             }
-            allocator.allocate(ram.indexMemory(logicalMemoryHandlerUtils.getInitialSize()));
+            try {
+                allocator.allocate(ram.indexMemory(logicalMemoryHandlerUtils.getInitialSize()));
+            } catch (OutOfMemoryError er) {
+                er.printStackTrace();
+                return false;
+            }
             logicalHandlers.add(allocator);
             return true;
         }
@@ -87,10 +98,24 @@ public class MemoryManagementUnit implements SystemClock {
      */
     public synchronized boolean allocateAdditionalMemory(int processIdentifier) {
         writeRequests++;
-        if (ram.getFreeMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
+        if (ram.getAvailableMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
             for (LogicalMemoryHandler handler : logicalHandlers) {
                 if (handler.getParentProcessID() == processIdentifier) {
-                    handler.allocate(ram.indexMemory(useSegmentation ? logicalMemoryHandlerUtils.getIncrease() : logicalMemoryHandlerUtils.getInitialSize()));
+                    if (handler.isInVirtualMemory() && vmi != null) {
+                        try {
+                            vmi.pullFromDisk(processIdentifier);
+                        } catch (MemoryHandlerNotFoundException e) {
+                            Logger.log(Status.CRIT, this, "Process [" + processIdentifier + "] was lost during paging swap.");
+                            e.printStackTrace();
+                            return false;
+                        }
+                    }
+                    try {
+                        handler.allocate(ram.indexMemory(useSegmentation ? logicalMemoryHandlerUtils.getIncrease() : logicalMemoryHandlerUtils.getInitialSize()));
+                    } catch (OutOfMemoryError er) {
+                        er.printStackTrace();
+                        return false;
+                    }
                     return true;
                 }
             }
@@ -101,11 +126,52 @@ public class MemoryManagementUnit implements SystemClock {
         return false;
     }
 
-    public synchronized int getNextUnitOffset(int processIdentifier) {
+    public synchronized void allocateMemoryHandler(VirtualMemoryDiskNode diskNode) {
+        try {
+            diskNode.getHandler().allocate(ram.indexMemory(diskNode.getInstructions().size()));
+        } catch (OutOfMemoryError er) {
+            er.printStackTrace();
+        }
+    }
+
+    /**
+     * Finds the most appropriate handler to be sent to virtual memory.
+     */
+    public synchronized LogicalMemoryHandler getLeastUsedHandler() {
+        /*
+            TODO(
+             return a list of handlers based on the size required
+             )
+         */
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.isInMainMemory()) {
+                return handler;
+            }
+        }
+        Logger.log(Status.WARN, this, "Could not find a handler to sent to virtual memory.");
+        return null;
+    }
+
+    public synchronized int getNextUnitOffset(int processIdentifier) {/*
+            TODO(
+             A stackoverflow is sometimes called when the memory
+             is full but it keeps trying to find a new offset.
+             Possibly throwing/catching an axception in the
+             allocation of a additional memory may solve this
+             )
+         */
         readRequests++;
         //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
+                if (handler.isInVirtualMemory() && vmi != null) {
+                    try {
+                        vmi.pullFromDisk(processIdentifier);
+                    } catch (MemoryHandlerNotFoundException e) {
+                        Logger.log(Status.CRIT, this, "Process [" + processIdentifier + "] was lost during paging swap.");
+                        e.printStackTrace();
+                    }
+                }
                 try {
                     return handler.getNextUnitOffset();
                 } catch (MemoryLogicalHandlerFullException e) {
@@ -123,7 +189,7 @@ public class MemoryManagementUnit implements SystemClock {
     public synchronized MemoryUnit getMemoryUnit(int processIdentifier, int offset) {
         readRequests++;
         //checks the cache before searching the ram
-        for (CacheMemoryNode cacheMemoryNode : cache) {
+        for (CacheMemoryNode cacheMemoryNode : translationLookasideBuffer) {
             if (cacheMemoryNode.getParentProcessID() == processIdentifier && cacheMemoryNode.getOffset() == offset) {
                 //Logger.log(this, "Fetched memory unit from cache instead of memory for process [" + processIdentifier + "] at offset [" + offset + "]");
                 return cacheMemoryNode.getMemoryUnit();
@@ -133,13 +199,21 @@ public class MemoryManagementUnit implements SystemClock {
         //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
+                if (handler.isInVirtualMemory() && vmi != null) {
+                    try {
+                        vmi.pullFromDisk(processIdentifier);
+                    } catch (MemoryHandlerNotFoundException e) {
+                        Logger.log(Status.CRIT, this, "Process [" + processIdentifier + "] was lost during paging swap.");
+                        e.printStackTrace();
+                    }
+                }
                 MemoryUnit unit = null;
                 try {
                     unit = handler.getMemoryUnit(offset);
                 } catch (MemoryUnitNotFoundException e) {
                     e.printStackTrace();
                 }
-                cache.add(new CacheMemoryNode(processIdentifier, offset, unit));
+                translationLookasideBuffer.add(new CacheMemoryNode(processIdentifier, offset, unit));
                 return unit;
             }
         }
@@ -157,6 +231,9 @@ public class MemoryManagementUnit implements SystemClock {
         writeRequests++;
         for (int i = 0; i < logicalHandlers.size(); i++) {
             if (logicalHandlers.get(i).getParentProcessID() == processIdentifier) {
+                if (logicalHandlers.get(i).isInVirtualMemory()) {
+                    vmi.requestDiskCleanUp();
+                }
                 logicalHandlers.get(i).free();
                 logicalHandlers.remove(i);
                 return;

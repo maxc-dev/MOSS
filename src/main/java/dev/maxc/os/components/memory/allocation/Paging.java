@@ -1,8 +1,11 @@
 package dev.maxc.os.components.memory.allocation;
 
+import dev.maxc.os.components.instruction.Instruction;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
+import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
+import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 
@@ -34,7 +37,7 @@ public class Paging extends LogicalMemoryHandler {
         int count = 0;
         for (int i = point.getStartPointer(); i <= point.getEndPointer(); i++) {
             if (count % utils.getInitialSize() == 0) {
-                int startingLogicalPointer = frames.size()*utils.getInitialSize();
+                int startingLogicalPointer = frames.size() * utils.getInitialSize();
                 frame = new Frame(startingLogicalPointer, utils);
                 frames.add(frame);
             }
@@ -48,7 +51,7 @@ public class Paging extends LogicalMemoryHandler {
      */
     @Override
     public MemoryUnit getMemoryUnit(int offset) throws MemoryUnitNotFoundException {
-        int pageId = (int) Math.floor((double) offset/utils.getInitialSize());
+        int pageId = (int) Math.floor((double) offset / utils.getInitialSize());
         int pageOffset = offset % utils.getInitialSize();
         return frames.get(pageId).getMemoryUnit(pageOffset);
     }
@@ -62,6 +65,42 @@ public class Paging extends LogicalMemoryHandler {
             frame.free();
         }
         frames.clear();
+    }
+
+    @Override
+    public ArrayList<Instruction> getPhysicalInstructions() {
+        ArrayList<Instruction> instructions = new ArrayList<>();
+        for (Frame frame : frames) {
+            for (MemoryUnit unit : frame.memoryUnits) {
+                unit.lock(getId());
+                try {
+                    instructions.add(unit.access(getId()));
+                } catch (AccessingLockedUnitException e) {
+                    e.printStackTrace();
+                }
+                unit.unlock();
+            }
+        }
+        return instructions;
+    }
+
+    @Override
+    public void writeToPhysicalMemory(ArrayList<Instruction> instructions) {
+        for (Frame frame : frames) {
+            for (MemoryUnit unit : frame.memoryUnits) {
+                if (!instructions.isEmpty()) {
+                    unit.lock(getId());
+                    try {
+                        unit.mutate(getId(), instructions.remove(0));
+                    } catch (MutatingLockedUnitException e) {
+                        e.printStackTrace();
+                    }
+                    unit.unlock();
+                } else {
+                    return;
+                }
+            }
+        }
     }
 
     @Override

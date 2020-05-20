@@ -1,11 +1,7 @@
 package dev.maxc.os.components.memory.allocation;
 
-import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.model.MemoryUnit;
-import dev.maxc.os.io.exceptions.memory.MemoryUnitAddressException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
-import dev.maxc.os.io.log.Logger;
-import dev.maxc.os.io.log.Status;
 
 import java.util.ArrayList;
 

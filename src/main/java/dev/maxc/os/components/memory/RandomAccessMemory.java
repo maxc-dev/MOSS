@@ -4,6 +4,7 @@ import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryAddress;
+import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -18,9 +19,9 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     private final int memorySize;
     private MemoryAllocationIndexer mallocIndexer;
 
-    public <T extends MemoryAllocationIndexer> RandomAccessMemory(int memorySize, int memoryPowerSize, Class<T> mallocIndexerClass) {
-        super((int) Math.pow(memorySize, memoryPowerSize));
-        this.memorySize = (int) Math.pow(memorySize, memoryPowerSize);
+    public <T extends MemoryAllocationIndexer> RandomAccessMemory(int memoryPowerSize, Class<T> mallocIndexerClass) {
+        super((int) Math.pow(2, memoryPowerSize));
+        this.memorySize = (int) Math.pow(2, memoryPowerSize);
         Logger.log(this, "Main memory created of size [" + getMemorySize() + "]");
         try {
             this.mallocIndexer = mallocIndexerClass.getConstructor(RandomAccessMemory.class).newInstance(this);
@@ -40,6 +41,14 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
         }
     }
 
+    public void initVirtualMemoryInterface(VirtualMemoryInterface vmi) {
+        mallocIndexer.initVirtualMemoryInterface(vmi);
+    }
+
+    public void initMemoryManagementUnit(MemoryManagementUnit mmu) {
+        mallocIndexer.initMemoryManagementUnit(mmu);
+    }
+
     public int getMemorySize() {
         return memorySize;
     }
@@ -47,7 +56,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     /**
      * Calculates the amount of locations in memory that are free
      */
-    public int getFreeMemory() {
+    public int getAvailableMemory() {
         int memory = getMemorySize();
         for (MemoryAddress memoryAddress : this) {
             if (memoryAddress.getMemoryUnit().isAllocated()) {
@@ -71,7 +80,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
     }
 
     public boolean isFull() {
-        return getFreeMemory() == 0;
+        return getAvailableMemory() == 0;
     }
 
     /**
@@ -82,7 +91,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * The returned address set is used to mark all the corresponding memory
      * units as active.
      */
-    public AddressPointerSet indexMemory(int size) {
+    public AddressPointerSet indexMemory(int size) throws OutOfMemoryError {
         return mallocIndexer.getIndexedAddressSlot(size);
     }
 }
