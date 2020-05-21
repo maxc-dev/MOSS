@@ -87,8 +87,6 @@ public class SystemAPI {
     public int CACHE_SIZE;
 
     //io config
-    @Configurable(docs = "The power of the size of the disk.", min = 4, max = 24, recommended = 12)
-    public int DISK_SIZE_POWER;
     @Configurable(docs = "Performs checks on the disk drive to ensure that any terminated processes are cleared.")
     public boolean DISK_CLEANER;
 
@@ -106,7 +104,7 @@ public class SystemAPI {
 
     public void onLoadingReady() {
         componentLoader.componentLoaded("Initialising I/O subsystem...");
-        diskDrive = new DiskDrive('C', (int) Math.pow(2, DISK_SIZE_POWER));
+        diskDrive = new DiskDrive('C');
         componentLoader.componentLoaded("Successfully initialised the I/O subsystem.");
 
         componentLoader.componentLoaded("Initialising memory subsystem...");

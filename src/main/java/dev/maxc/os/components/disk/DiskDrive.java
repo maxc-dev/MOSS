@@ -10,20 +10,19 @@ import java.util.ArrayList;
  */
 public class DiskDrive extends ArrayList<VirtualMemoryDiskNode> {
     private final char driveSymbol;
-    private final int capacity;
 
-    public DiskDrive(char driveSymbol, int capacity) {
-        super(capacity);
+    public DiskDrive(char driveSymbol) {
         this.driveSymbol = driveSymbol;
-        this.capacity = capacity;
     }
 
     public void clean() {
-
+/*        for (VirtualMemoryDiskNode node : this) {
+            if (node.getHandler().getId())
+        }*/
     }
 
     @Override
     public String toString() {
-        return "(" + driveSymbol + "-Drive {" + capacity + "b})";
+        return "(" + driveSymbol + ":)";
     }
 }

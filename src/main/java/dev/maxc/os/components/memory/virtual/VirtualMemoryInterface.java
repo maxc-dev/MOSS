@@ -20,6 +20,30 @@ public class VirtualMemoryInterface {
     }
 
     /**
+     * Copies physical content of the memory into a node which is saved
+     * into the virtual memory. This method uses a node already created.
+     */
+    public synchronized void pushToDisk(VirtualMemoryDiskNode diskNode) {
+        Logger.log(this, "Pushing process [" + diskNode.getHandler().getId() + "] into disk drive.");
+        diskNode.getHandler().setInVirtualMemory();
+        diskNode.getHandler().free();
+        diskDrive.add(diskNode);
+    }
+
+    /**
+     * Copies physical content of the memory into a node which is saved
+     * into the virtual memory.
+     */
+    public synchronized void pushToDisk(LogicalMemoryHandler handler) {
+        Logger.log(this, "Pushing process [" + handler.getId() + "] into disk drive.");
+        handler.setInVirtualMemory();
+        VirtualMemoryDiskNode diskNode = new VirtualMemoryDiskNode(handler);
+        diskNode.addInstructions(handler.getPhysicalInstructions());
+        handler.free();
+        diskDrive.add(diskNode);
+    }
+
+    /**
      * Inserts a required process back into the main memory
      */
     public synchronized void pullFromDisk(int requiredProcess) throws MemoryHandlerNotFoundException {
@@ -34,19 +58,6 @@ public class VirtualMemoryInterface {
             }
         }
         throw new MemoryHandlerNotFoundException(diskDrive, requiredProcess);
-    }
-
-    /**
-     * Copies physical content of the memory into a node which is saved
-     * into the virtual memory.
-     */
-    public synchronized void pushToDisk(LogicalMemoryHandler pushedHandler) {
-        Logger.log(this, "Pushing process [" + pushedHandler.getId() + "] into disk drive.");
-        pushedHandler.setInVirtualMemory();
-        VirtualMemoryDiskNode diskNode = new VirtualMemoryDiskNode(pushedHandler);
-        diskNode.addInstructions(pushedHandler.getPhysicalInstructions());
-        pushedHandler.free();
-        diskDrive.add(diskNode);
     }
 
     public void requestDiskCleanUp() {

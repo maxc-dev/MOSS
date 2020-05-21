@@ -102,8 +102,7 @@ public class ProcessorCore implements SystemClock {
                 //^ critical error if the cpu cannot decode an instruction successfully
             }
         } else {
-            //todo wrap this in a config option
-            //pcb.setProcessState(ProcessState.TERMINATED);
+            pcb.setProcessState(ProcessState.TERMINATED);
             socketPCB = null;
             coreThread.setBusy(false);
         }

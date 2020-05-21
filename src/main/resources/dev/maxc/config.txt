@@ -34,5 +34,4 @@
     cache_size_level_1=100
 
 #io config
-    disk_size_power=12
     disk_cleaner=false

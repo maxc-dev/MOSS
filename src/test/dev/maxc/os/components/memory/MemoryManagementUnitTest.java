@@ -32,7 +32,7 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, false);
-        DiskDrive diskDrive = new DiskDrive('T', 12);
+        DiskDrive diskDrive = new DiskDrive('T');
         VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
         ram.initMemoryManagementUnit(mmu);
         ram.initVirtualMemoryInterface(vmi);
@@ -63,7 +63,7 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
-        DiskDrive diskDrive = new DiskDrive('T', 12);
+        DiskDrive diskDrive = new DiskDrive('T');
         VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
         ram.initMemoryManagementUnit(mmu);
         ram.initVirtualMemoryInterface(vmi);
@@ -93,7 +93,7 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, false);
-        DiskDrive diskDrive = new DiskDrive('T', 12);
+        DiskDrive diskDrive = new DiskDrive('T');
         VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
         ram.initMemoryManagementUnit(mmu);
         ram.initVirtualMemoryInterface(vmi);
@@ -134,7 +134,7 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
-        DiskDrive diskDrive = new DiskDrive('T', 12);
+        DiskDrive diskDrive = new DiskDrive('T');
         VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
         ram.initMemoryManagementUnit(mmu);
         ram.initVirtualMemoryInterface(vmi);
@@ -174,7 +174,7 @@ class MemoryManagementUnitTest {
         RandomAccessMemory ram = getTestRAM();
         LogicalMemoryHandlerUtils utils = getTestUtils();
         MemoryManagementUnit mmu = getTestMMU(ram, utils, true);
-        DiskDrive diskDrive = new DiskDrive('T', 12);
+        DiskDrive diskDrive = new DiskDrive('T');
         VirtualMemoryInterface vmi = new VirtualMemoryInterface(mmu, diskDrive);
         ram.initMemoryManagementUnit(mmu);
         ram.initVirtualMemoryInterface(vmi);

@@ -12,6 +12,7 @@ import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
 import dev.maxc.os.io.exceptions.disk.MemoryHandlerNotFoundException;
 import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
+import dev.maxc.os.io.exceptions.memory.virtual.OutOfHandlersException;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 import dev.maxc.os.system.sync.SystemClock;
@@ -98,31 +99,28 @@ public class MemoryManagementUnit implements SystemClock {
      */
     public synchronized boolean allocateAdditionalMemory(int processIdentifier) {
         writeRequests++;
-        if (ram.getAvailableMemory() >= logicalMemoryHandlerUtils.getIncrease()) {
-            for (LogicalMemoryHandler handler : logicalHandlers) {
-                if (handler.getParentProcessID() == processIdentifier) {
-                    if (handler.isInVirtualMemory() && vmi != null) {
-                        try {
-                            vmi.pullFromDisk(processIdentifier);
-                        } catch (MemoryHandlerNotFoundException e) {
-                            Logger.log(Status.CRIT, this, "Process [" + processIdentifier + "] was lost during paging swap.");
-                            e.printStackTrace();
-                            return false;
-                        }
-                    }
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.getParentProcessID() == processIdentifier) {
+                if (handler.isInVirtualMemory() && vmi != null) {
                     try {
-                        handler.allocate(ram.indexMemory(useSegmentation ? logicalMemoryHandlerUtils.getIncrease() : logicalMemoryHandlerUtils.getInitialSize()));
-                    } catch (OutOfMemoryError er) {
-                        er.printStackTrace();
+                        vmi.pushToDisk(getLeastUsedHandler(processIdentifier));
+                        vmi.pullFromDisk(processIdentifier);
+                    } catch (MemoryHandlerNotFoundException | OutOfHandlersException e) {
+                        Logger.log(Status.CRIT, this, "Process [" + processIdentifier + "] was lost during paging swap.");
+                        e.printStackTrace();
                         return false;
                     }
-                    return true;
                 }
+                try {
+                    handler.allocate(ram.indexMemory(useSegmentation ? logicalMemoryHandlerUtils.getIncrease() : logicalMemoryHandlerUtils.getInitialSize()));
+                } catch (OutOfMemoryError er) {
+                    er.printStackTrace();
+                    return false;
+                }
+                return true;
             }
-            Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the process ID could not be linked to a memory handler.");
-        } else {
-            Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the main memory is full.");
         }
+        Logger.log(Status.ERROR, this, "Unable to allocate memory to process [" + processIdentifier + "] because the process ID could not be linked to a memory handler.");
         return false;
     }
 
@@ -137,46 +135,51 @@ public class MemoryManagementUnit implements SystemClock {
     /**
      * Finds the most appropriate handler to be sent to virtual memory.
      */
-    public synchronized LogicalMemoryHandler getLeastUsedHandler() {
-        /*
-            TODO(
-             return a list of handlers based on the size required
-             )
-         */
+    public synchronized LogicalMemoryHandler getLeastUsedHandler() throws OutOfHandlersException {
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.isInMainMemory()) {
                 return handler;
             }
         }
         Logger.log(Status.WARN, this, "Could not find a handler to sent to virtual memory.");
-        return null;
+        throw new OutOfHandlersException();
     }
 
-    public synchronized int getNextUnitOffset(int processIdentifier) {/*
-            TODO(
-             A stackoverflow is sometimes called when the memory
-             is full but it keeps trying to find a new offset.
-             Possibly throwing/catching an axception in the
-             allocation of a additional memory may solve this
-             )
-         */
+    /**
+     * Finds the most appropriate handler to be sent to virtual memory.
+     */
+    public synchronized LogicalMemoryHandler getLeastUsedHandler(int ignoreProcess) throws OutOfHandlersException {
+        for (LogicalMemoryHandler handler : logicalHandlers) {
+            if (handler.isInMainMemory() && ignoreProcess != handler.getId()) {
+                return handler;
+            }
+        }
+        Logger.log(Status.WARN, this, "Could not find a handler to sent to virtual memory.");
+        throw new OutOfHandlersException();
+    }
+
+    public synchronized int getNextUnitOffset(int processIdentifier) {
         readRequests++;
         //search the logical handlers in the ram
         for (LogicalMemoryHandler handler : logicalHandlers) {
             if (handler.getParentProcessID() == processIdentifier) {
                 if (handler.isInVirtualMemory() && vmi != null) {
                     try {
+                        vmi.pushToDisk(getLeastUsedHandler(processIdentifier));
                         vmi.pullFromDisk(processIdentifier);
                     } catch (MemoryHandlerNotFoundException e) {
                         Logger.log(Status.CRIT, this, "Process [" + processIdentifier + "] was lost during paging swap.");
+                        e.printStackTrace();
+                    } catch (OutOfHandlersException e) {
                         e.printStackTrace();
                     }
                 }
                 try {
                     return handler.getNextUnitOffset();
                 } catch (MemoryLogicalHandlerFullException e) {
-                    allocateAdditionalMemory(processIdentifier);
-                    return getNextUnitOffset(processIdentifier);
+                    if (allocateAdditionalMemory(processIdentifier)) {
+                        return getNextUnitOffset(processIdentifier);
+                    }
                 }
             }
         }

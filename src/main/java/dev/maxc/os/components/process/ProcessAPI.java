@@ -30,8 +30,8 @@ public class ProcessAPI {
      */
     public Process getNewProcess(int parentProcessIdentifier) {
         Process process = new Process(new ProcessControlBlock(processCount.addAndGet(1), parentProcessIdentifier, this), this);
-        //threadAPI.addNewThreadToProcess(process);
-        Logger.log(this, "Initialised new process: " + process.toString());
+        threadAPI.addNewThreadToProcess(process);
+        Logger.log(this, "Initialised new process [" + process.toString() + "]");
         mmu.allocateMemory(process.getProcessControlBlock().getProcessID());
         return process;
     }
