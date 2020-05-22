@@ -5,6 +5,7 @@ import dev.maxc.os.components.memory.indexer.MemoryAllocationIndexer;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryAddress;
 import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
+import dev.maxc.os.io.exceptions.memory.InvalidIndexSizeError;
 import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
@@ -91,7 +92,10 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * The returned address set is used to mark all the corresponding memory
      * units as active.
      */
-    public AddressPointerSet indexMemory(int size) throws OutOfMemoryError {
+    public AddressPointerSet indexMemory(int size) throws OutOfMemoryError, InvalidIndexSizeError {
+        if (size < 1 || size > getMemorySize()) {
+            throw new InvalidIndexSizeError(size);
+        }
         return mallocIndexer.getIndexedAddressSlot(size);
     }
 }

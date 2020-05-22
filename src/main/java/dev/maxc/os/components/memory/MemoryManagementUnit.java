@@ -10,6 +10,7 @@ import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.virtual.VirtualMemoryDiskNode;
 import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
 import dev.maxc.os.io.exceptions.disk.MemoryHandlerNotFoundException;
+import dev.maxc.os.io.exceptions.memory.InvalidIndexSizeError;
 import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;
 import dev.maxc.os.io.exceptions.memory.MemoryUnitNotFoundException;
 import dev.maxc.os.io.exceptions.memory.virtual.OutOfHandlersException;
@@ -80,7 +81,7 @@ public class MemoryManagementUnit implements SystemClock {
             }
             try {
                 allocator.allocate(ram.indexMemory(logicalMemoryHandlerUtils.getInitialSize()));
-            } catch (OutOfMemoryError er) {
+            } catch (OutOfMemoryError | InvalidIndexSizeError er) {
                 er.printStackTrace();
                 return false;
             }
@@ -113,7 +114,7 @@ public class MemoryManagementUnit implements SystemClock {
                 }
                 try {
                     handler.allocate(ram.indexMemory(useSegmentation ? logicalMemoryHandlerUtils.getIncrease() : logicalMemoryHandlerUtils.getInitialSize()));
-                } catch (OutOfMemoryError er) {
+                } catch (OutOfMemoryError | InvalidIndexSizeError er) {
                     er.printStackTrace();
                     return false;
                 }
@@ -125,10 +126,17 @@ public class MemoryManagementUnit implements SystemClock {
     }
 
     public synchronized void allocateMemoryHandler(VirtualMemoryDiskNode diskNode) {
+        int allocationSize = diskNode.getInstructions().size();
+        if (allocationSize < logicalMemoryHandlerUtils.getInitialSize()) {
+            allocationSize = logicalMemoryHandlerUtils.getInitialSize();
+        }
         try {
-            diskNode.getHandler().allocate(ram.indexMemory(diskNode.getInstructions().size()));
+            diskNode.getHandler().allocate(ram.indexMemory(allocationSize));
         } catch (OutOfMemoryError er) {
             er.printStackTrace();
+        } catch (InvalidIndexSizeError ex) {
+            Logger.log(Status.CRIT, this, "Unable to pull process from disk, check stack trace for more details.");
+            ex.printStackTrace();
         }
     }
 

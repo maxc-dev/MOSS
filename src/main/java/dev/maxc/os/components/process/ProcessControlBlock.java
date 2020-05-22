@@ -18,7 +18,6 @@ public class ProcessControlBlock {
     private final ProgramCounter programCounter = new ProgramCounter();
     private final ProcessAPI processAPI;
     private final Date processStartTime;
-    private Date processEndTime;
 
     public ProcessControlBlock(int processIdentifier, int parentProcessIdentifier, ProcessAPI processAPI) {
         this.processIdentifier = processIdentifier;
@@ -47,11 +46,18 @@ public class ProcessControlBlock {
         return processState;
     }
 
+    /**
+     * Sets the state of the process.
+     *
+     * If the state is set to TERMINATED, the Process API is
+     * called and it will attempt to clear the memory that the
+     * process is using if the setting is enabled in the config.
+     */
     public void setProcessState(ProcessState processState) {
         if (this.processState != processState) {
             this.processState = processState;
             if (processState == ProcessState.TERMINATED) {
-                processEndTime = Calendar.getInstance().getTime();
+                Date processEndTime = Calendar.getInstance().getTime();
                 long diffInMillies = processEndTime.getTime() - processStartTime.getTime();
                 Logger.log(this, "Process [" + processIdentifier + "] terminated. Alive time: [" + TimeUnit.MILLISECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS) + "ms]");
                 processAPI.exitProcess(processIdentifier);
