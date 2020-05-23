@@ -1,5 +1,6 @@
 package dev.maxc.os.components.memory.indexer;
 
+import dev.maxc.os.io.exceptions.memory.InvalidIndexSizeError;
 import org.junit.jupiter.api.Test;
 
 import dev.maxc.os.components.memory.RandomAccessMemory;
@@ -18,5 +19,23 @@ public class FirstFitTest {
         AddressPointerSet address = ram.indexMemory(40);
         assertEquals(0, address.getStartPointer());
         assertEquals(39, address.getEndPointer());
+    }
+
+    @Test
+    public void testInvalidNegativeIndexAddressSlot() {
+        RandomAccessMemory ram = getTestRam();
+        assertThrows(InvalidIndexSizeError.class, () -> ram.indexMemory(-1));
+    }
+
+    @Test
+    public void testInvalidZeroIndexAddressSlot() {
+        RandomAccessMemory ram = getTestRam();
+        assertThrows(InvalidIndexSizeError.class, () -> ram.indexMemory(0));
+    }
+
+    @Test
+    public void testInvalidExceedIndexAddressSlot() {
+        RandomAccessMemory ram = getTestRam();
+        assertThrows(InvalidIndexSizeError.class, () -> ram.indexMemory(99999999));
     }
 }
