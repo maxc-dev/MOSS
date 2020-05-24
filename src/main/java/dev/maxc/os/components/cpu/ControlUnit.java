@@ -38,15 +38,17 @@ public class ControlUnit implements HardwareClockTick {
     /**
      * Writes a PCB to an available core's PCB socket.
      */
-    public boolean writeCoreSocket(ProcessControlBlock pcb) {
+    public synchronized boolean writeCoreSocket(ProcessControlBlock pcb) {
         for (int i = 0; i < cores.length; i++) {
             if (lastCoreIndexed >= cores.length) {
                 lastCoreIndexed = 0;
             }
             if (cores[lastCoreIndexed].isAvailable()) {
-                cores[lastCoreIndexed].writePCBSocket(pcb);
-                lastCoreIndexed++;
-                return true;
+                if (cores[lastCoreIndexed].writePCBSocket(pcb)) {
+                    lastCoreIndexed++;
+                    return true;
+                }
+                return false;
             }
             lastCoreIndexed++;
         }
@@ -54,7 +56,7 @@ public class ControlUnit implements HardwareClockTick {
     }
 
     @Override
-    public void onClockTick() {
+    public synchronized void onClockTick() {
         //if the ready queue is not empty, it will find a core to execute the next job.
         while (readyQueue.hasNext()) {
             ProcessControlBlock pcb = readyQueue.get();

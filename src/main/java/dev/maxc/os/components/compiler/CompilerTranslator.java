@@ -129,21 +129,13 @@ public class CompilerTranslator {
         Operand afterInt = splitOperandList(after);
         Operand beforeInt = splitOperandList(before);
 
-        Opcode code = null;
-        switch (operator) {
-            case "*":
-                code = Opcode.MUL;
-                break;
-            case "/":
-                code = Opcode.DIV;
-                break;
-            case "+":
-                code = Opcode.ADD;
-                break;
-            case "-":
-                code = Opcode.SUB;
-                break;
-        }
+        Opcode code = switch (operator) {
+            case "*" -> Opcode.MUL;
+            case "/" -> Opcode.DIV;
+            case "+" -> Opcode.ADD;
+            case "-" -> Opcode.SUB;
+            default -> null;
+        };
 
         //gets the next available address in memory
         int address = submitInstruction(new Instruction(code, beforeInt, afterInt));

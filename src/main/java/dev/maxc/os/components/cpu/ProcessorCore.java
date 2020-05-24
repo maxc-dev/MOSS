@@ -134,27 +134,19 @@ public class ProcessorCore implements SystemClock {
     /**
      * Performs the execution of the instruction with two operands
      */
-    private synchronized void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int val1, int val2, MemoryUnit unit) throws UnknownOpcodeException, MutatingLockedUnitException {
+    private synchronized void executeInstruction(ProcessControlBlock pcb, Opcode opcode, int operand1, int operand2, MemoryUnit unit) throws UnknownOpcodeException, MutatingLockedUnitException {
         ticks++;
-        int val3;
-        switch (opcode) {
-            case MUL:
-                val3 = val1 * val2;
-                break;
-            case DIV:
-                val3 = val1 / val2;
-                break;
-            case ADD:
-                val3 = val1 + val2;
-                break;
-            case SUB:
-                val3 = val1 - val2;
-                break;
-            default:
+        int result = switch (opcode) {
+            case MUL -> operand1 * operand2;
+            case DIV -> operand1 / operand2;
+            case ADD -> operand1 + operand2;
+            case SUB -> operand1 - operand2;
+            default -> {
                 Logger.log(Status.CRIT, this, "Opcode not recognised [" + opcode.toString() + "] for process [" + pcb.getProcessID() + "]");
                 throw new UnknownOpcodeException(opcode.toString());
-        }
-        saveExecution(pcb, unit, val3);
+            }
+        };
+        saveExecution(pcb, unit, result);
     }
 
     /**
