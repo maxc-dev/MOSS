@@ -12,7 +12,8 @@ import dev.maxc.os.system.api.SystemAPITest;
 import dev.maxc.os.system.api.SystemSetup;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VirtualMemoryTest {
 

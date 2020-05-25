@@ -1,5 +1,12 @@
 package dev.maxc.os.bootup.config;
 
+import dev.maxc.App;
+import dev.maxc.os.bootup.DynamicComponentLoader;
+import dev.maxc.os.io.log.Logger;
+import dev.maxc.os.io.log.Status;
+import dev.maxc.os.system.api.SystemAPI;
+import dev.maxc.os.system.api.SystemUtils;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -8,13 +15,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import dev.maxc.App;
-import dev.maxc.os.io.log.Logger;
-import dev.maxc.os.bootup.DynamicComponentLoader;
-import dev.maxc.os.io.log.Status;
-import dev.maxc.os.system.api.SystemAPI;
-import dev.maxc.os.system.api.SystemUtils;
 
 /**
  * @author Max Carter

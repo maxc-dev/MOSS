@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author Max Carter
- * @since  10/04/2020
+ * @since 10/04/2020
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
@@ -17,8 +17,11 @@ public @interface Configurable {
     int NO_NUMBER_CONSTRAINT = -999999999;
 
     String value() default FIELD_MATCHES_CONFIG_VAR;
+
     String docs() default NO_DOCUMENTATION;
+
     int min() default NO_NUMBER_CONSTRAINT;
+
     int max() default NO_NUMBER_CONSTRAINT;
 
     /*

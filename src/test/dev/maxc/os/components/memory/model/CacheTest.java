@@ -13,7 +13,7 @@ import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CacheTest {
     public LogicalMemoryHandlerUtils getTestUtils() {

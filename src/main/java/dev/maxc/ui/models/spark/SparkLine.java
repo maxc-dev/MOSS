@@ -147,7 +147,7 @@ public class SparkLine extends Line {
         }
 
         //out of bounds
-        if (Math.abs(getEndX()) >= (double) UiUtils.WIDTH / 2 || Math.abs(getEndY()) >= (double) UiUtils.HEIGHT / 2 || getChainLength() >= maxChainLength) {
+        if (Math.abs(getEndX()) >= UiUtils.WIDTH / 2 || Math.abs(getEndY()) >= UiUtils.HEIGHT / 2 || getChainLength() >= maxChainLength) {
             if (previous != null) {
                 //tells all the other nodes to retreat
                 previous.traverse();

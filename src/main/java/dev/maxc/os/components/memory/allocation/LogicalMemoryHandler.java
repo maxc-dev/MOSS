@@ -25,6 +25,7 @@ public abstract class LogicalMemoryHandler {
     public boolean isInMainMemory() {
         return isInMainMemory;
     }
+
     public boolean isInVirtualMemory() {
         return !isInMainMemory;
     }

@@ -10,7 +10,7 @@ import dev.maxc.os.system.sync.HardwareClockTick;
  * @since 02/05/2020
  */
 public class AdmissionScheduler implements HardwareClockTick {
-    private volatile MutableQueue<ProcessControlBlock> waitingQueue = new MutableQueue<>();
+    private final MutableQueue<ProcessControlBlock> waitingQueue = new MutableQueue<>();
     private final CPUScheduler cpuScheduler;
 
     public AdmissionScheduler(CPUScheduler cpuScheduler) {

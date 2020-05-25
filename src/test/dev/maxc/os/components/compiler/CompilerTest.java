@@ -15,7 +15,6 @@ import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.components.scheduler.CPUScheduler;
 import dev.maxc.os.components.scheduler.disciplines.FirstInFirstOut;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
-import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.structures.Queue;
 import org.junit.jupiter.api.Test;
 

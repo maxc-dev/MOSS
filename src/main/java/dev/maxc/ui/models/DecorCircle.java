@@ -31,8 +31,8 @@ public class DecorCircle extends Circle {
         super(SystemUtils.randomInt(RADIUS_MIN, RADIUS_MAX));
         this.counter = counter;
 
-        xOffset = OFFSET_X_BASE + (double) SystemUtils.randomInt(0, OFFSET_X)/10;
-        yOffset = OFFSET_Y_BASE + (double) SystemUtils.randomInt(0, OFFSET_Y)/10;
+        xOffset = OFFSET_X_BASE + (double) SystemUtils.randomInt(0, OFFSET_X) / 10;
+        yOffset = OFFSET_Y_BASE + (double) SystemUtils.randomInt(0, OFFSET_Y) / 10;
 
         setFill(ColorUtils.PRIMARY_ACCENT);
         DropShadow shadow = new DropShadow();
@@ -46,11 +46,11 @@ public class DecorCircle extends Circle {
      * translates the position of the node
      */
     public void translate() {
-        counter+=0.01;
+        counter += 0.01;
         if (counter >= 360) {
             counter = 0;
         }
-        setLayoutX(xOffset*Math.sin(Math.toRadians(counter))*((double) UiUtils.WIDTH/3) + (double) UiUtils.WIDTH/2);
-        setLayoutY(yOffset*Math.cos(Math.toRadians(counter))*(UiUtils.HEIGHT) + (double) UiUtils.HEIGHT/2);
+        setLayoutX(xOffset * Math.sin(Math.toRadians(counter)) * (UiUtils.WIDTH / 3) + UiUtils.WIDTH / 2);
+        setLayoutY(yOffset * Math.cos(Math.toRadians(counter)) * (UiUtils.HEIGHT) + UiUtils.HEIGHT / 2);
     }
 }

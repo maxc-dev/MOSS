@@ -5,7 +5,7 @@ import dev.maxc.os.structures.MutableQueue;
 import dev.maxc.os.structures.Queue;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ShortestJobFirstTest {
 

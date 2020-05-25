@@ -1,9 +1,9 @@
 package dev.maxc.os.components.memory.allocation;
 
 import dev.maxc.os.components.instruction.Instruction;
+import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.components.memory.model.AddressPointerSet;
 import dev.maxc.os.components.memory.model.MemoryUnit;
-import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
 import dev.maxc.os.io.exceptions.memory.MemoryLogicalHandlerFullException;

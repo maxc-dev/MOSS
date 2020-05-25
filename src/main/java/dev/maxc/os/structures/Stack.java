@@ -20,6 +20,7 @@ public class Stack<T> {
 
     /**
      * Returns the top of the stack.
+     *
      * @return Returns null if the stack is empty
      */
     public T pop() {

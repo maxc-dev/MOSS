@@ -16,7 +16,7 @@ public class HardwareClockTickEmitter {
             while (emit) {
                 emit();
                 try {
-                    Thread.sleep(1000/frequency);
+                    Thread.sleep(1000 / frequency);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

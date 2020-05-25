@@ -33,7 +33,7 @@ public class RotatablePane extends Pane implements Rotatable, Spinnable {
     @Override
     public void spin() {
         if (!hovered) {
-            getRotation().setAngle(getRotation().getAngle() + increment * (1.4+Math.sin(225+Math.toRadians(getRotation().getAngle()))));
+            getRotation().setAngle(getRotation().getAngle() + increment * (1.4 + Math.sin(225 + Math.toRadians(getRotation().getAngle()))));
         }
     }
 }

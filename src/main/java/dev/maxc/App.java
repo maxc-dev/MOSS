@@ -1,8 +1,8 @@
 package dev.maxc;
 
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.system.api.SystemAPI;
 import dev.maxc.os.system.api.SystemUtils;
-import dev.maxc.os.io.log.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

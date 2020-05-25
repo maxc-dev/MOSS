@@ -14,7 +14,7 @@ import javafx.scene.text.Text;
  * @since 11/04/2020
  */
 public class FloatingText extends Pane {
-    private volatile Text text;
+    private final Text text;
 
     /**
      * Creates a new text box in a pane hat floats in an offset.

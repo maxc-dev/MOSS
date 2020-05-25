@@ -16,7 +16,7 @@ import dev.maxc.ui.anchors.TaskManagerController;
 public class ControlUnit implements HardwareClockTick {
     private final ProcessorCore[] cores;
     private int lastCoreIndexed = 0;
-    private volatile Queue<ProcessControlBlock> readyQueue;
+    private final Queue<ProcessControlBlock> readyQueue;
 
     public ControlUnit(int coreCount, Queue<ProcessControlBlock> readyQueue, MemoryManagementUnit mmu) {
         this.readyQueue = readyQueue;

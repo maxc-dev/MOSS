@@ -7,21 +7,22 @@
 package dev.maxc.os.system.api;
 
 import dev.maxc.os.bootup.DynamicComponentLoader;
+import dev.maxc.os.bootup.config.Configurable;
 import dev.maxc.os.components.compiler.CompilerAPI;
 import dev.maxc.os.components.cpu.ControlUnit;
 import dev.maxc.os.components.cpu.ProcessorCore;
 import dev.maxc.os.components.disk.DiskDrive;
+import dev.maxc.os.components.memory.MemoryManagementUnit;
+import dev.maxc.os.components.memory.RandomAccessMemory;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
+import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
+import dev.maxc.os.components.process.ProcessAPI;
 import dev.maxc.os.components.process.ProcessControlBlock;
+import dev.maxc.os.components.process.thread.ThreadAPI;
 import dev.maxc.os.components.scheduler.AdmissionScheduler;
 import dev.maxc.os.components.scheduler.CPUScheduler;
 import dev.maxc.os.components.scheduler.disciplines.FirstInFirstOut;
-import dev.maxc.os.bootup.config.Configurable;
-import dev.maxc.os.components.memory.*;
-import dev.maxc.os.components.memory.indexer.FirstFit;
-import dev.maxc.os.components.process.ProcessAPI;
-import dev.maxc.os.components.process.thread.ThreadAPI;
 import dev.maxc.os.components.scheduler.disciplines.ShortestJobFirst;
 import dev.maxc.os.structures.Queue;
 import dev.maxc.os.system.sync.HardwareClockTickEmitter;
@@ -86,13 +87,8 @@ public class SystemAPI {
     @Configurable(value = "cache_size_level_1", docs = "The amount of memory that the cache can store.", min = 0, max = 1024, recommended = 24)
     public int CACHE_SIZE;
 
-    //io config
-    @Configurable(docs = "Performs checks on the disk drive to ensure that any terminated processes are cleared.")
-    public boolean DISK_CLEANER;
-
     public static UserInterfaceAPI uiAPI = new UserInterfaceAPI();
-
-    private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
+    private final Queue<ProcessControlBlock> readyQueue = new Queue<>();
     public volatile AdmissionScheduler longTermScheduler;
     public MemoryManagementUnit memoryAPI;
     public ThreadAPI threadAPI;

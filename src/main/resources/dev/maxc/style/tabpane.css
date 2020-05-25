@@ -3,8 +3,8 @@
 }
 
 .tab-pane {
-    -fx-tab-min-width:80px;
-    -fx-tab-min-height:40px;
+    -fx-tab-min-width: 80px;
+    -fx-tab-min-height: 40px;
 }
 
 .tab-pane .tab {
@@ -30,5 +30,5 @@
 }
 
 .tab {
-    -fx-background-insets: 0 3 0 3,0,0;
+    -fx-background-insets: 0 3 0 3, 0, 0;
 }

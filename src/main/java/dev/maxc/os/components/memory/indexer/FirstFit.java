@@ -35,7 +35,7 @@ public class FirstFit extends MemoryAllocationIndexer {
                     //the whole section is clear
                     return new AddressPointerSet(startPointer, endPointer);
                 }
-            } else if (i + size -1 < ramSize) {
+            } else if (i + size - 1 < ramSize) {
                 if (!getRam().get(i + size - 1).getMemoryUnit().isAllocated() && !getRam().get(i).getMemoryUnit().isAllocated()) {
                     startPointer = i;
                     endPointer = i + size - 1;

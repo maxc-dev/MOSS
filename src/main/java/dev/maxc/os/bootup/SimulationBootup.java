@@ -1,11 +1,12 @@
 package dev.maxc.os.bootup;
 
+import dev.maxc.os.bootup.config.ConfigurationReader;
+import dev.maxc.os.io.log.Logger;
+import dev.maxc.os.system.api.SystemAPI;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.maxc.os.bootup.config.ConfigurationReader;
-import dev.maxc.os.system.api.SystemAPI;
-import dev.maxc.os.io.log.Logger;
 /**
  * @author Max Carter
  * @since 10/04/2020

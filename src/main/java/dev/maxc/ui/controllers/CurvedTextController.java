@@ -37,7 +37,8 @@ public class CurvedTextController {
         }
     }
 
-    public void updateText(String text) {text = text.toUpperCase();
+    public void updateText(String text) {
+        text = text.toUpperCase();
         chars = new Text[text.length()];
         for (int i = 0; i < chars.length; i++) {
             chars[i] = new Text(text.charAt(i) + "");

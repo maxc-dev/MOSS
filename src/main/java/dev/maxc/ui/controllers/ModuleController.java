@@ -8,12 +8,11 @@ import dev.maxc.ui.util.ColorUtils;
 import javafx.scene.transform.Rotate;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Calendar;
 
 /**
  * @author Max Carter
- * @since  11/04/2020
+ * @since 11/04/2020
  */
 public class ModuleController {
     /*
@@ -23,7 +22,7 @@ public class ModuleController {
         It now acts purely as a cosmetic flex of the hours I spent using
         trigonometry to get those things to spins...
      */
-    public static final String[] MODULE_TITLES = new String[]{ "Version 1", new SimpleDateFormat("dd/MM/yy").format(Calendar.getInstance().getTime()),"" };
+    public static final String[] MODULE_TITLES = new String[]{"Version 1", new SimpleDateFormat("dd/MM/yy").format(Calendar.getInstance().getTime()), ""};
 
     private RotatablePane[] rotatablePanes;
 

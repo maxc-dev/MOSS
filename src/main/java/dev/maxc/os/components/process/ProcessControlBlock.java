@@ -48,7 +48,7 @@ public class ProcessControlBlock {
 
     /**
      * Sets the state of the process.
-     *
+     * <p>
      * If the state is set to TERMINATED, the Process API is
      * called and it will attempt to clear the memory that the
      * process is using if the setting is enabled in the config.

@@ -8,5 +8,6 @@ import javafx.scene.transform.Rotate;
  */
 public interface Rotatable {
     Rotate getRotation();
+
     void setRotation(Rotate rotation);
 }

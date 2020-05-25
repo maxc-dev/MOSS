@@ -5,7 +5,6 @@ import dev.maxc.os.components.cpu.ControlUnit;
 import dev.maxc.os.components.disk.DiskDrive;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.memory.RandomAccessMemory;
-import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.indexer.FirstFit;
 import dev.maxc.os.components.memory.virtual.VirtualMemoryInterface;
 import dev.maxc.os.components.process.ProcessAPI;
@@ -19,7 +18,7 @@ import dev.maxc.os.structures.Queue;
 import dev.maxc.os.system.sync.HardwareClockTickEmitter;
 
 public class SystemAPITest {
-    private volatile Queue<ProcessControlBlock> readyQueue = new Queue<>();
+    private final Queue<ProcessControlBlock> readyQueue = new Queue<>();
     public volatile AdmissionScheduler longTermScheduler;
     public RandomAccessMemory ram;
     public MemoryManagementUnit memoryAPI;

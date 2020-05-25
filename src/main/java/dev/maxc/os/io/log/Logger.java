@@ -9,7 +9,7 @@ import java.util.Calendar;
 
 /**
  * @author Max Carter
- * @since  10/04/2020
+ * @since 10/04/2020
  */
 public class Logger {
     private static final String LOG_FORMAT = "[%s] %s";

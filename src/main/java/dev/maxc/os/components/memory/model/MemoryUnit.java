@@ -1,9 +1,9 @@
 package dev.maxc.os.components.memory.model;
 
 import dev.maxc.os.components.instruction.Instruction;
-import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.exceptions.deadlock.AccessingLockedUnitException;
 import dev.maxc.os.io.exceptions.deadlock.MutatingLockedUnitException;
+import dev.maxc.os.io.log.Logger;
 import dev.maxc.os.io.log.Status;
 
 /**

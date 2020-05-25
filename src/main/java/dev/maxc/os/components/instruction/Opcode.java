@@ -12,7 +12,7 @@ public enum Opcode {
     MUL(true),         //MUL 2 3 will store 2 * 3
     DIV(true);         //DIV 2 3 will store 2 / 3
 
-    private boolean secondOperand;
+    private final boolean secondOperand;
 
     public boolean needsSecondOperand() {
         return secondOperand;

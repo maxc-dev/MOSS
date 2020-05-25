@@ -12,7 +12,7 @@ public class SystemClockPulse {
     private final ArrayList<SystemClock> clockTickListeners = new ArrayList<>();
     private final Thread systemTickThread;
     private boolean emit = true;
-    private TaskManagerController taskManagerController;
+    private final TaskManagerController taskManagerController;
 
     public SystemClockPulse(TaskManagerController taskManagerController) {
         this.taskManagerController = taskManagerController;

@@ -6,28 +6,30 @@ package dev.maxc.os.system.api;
     affect the system, those that do are in SystemAPI.
  */
 
-import java.util.Random;
-
 import dev.maxc.os.io.log.Logger;
 import javafx.application.Platform;
 
+import java.util.Random;
+
 /**
  * @author Max Carter
- * @since  10/04/2020
+ * @since 10/04/2020
  */
 public class SystemUtils {
     /**
      * Returns a random number between two numbers.
+     *
      * @param min minimum
      * @param max maximum
      * @return random number
      */
     public static int randomInt(int min, int max) {
-        return new Random().nextInt((max-min)+1)+min;
+        return new Random().nextInt((max - min) + 1) + min;
     }
 
     /**
      * Returns true on a chance
+     *
      * @param chance chance out of 100
      */
     public static boolean chance(int chance) {

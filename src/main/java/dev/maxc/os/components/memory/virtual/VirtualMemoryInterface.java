@@ -60,7 +60,10 @@ public class VirtualMemoryInterface {
         throw new MemoryHandlerNotFoundException(diskDrive, requiredProcess);
     }
 
-    public void requestDiskCleanUp() {
-        diskDrive.clean();
+    /**
+     * Requests the disk clean out a terminated process.
+     */
+    public void requestDiskCleanUp(int processIdentifier) {
+        diskDrive.clean(processIdentifier);
     }
 }

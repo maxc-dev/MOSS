@@ -7,14 +7,14 @@ import dev.maxc.os.io.log.Logger;
  * @since 07/05/2020
  */
 public class CoreThread extends Thread {
-    private volatile ProcessorCore core;
+    private final ProcessorCore core;
     private final int delay;
     protected volatile boolean busy = false;
 
     public CoreThread(ProcessorCore core, int frequency) {
         Logger.log(this, "Processor Core Thread initialised, operating @" + frequency + "hz, awaiting instructions.");
         this.core = core;
-        this.delay = 1000/frequency;
+        this.delay = 1000 / frequency;
     }
 
     @Override

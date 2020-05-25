@@ -11,15 +11,12 @@ import dev.maxc.ui.models.FloatingText;
 import dev.maxc.ui.models.RingLines;
 import dev.maxc.ui.util.ColorUtils;
 import dev.maxc.ui.util.UiUtils;
-
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;

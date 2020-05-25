@@ -1,10 +1,10 @@
 package dev.maxc.os.components.memory;
 
-import dev.maxc.os.components.memory.model.Cache;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandler;
 import dev.maxc.os.components.memory.allocation.LogicalMemoryHandlerUtils;
 import dev.maxc.os.components.memory.allocation.Paging;
 import dev.maxc.os.components.memory.allocation.Segmentation;
+import dev.maxc.os.components.memory.model.Cache;
 import dev.maxc.os.components.memory.model.CacheMemoryNode;
 import dev.maxc.os.components.memory.model.MemoryUnit;
 import dev.maxc.os.components.memory.virtual.VirtualMemoryDiskNode;
@@ -33,7 +33,7 @@ public class MemoryManagementUnit implements SystemClock {
     private final LogicalMemoryHandlerUtils logicalMemoryHandlerUtils;
     private VirtualMemoryInterface vmi = null;
     private final AtomicInteger logicalHandlerCount = new AtomicInteger(-1);
-    private volatile Cache translationLookasideBuffer;
+    private final Cache translationLookasideBuffer;
     private volatile int readRequests = 0;
     private volatile int writeRequests = 0;
 
@@ -243,7 +243,7 @@ public class MemoryManagementUnit implements SystemClock {
         for (int i = 0; i < logicalHandlers.size(); i++) {
             if (logicalHandlers.get(i).getParentProcessID() == processIdentifier) {
                 if (logicalHandlers.get(i).isInVirtualMemory()) {
-                    vmi.requestDiskCleanUp();
+                    vmi.requestDiskCleanUp(processIdentifier);
                 }
                 logicalHandlers.get(i).free();
                 logicalHandlers.remove(i);

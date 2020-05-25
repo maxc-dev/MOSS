@@ -1,8 +1,8 @@
 package dev.maxc.os.components.compiler;
 
 import dev.maxc.App;
-import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.compiler.model.Variable;
+import dev.maxc.os.components.instruction.Operand;
 import dev.maxc.os.components.memory.MemoryManagementUnit;
 import dev.maxc.os.components.process.Process;
 import dev.maxc.os.components.process.ProcessAPI;

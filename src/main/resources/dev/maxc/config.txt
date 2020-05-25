@@ -32,6 +32,3 @@
     #cache memory config
     #set the values to any negative number if you don't want that level of cache.
     cache_size_level_1=100
-
-#io config
-    disk_cleaner=false

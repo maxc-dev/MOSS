@@ -32,11 +32,11 @@ public class CoreRing extends Circle {
      * Glows the core
      */
     public void glow() {
-        counter+=0.5;
+        counter += 0.5;
         if (counter == 360) {
             counter = 0;
         }
-        setRadius(RADIUS_MIN + RADIUS_EXPANSION*(1+Math.sin(Math.toRadians(counter))));
-        shadow.setRadius(SHADOW_MIN + SHADOW_EXPANSION*(1+Math.sin(Math.toRadians(counter))));
+        setRadius(RADIUS_MIN + RADIUS_EXPANSION * (1 + Math.sin(Math.toRadians(counter))));
+        shadow.setRadius(SHADOW_MIN + SHADOW_EXPANSION * (1 + Math.sin(Math.toRadians(counter))));
     }
 }

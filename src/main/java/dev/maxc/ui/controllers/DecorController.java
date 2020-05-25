@@ -10,18 +10,19 @@ import javafx.util.Duration;
 
 public class DecorController {
     public static final double UPDATE_DECOR = 0.01;
-    public static final int CIRCLE_COUNT = (int) UiUtils.RESOLUTION/35000;
+    public static final int CIRCLE_COUNT = (int) UiUtils.RESOLUTION / 35000;
 
     private static DecorCircle[] decorCircles;
 
     /**
      * Creates the controller for the decor circles
+     *
      * @param anchorPane background to add the decor to
      */
     public DecorController(AnchorPane anchorPane) {
         decorCircles = new DecorCircle[CIRCLE_COUNT];
         for (int i = 0; i < decorCircles.length; i++) {
-            decorCircles[i] = new DecorCircle((double) (i*360)/decorCircles.length);
+            decorCircles[i] = new DecorCircle((double) (i * 360) / decorCircles.length);
             decorCircles[i].toFront();
         }
         anchorPane.getChildren().addAll(decorCircles);

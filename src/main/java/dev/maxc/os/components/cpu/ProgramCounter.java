@@ -9,6 +9,7 @@ import dev.maxc.os.structures.Queue;
 public class ProgramCounter extends Queue<Integer> {
     /**
      * Gets the next instruction address.
+     *
      * @return Returns null if the queue is empty.
      */
     public Integer getNextInstructionLocation() {

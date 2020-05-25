@@ -88,7 +88,7 @@ public class RandomAccessMemory extends ArrayList<MemoryAddress> {
      * Uses the Memory Allocation Indexer to allocate a space in the memory to store
      * the process. A start pointer and an end pointer are returned and are used to
      * identify which parts of the memory will be allocated to the process.
-     *
+     * <p>
      * The returned address set is used to mark all the corresponding memory
      * units as active.
      */
