@@ -1,8 +1,15 @@
 #system config
+    #it is recommended to keep the frequency at 1000, lowering it
+    #may expose the os to concurrency issues - LOWER AT OWN RISK.
     clock_tick_frequency=1000
 
 #cpu config
     cpu_cores=4
+
+    #it is recommended to keep the frequency at 1000, lowering it
+    #may expose the os to concurrency issues - LOWER AT OWN RISK.
+    #it is also recommended that the cpu frequency matches the
+    #clock tick frequency.
     cpu_core_frequency=1000
 
 #scheduler config
