@@ -4,7 +4,9 @@ An Operating System Simulator, demonstrating how an operating system manages sch
 
 ## GUI
 
-![GUI GIF Preview](https://imgur.com/a/6cnEmEs)
+![GUI Preview](https://imgur.com/h8xM0QL.jpg)
+
+[Animated GUI Preview](https://imgur.com/6cnEmEs.gif)
 
 The MOSS GUI is inspired by generic J.A.R.V.I.S static concepts, except the animations bring it to life as the OS user interface.  
 
